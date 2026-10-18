@@ -1,4 +1,12 @@
 export function safeHttps(value){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password?u.href:null;}catch{return null;}}
+export function articleLink(place){
+ const safe=safeHttps(place.articleUrl);if(!safe)return null;
+ const url=new URL(safe);
+ // CacheTide's current Valaxy client applies encodeURI to already encoded slugs.
+ // Match its published canonical/client routes without changing exchanged data.
+ if(url.origin==='https://cachetide.top'&&/^\/posts\/[^/]+\/?$/.test(url.pathname)&&/%[0-9a-f]{2}/i.test(url.pathname)&&!/%25[0-9a-f]{2}/i.test(url.pathname))url.pathname=encodeURI(url.pathname);
+ return url.href;
+}
 const categories={'小吃':'Snacks','面馆':'Noodles','甜品':'Dessert','咖啡':'Coffee','正餐':'Dining','烧烤':'Barbecue','火锅':'Hot pot','餐厅':'Dining','美食':'Food','饮品':'Drinks','甜品店':'Dessert','咖啡店':'Coffee'};
 export function categoryLabel(value){return categories[value]||(/^[\x20-\x7e]{1,40}$/.test(String(value))?String(value):'Food');}
 export function normalizeFeed(data){if(!data||data.schemaVersion!==1||!Array.isArray(data.spots)||data.spots.length>5000)throw new Error('Invalid public venue collection');return data.spots.filter(p=>p&&typeof p.name==='string'&&typeof p.city==='string'&&(p.coordinateSystem??data.coordinateSystem)==='GCJ-02'&&Number.isFinite(p.lng)&&Number.isFinite(p.lat)&&p.lng>=-180&&p.lng<=180&&p.lat>=-90&&p.lat<=90).map(p=>({id:String(p.id),name:p.name.slice(0,160),city:p.city.slice(0,100),address:String(p.address||'').slice(0,250),category:categoryLabel(p.category),lng:p.lng,lat:p.lat,articleUrl:safeHttps(p.articleUrl),sourceName:p.source?.jsonUrl==='https://frostmoonrui.com/food-map/index.json'?'frostmoon-rui':'CacheTide'}));}
