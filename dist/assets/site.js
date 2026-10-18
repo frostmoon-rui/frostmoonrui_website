@@ -1,8 +1,16 @@
-'use strict';
+import {translate as t} from './i18n.js';
+try {
+  const saved=localStorage.getItem('frostmoon-language');
+  if(document.documentElement.dataset.defaultEntry==='true' && ['zh','ru','ja'].includes(saved)){
+    const target=new URL(window.location.href);
+    target.pathname='/'+saved+target.pathname;
+    window.location.replace(target.href);
+  }
+} catch {}
 try { if (localStorage.getItem('frostmoon-theme') === 'dark') document.body.classList.add('dark'); } catch {}
 document.querySelectorAll('.theme-button').forEach(button => button.addEventListener('click', () => {
   const dark = document.body.classList.toggle('dark');
-  button.setAttribute('aria-label', dark ? 'Use light theme' : 'Use dark theme');
+  button.setAttribute('aria-label', t(dark ? 'Use light theme' : 'Use dark theme'));
   try { localStorage.setItem('frostmoon-theme', dark ? 'dark' : 'light'); } catch {}
 }));
 document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click', () => {
@@ -12,3 +20,13 @@ document.querySelectorAll('[data-filter]').forEach(button => button.addEventList
   document.querySelectorAll('.note-card').forEach(card => { card.hidden = choice !== 'all' && card.dataset.category !== choice; if (!card.hidden) count++; });
   const empty = document.querySelector('.filter-empty'); if (empty) empty.hidden = count > 0;
 }));
+document.querySelectorAll('[data-site-language]').forEach(link => {
+  const target=new URL(link.href);
+  target.search=window.location.search;
+  target.hash=window.location.hash;
+  link.href=target.href;
+  link.addEventListener('click',()=>{
+    try { localStorage.setItem('frostmoon-language',link.dataset.siteLanguage); } catch {}
+  });
+});
+// Localized navigation links preserve the selected language without translation APIs.

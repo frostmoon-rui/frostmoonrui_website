@@ -5,7 +5,7 @@
   "description": "A private-data-free technical notebook and independent public food atlas",
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs",
+    "build": "node scripts/build-site.mjs",
     "test": "node --test tests/*.test.mjs"
   },
   "engines": {"node": ">=20"}

@@ -1,19 +1,31 @@
 # Frostmoon · a curious corner
 
-An independent technical notebook and public food atlas for **frostmoonrui.com**. The homepage is a personal technical site, inspired by the blog structure of [CacheTide](https://cachetide.top), not a copy of its theme or articles. The food atlas lives at **`/food-map/`**, never on the homepage.
+An independent technical notebook and public food atlas for **frostmoonrui.com**, with complete Chinese / English / Russian / Japanese versions. The homepage is a personal technical site, inspired by the blog structure of [CacheTide](https://cachetide.top), not a copy of its theme or articles. The food atlas lives at **`/food-map/`** or its locale-prefixed equivalent, never on the homepage.
 
 ## Local development
 
 No framework or package installation is required. Use Node.js 20+ and Python 3.10+:
 
 ```sh
-node scripts/build.mjs
+pnpm build
 node --test tests/*.test.mjs
 python -m unittest discover -s tests -q
 python -m http.server 8791 --bind 127.0.0.1 --directory dist
 ```
 
-Edit `content/pages.json` for project/field-note content, then regenerate pages. The homepage and atlas are edited directly in `dist/`. Only `dist/` is deployed. Never serve the repository root or a bot directory publicly.
+`pnpm build` is supported directly from the repository root because `package.json` is tracked. `node scripts/build.mjs` is a compatibility entry point to the same multilingual build; it does not revert to an English-only site. No dependency installation or translation API is needed.
+
+Edit `content/pages.json` for English project/field-note content and the matching `content/pages.zh.json`, `content/pages.ru.json` and `content/pages.ja.json` files for full translations. `content/ui.json` contains the complete UI catalogs. Author homepage, atlas and 404 markup in `templates/`, not in their generated `dist/` files. Shared CSS and authored JavaScript remain in `dist/assets/`. A build validates matching catalogs and generates all localized pages plus the UI runtime and sitemap. Only `dist/` is deployed. Never serve the repository root or a bot directory publicly.
+
+## Site-wide language switching
+
+Every page includes **中 / 英 / 俄 / 日** links. They retain the current article or section, then keep internal navigation in that language. The selection is stored only in the visitor's browser; later visits to unprefixed pages reuse that preference. Explicit locale URLs are always respected:
+
+- `/zh/`, `/en/`, `/ru/`, `/ja/`: complete homepages.
+- `/<locale>/projects/`, `/<locale>/privacy/`, `/<locale>/notes/.../`: translated full content, not just navigation.
+- `/<locale>/food-map/`: localized filtering, statuses, result counts, dates and map controls. Original business names and public addresses remain unchanged.
+
+The root `/` remains the default English entry. The build produces 35 indexable routes plus localized 404 documents, with language-specific `lang`, canonical and alternate-language links. No automatic model-based translation runs on visitors or deploys.
 
 ## Existing Cloudflare Worker
 
@@ -24,7 +36,7 @@ In the existing Worker's **Settings → Builds** Git integration, select this re
 | Setting | Value |
 | --- | --- |
 | Root directory | Repository root |
-| Build command | `node scripts/build.mjs` |
+| Build command | `pnpm build` |
 | Deploy command | `npx wrangler deploy` |
 | Worker name | `frostmoonrui-website` |
 | Static asset directory | `dist` (declared in the Wrangler configuration) |
@@ -46,7 +58,7 @@ If you intentionally choose Cloudflare **Pages** instead, this static output als
 
 `python scripts/sync_food.py` imports only the fixed public feed at `https://cachetide.top/food-map/index.json`. A GitHub Action checks it once daily at 01:20 UTC / 09:20 Asia/Shanghai and commits `dist/data/food.json` only when its sanitized contents change. Failed downloads preserve the existing dataset; the displayed timestamp means the source content last changed, not a guaranteed daily availability check. GitHub schedules can be delayed.
 
-Only venue facts and original source links are retained. Names and addresses keep their original proper spelling; the interface, documentation and authored text are English. No full articles, photographs, ratings or personal comments are copied. A correction or removal can be requested in Issues. The updater never reads a bot database or weather bindings.
+Only venue facts and original source links are retained. Names and addresses keep their original proper spelling; the authored interface and articles have all four language versions, while source comments and maintenance documentation remain English. No full source articles, photographs, ratings or personal comments are copied. A correction or removal can be requested in Issues. The updater never reads a bot database or weather bindings.
 
 The atlas supports search, city/category filtering, source links, original-coordinate Amap links and an optional interactive OpenStreetMap view. It loads tiles only after a click, never asks for location access and uses no map API credentials. GCJ-02 coordinates are approximately converted to WGS84 for the optional OSM display; use original Amap links when precision matters. Leaflet 1.9.4 and its license are vendored from the official distribution; do not remove OSM attribution or introduce bulk tile downloading.
 

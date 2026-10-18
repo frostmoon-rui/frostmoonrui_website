@@ -1,0 +1,27 @@
+name: Check website
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  offline-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build every language without dependencies
+        run: node scripts/build.mjs
+      - name: Check site behavior and translations
+        run: node --test tests/*.test.mjs
+      - name: Check public data sanitizer offline
+        run: python -m unittest discover -s tests -q
+      - name: Require generated assets to match source
+        run: git diff --exit-code -- dist/

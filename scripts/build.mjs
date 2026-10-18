@@ -1,14 +1,2 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import {fileURLToPath} from 'node:url';
-const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const pages=JSON.parse(fs.readFileSync(path.join(root,'content/pages.json'),'utf8'));
-const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-for(const page of pages){
- if(!/^(?:notes\/[a-z-]+|projects|privacy)$/.test(page.path))throw new Error('Invalid page path');
- const target=path.join(root,'dist',page.path,'index.html');fs.mkdirSync(path.dirname(target),{recursive:true});
- fs.writeFileSync(target,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(page.title)} · Frostmoon</title><meta name="description" content="${escape(page.description)}"><meta name="theme-color" content="#eff3f6"><link rel="canonical" href="https://frostmoonrui.com/${page.path}/"><link rel="icon" href="/assets/moon.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/site.css"><script src="/assets/site.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><aside class="sidebar"><a class="wordmark" href="/"><img src="/assets/moon.svg" width="28" height="28" alt=""> frostmoon<span>✦</span></a><div class="profile"><img class="avatar" src="/assets/avatar.jpg" width="88" height="88" alt="Frostmoon's illustrated avatar"><h2>frostmoon-rui</h2><p>Little experiments.<br>Long-lived curiosity.</p></div><nav aria-label="Main navigation"><a class="nav-link" href="/"><span>⌂</span> Home <small>01</small></a><a class="nav-link" href="/#notes"><span>≋</span> Field notes <small>02</small></a><a class="nav-link" href="/projects/"><span>⌘</span> Projects <small>03</small></a><a class="nav-link" href="/food-map/"><span>◎</span> Food atlas <small>04</small></a></nav><div class="sidebar-bottom"><a href="https://github.com/frostmoon-rui" target="_blank" rel="noopener noreferrer">GitHub ↗</a><button class="theme-button" type="button" aria-label="Switch color theme">◐ <span>Change theme</span></button><span class="quiet-label">An independently built little corner.</span></div></aside><div class="page"><header class="topline"><a href="/">← BACK TO THE NOTEBOOK</a><a href="/food-map/">Food atlas ↗</a></header><main id="main" class="article-layout"><p class="eyebrow">${escape(page.label)}</p><h1>${escape(page.title)}</h1>${page.body}<p style="margin-top:45px"><a class="text-link" href="/">Back to the notebook ←</a></p></main><footer><span>© 2026 frostmoon-rui</span><span>Built slowly. Kept simple.</span><a href="/privacy/">Privacy & sources</a></footer></div></body></html>\n`);
-}
-const routes=['','food-map/',...pages.map(p=>p.path+'/')];
-fs.writeFileSync(path.join(root,'dist/sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>https://frostmoonrui.com/${route}</loc></url>`).join('')}</urlset>\n`);
-console.log(`Built ${pages.length} notebook pages and sitemap; homepage and atlas remain separate.`);
+// Compatibility entry point: both direct Node invocation and pnpm build generate all languages.
+import './build-site.mjs';
