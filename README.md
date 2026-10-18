@@ -68,6 +68,8 @@ This deployment has no public write API. Local bot food submissions are not auto
 
 In the existing Cloudflare Worker, set `AMAP_JS_KEY` and `AMAP_SECURITY_CODE` as secrets, then deploy. The JS key must be a JavaScript API key, not a Web Service key. Add `frostmoonrui.com` to its allowed domains in the Amap console. `AMAP_WEB_KEY` is not needed for the current map display and is not exposed or used by the site.
 
+Use the production Worker's **Settings → Variables and Secrets**, not the separate build environment variables. `keep_vars: true` preserves dashboard-managed ordinary variables on later Git deployments; secrets are still preferred. If `/api/map-config` returns HTTP 503, its `missing` array lists only absent binding names, never values. Save/deploy runtime configuration after correcting them.
+
 `/api/map-config` returns the browser SDK key and a same-origin `serviceHost`; the security code stays in the Worker and is added only to allowlisted Amap requests. The SDK key is necessarily visible to map visitors, so its domain restrictions still matter. The proxy pins upstream hosts, replaces caller-supplied credentials, rejects unknown paths and cross-origin requests, bounds timeouts and disables redirects. It is not a general-purpose API relay. The map-specific CSP permits Amap's SDK while other pages keep the restrictive static policy. See [Amap's official security proxy documentation](https://lbs.amap.com/api/javascript-api-v2/guide/abc/jscode).
 
 The plain Python preview serves static files only: its map configuration endpoint is intentionally unavailable. Test full Amap behavior on the deployed Worker or through Wrangler with ignored `.dev.vars` configuration. Never paste secret values into this README or tracked files.

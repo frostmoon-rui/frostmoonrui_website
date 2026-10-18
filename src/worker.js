@@ -14,7 +14,8 @@ export async function handle(request,env,fetcher=fetch){
  const url=new URL(request.url);
  if(url.pathname==='/api/map-config'){
   if(request.method!=='GET')return json({error:'Method not allowed'},405);
-  if(!env.AMAP_JS_KEY||!env.AMAP_SECURITY_CODE)return json({configured:false},503);
+  const missing=['AMAP_JS_KEY','AMAP_SECURITY_CODE'].filter(name=>!env[name]);
+  if(missing.length)return json({configured:false,missing},503);
   return json({configured:true,key:env.AMAP_JS_KEY,serviceHost:url.origin+'/_AMapService'});
  }
  if(url.pathname.startsWith('/_AMapService/')){

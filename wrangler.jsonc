@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "frostmoonrui-website",
   "main": "src/worker.js",
+  "keep_vars": true,
   "compatibility_date": "2026-10-18",
   "routes": [
     {"pattern": "frostmoonrui.com/*", "zone_name": "frostmoonrui.com"}
