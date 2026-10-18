@@ -127,6 +127,12 @@ def sanitize(body):
     for spot in spots:
         if not isinstance(spot, dict):
             raise ValueError("Each spot must be an object")
+        source = spot.get("source")
+        if source is not None:
+            if not isinstance(source, dict):
+                raise ValueError("Invalid public source attribution")
+            if source.get("type", "local") != "local" or source.get("jsonUrl", SOURCE_URL) != SOURCE_URL:
+                continue  # Do not echo federated records back to their original owner.
         item = {key: clean_text(spot.get(key, ""), key, key == "name")
                 for key in ("name", "city", "address", "category")}
         for key, bound in (("lng", 180), ("lat", 90)):

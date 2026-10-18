@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {exportFood,feedUrl} from '../scripts/food-export.mjs';
+import {mergeFeeds} from '../dist/assets/food-core.js';
+const base=()=>({schemaVersion:1,coordinateSystem:'GCJ-02',generatedAt:'2026-10-18T15:49:38Z',spots:[]});
+const venue=()=>({name:'Example venue',city:'Example city',address:'Example address',lng:116.4,lat:39.9,price:30,rating:4,profile:'PRIVATE',contact:'PRIVATE'});
+test('public export matches CacheTide v1 root and original-source attribution',()=>{const feed=exportFood({...base(),spots:[venue(),venue()]});assert.equal(feed.schema,'https://valaxy.site/schemas/food-map.v1.json');assert.equal(feed.spots.length,1);assert.equal(feed.spots[0].source.type,'local');assert.equal(feed.spots[0].source.jsonUrl,feedUrl);assert.ok(!JSON.stringify(feed).includes('PRIVATE'));assert.equal(feed.spots[0].price,30);assert.equal(feed.spots[0].rating,4);assert.deepEqual(exportFood(base()).spots,[]);});
+test('exports reject imported echoes, non-GCJ coordinates, credentials and invalid venues',()=>{for(const changes of [{source:{jsonUrl:'https://cachetide.top/food-map/index.json'}},{coordinateSystem:'WGS84'},{lng:NaN},{lat:91},{rating:6},{price:-1},{articleUrl:'https://user:secret@example.com'}])assert.throws(()=>exportFood({...base(),spots:[{...venue(),...changes}]}));});
+test('merged display deduplicates while the exchange feed never includes imports',()=>{const own=exportFood({...base(),spots:[venue()]});const remote={schemaVersion:1,coordinateSystem:'GCJ-02',spots:[{...venue(),id:'remote',coordinateSystem:'GCJ-02',sourceName:'CacheTide'}]};assert.equal(mergeFeeds(own,remote).length,1);assert.equal(mergeFeeds(own,remote)[0].sourceName,'frostmoon-rui');const built=JSON.parse(fs.readFileSync(new URL('../dist/food-map/index.json',import.meta.url)));assert.deepEqual(built,exportFood(JSON.parse(fs.readFileSync(new URL('../content/food-spots.json',import.meta.url)))));assert.equal(built.spots.length,0);});

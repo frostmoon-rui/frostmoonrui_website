@@ -14,7 +14,7 @@ export function localizeHtml(html,locale,route,catalog,{defaultEntry=false}={}){
   if(!part.startsWith('<'))return translate(part);
   let tag=part.replace(/\b(alt|title|placeholder|aria-label|content)="([^"]*)"/g,(all,key,value)=>`${key}="${escape(dictionary[value]??value)}"`);
   tag=tag.replace(/\bhref="(\/(?!assets\/|data\/)[^"]*)"/g,(all,url)=>{
-   if(url.startsWith('//'))return all;
+   if(url.startsWith('//')||url.endsWith('.json'))return all;
    return `href="${defaultEntry?url:languagePath(locale,url.slice(1))}"`;
   });
   if(tag.startsWith('<html '))tag=tag.replace(/lang="[^"]*"/,`lang="${htmlLanguages[locale]}" data-locale="${locale}"${defaultEntry?' data-default-entry="true"':''}`);

@@ -1,12 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "frostmoonrui-website",
+  "main": "src/worker.js",
   "compatibility_date": "2026-10-18",
   "routes": [
     {"pattern": "frostmoonrui.com/*", "zone_name": "frostmoonrui.com"}
   ],
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": true,
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
   }

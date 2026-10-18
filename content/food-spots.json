@@ -1,0 +1,10 @@
+{
+  "schema": "https://valaxy.site/schemas/food-map.v1.json",
+  "schemaVersion": 1,
+  "generator": {"name": "frostmoon-food-atlas", "version": "1.0.0"},
+  "owner": {"name": "frostmoon-rui", "avatar": "https://frostmoonrui.com/assets/avatar.jpg"},
+  "site": {"title": "Frostmoon Food Atlas", "url": "https://frostmoonrui.com/", "homepage": "https://frostmoonrui.com/"},
+  "generatedAt": "2026-10-18T15:49:38Z",
+  "coordinateSystem": "GCJ-02",
+  "spots": []
+}

@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {locales,htmlLanguages,escape,loadCatalog,localizeHtml,languagePath} from './i18n.mjs';
+import {exportFood} from './food-export.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const catalog=loadCatalog(path.join(root,'content/ui.json'));
@@ -12,14 +13,15 @@ for(const locale of locales.filter(code=>code!=='en')){
  if(JSON.stringify(source[locale].map(p=>p.path))!==JSON.stringify(english.map(p=>p.path)))throw new Error(`Incomplete ${locale} article catalog`);
 }
 const home=read('templates/home.html');
-const atlas=read('templates/food-map.html');
+const atlas=read('templates/food-map.html').replace('</head>','<link rel="stylesheet" href="/assets/map-tools.css"></head>');
 const notFound=read('templates/404.html');
 const aside=home.match(/<aside class="sidebar">[\s\S]*?<\/aside>/)[0].replace('nav-link active','nav-link').replace(' aria-current="page"','').replace('href="#notes"','href="/#notes"');
 const footer=home.match(/<footer>[\s\S]*?<\/footer>/)[0];
 function article(page){return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(page.title)} · Frostmoon</title><meta name="description" content="${escape(page.description)}"><meta name="theme-color" content="#eff3f6"><link rel="canonical" href="https://frostmoonrui.com/${page.path}/"><link rel="icon" href="/assets/moon.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/site.css"><script src="/assets/site.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a>${aside}<div class="page"><header class="topline"><a href="/">← BACK TO THE NOTEBOOK</a><a href="/food-map/">Food atlas ↗</a></header><main id="main" class="article-layout"><p class="eyebrow">${escape(page.label)}</p><h1>${escape(page.title)}</h1>${page.body}<p style="margin-top:45px"><a class="text-link" href="/">Back to the notebook ←</a></p></main>${footer}</div></body></html>\n`;}
 function write(file,content){const destination=path.join(root,'dist',file);fs.mkdirSync(path.dirname(destination),{recursive:true});fs.writeFileSync(destination,content.replace(/\\n$/,'\n'));}
+write('food-map/index.json',JSON.stringify(exportFood(JSON.parse(read('content/food-spots.json'))),null,2)+'\n');
 for(const locale of locales){
- const pages=[['',home],['food-map/',atlas],['404.html',notFound],...source[locale].map(p=>[p.path+'/',article(p)])];
+ const pages=[['',home],['food-map/',atlas],['404.html',notFound],...source[locale].map(p=>[p.path+'/',article(p).replace('</main>',(['privacy','notes/a-map-with-boundaries'].includes(p.path)?'<p>Loading Amap contacts Amap servers; the security code stays on the server. OpenStreetMap remains an optional alternative.</p>':'')+'</main>')])];
  for(const [route,html] of pages){
   if(route.includes('..')||!/^([a-z/-]+|404\.html)$/.test(route||'/'))throw new Error('Invalid route');
   const leaf=route.endsWith('.html')?route:route+'index.html';

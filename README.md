@@ -29,7 +29,7 @@ The root `/` remains the default English entry. The build produces 35 indexable 
 
 ## Existing Cloudflare Worker
 
-This repository targets the existing **Workers** project `frostmoonrui-website`, not a second Pages project. `wrangler.jsonc` declares static assets in `dist/` and a real 404 page; it does not expose a local computer or create paid storage.
+This repository targets the existing **Workers** project `frostmoonrui-website`, not a second Pages project. `src/worker.js` serves `dist/` through the `ASSETS` binding and supplies the Amap configuration/security proxy. It does not expose a local computer, create storage, or add a public write API. `wrangler.jsonc` enables Worker-first routing while retaining the existing domain route and real 404 page.
 
 In the existing Worker's **Settings → Builds** Git integration, select this repository and production branch `main`:
 
@@ -60,9 +60,25 @@ If you intentionally choose Cloudflare **Pages** instead, this static output als
 
 Only venue facts and original source links are retained. Names and addresses keep their original proper spelling; the authored interface and articles have all four language versions, while source comments and maintenance documentation remain English. No full source articles, photographs, ratings or personal comments are copied. A correction or removal can be requested in Issues. The updater never reads a bot database or weather bindings.
 
-The atlas supports search, city/category filtering, source links, original-coordinate Amap links and an optional interactive OpenStreetMap view. It loads tiles only after a click, never asks for location access and uses no map API credentials. GCJ-02 coordinates are approximately converted to WGS84 for the optional OSM display; use original Amap links when precision matters. Leaflet 1.9.4 and its license are vendored from the official distribution; do not remove OSM attribution or introduce bulk tile downloading.
+The atlas defaults to Amap JS API 2.0, with standard/satellite imagery and optional traffic layers using the original GCJ-02 coordinates. The SDK loads only on request. Traffic does not auto-refresh. OpenStreetMap remains a manually selected fallback using approximate WGS84 conversion. Neither provider requests location permission. Keep the vendored Leaflet license and OSM attribution; never bulk-download map tiles.
 
 This deployment has no public write API. Local bot food submissions are not automatically published: only this explicitly configured public feed is imported. Add any future reviewed publisher separately, with a public-field allowlist and no contact/profile data.
+
+### Amap server configuration
+
+In the existing Cloudflare Worker, set `AMAP_JS_KEY` and `AMAP_SECURITY_CODE` as secrets, then deploy. The JS key must be a JavaScript API key, not a Web Service key. Add `frostmoonrui.com` to its allowed domains in the Amap console. `AMAP_WEB_KEY` is not needed for the current map display and is not exposed or used by the site.
+
+`/api/map-config` returns the browser SDK key and a same-origin `serviceHost`; the security code stays in the Worker and is added only to allowlisted Amap requests. The SDK key is necessarily visible to map visitors, so its domain restrictions still matter. The proxy pins upstream hosts, replaces caller-supplied credentials, rejects unknown paths and cross-origin requests, bounds timeouts and disables redirects. It is not a general-purpose API relay. The map-specific CSP permits Amap's SDK while other pages keep the restrictive static policy. See [Amap's official security proxy documentation](https://lbs.amap.com/api/javascript-api-v2/guide/abc/jscode).
+
+The plain Python preview serves static files only: its map configuration endpoint is intentionally unavailable. Test full Amap behavior on the deployed Worker or through Wrangler with ignored `.dev.vars` configuration. Never paste secret values into this README or tracked files.
+
+### Bidirectional public JSON exchange
+
+Give CacheTide **https://frostmoonrui.com/food-map/index.json**. The alternative raw URL is **https://raw.githubusercontent.com/frostmoon-rui/frostmoonrui_website/main/dist/food-map/index.json**. Both contain the same Valaxy food-map v1 document: `schema`, `schemaVersion`, `generator`, `owner`, `site`, `generatedAt`, `coordinateSystem` and `spots`, matching CacheTide's published format. Cross-origin GET is allowed, with one-hour caching. The JSON URL is shared by all four interface languages.
+
+Edit **`content/food-spots.json`**, not the generated file. Add only your reviewed, original public recommendations to `spots`, and update its `generatedAt` timestamp. Each venue needs `name`, `city`, numeric `lng`/`lat` in GCJ-02; optional fields include `address`, `category`, `price`, `rating`, `articleUrl` and `amapUrl`. The build generates stable IDs, explicit `source.type: "local"` attribution and the public-field allowlist. Invalid data fails the build rather than publishing partial records. Commit and push the source plus rebuilt output.
+
+The initial original collection is intentionally empty: no personal bot records were copied and no recommendations were fabricated. CacheTide's imported collection remains visible on the map, but is never republished as yours. The daily importer skips externally sourced/returned records to prevent feedback loops. The display merges and deduplicates both sources, preferring your original entry for an exact venue match. This is feed exchange, not permission to write to or change the other person's repository. Each owner manages their own source file and adds the other's JSON URL to their own subscription list.
 
 ## Privacy and publishing
 

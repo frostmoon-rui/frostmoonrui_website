@@ -26,6 +26,12 @@ def payload(spots=None):
 
 
 class FoodSyncTests(unittest.TestCase):
+    def test_federated_echoes_are_not_imported_again(self):
+        row = json.loads(payload())["spots"][0]
+        local = dict(row, source={"type": "local", "jsonUrl": food.SOURCE_URL})
+        echo = dict(row, name="Imported echo", source={"type": "external", "jsonUrl": "https://frostmoonrui.com/food-map/index.json"})
+        self.assertEqual(len(food.sanitize(payload([local, echo]))["spots"]), 1)
+
     def test_whitelist_and_original_names(self):
         document = food.sanitize(payload())
         item = document["spots"][0]
