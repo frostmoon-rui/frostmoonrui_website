@@ -1,0 +1,10 @@
+node_modules/
+.wrangler/
+.dev.vars*
+.env*
+__pycache__/
+*.pyc
+preview-*.log
+local_settings.json
+*.sqlite3*
+backup/

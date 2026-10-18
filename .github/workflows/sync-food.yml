@@ -1,0 +1,40 @@
+name: Sync public food data
+
+on:
+  schedule:
+    - cron: '20 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-public-food
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run offline tests
+        run: python -m unittest discover -s tests -p test_food_sync.py -q
+      - name: Fetch and sanitize public food data
+        run: python scripts/sync_food.py
+      - name: Commit food data if changed
+        shell: bash
+        run: |
+          git add -- dist/data/food.json
+          if git diff --cached --quiet -- dist/data/food.json; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit --only -m "Update public food data" -- dist/data/food.json
+          git push origin "HEAD:${{ github.event.repository.default_branch }}"

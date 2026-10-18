@@ -1,0 +1,12 @@
+{
+  "name": "frostmoonrui-website",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A private-data-free technical notebook and independent public food atlas",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": {"node": ">=20"}
+}
