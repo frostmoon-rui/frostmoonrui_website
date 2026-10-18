@@ -3,7 +3,7 @@
   "name": "frostmoonrui-website",
   "compatibility_date": "2026-10-18",
   "routes": [
-    {"pattern": "frostmoonrui.com", "custom_domain": true}
+    {"pattern": "frostmoonrui.com/*", "zone_name": "frostmoonrui.com"}
   ],
   "assets": {
     "directory": "./dist",
