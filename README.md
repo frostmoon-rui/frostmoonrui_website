@@ -19,7 +19,7 @@ Edit `content/pages.json` for English project/field-note content and the matchin
 
 ## Site-wide language switching
 
-Every page includes **中 / 英 / 俄 / 日** links. They retain the current article or section, then keep internal navigation in that language. The selection is stored only in the visitor's browser; later visits to unprefixed pages reuse that preference. Explicit locale URLs are always respected:
+Every page includes **ZH / EN / RU / JA** links, with native accessible labels **中文 / English / Русский / 日本語**. They retain the current article or section, then keep internal navigation in that language. The selection is stored only in the visitor's browser; later visits to unprefixed pages reuse that preference. Explicit locale URLs are always respected:
 
 - `/zh/`, `/en/`, `/ru/`, `/ja/`: complete homepages.
 - `/<locale>/projects/`, `/<locale>/privacy/`, `/<locale>/notes/.../`: translated full content, not just navigation.

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 export const locales=['zh','en','ru','ja'];
 export const htmlLanguages={zh:'zh-CN',en:'en',ru:'ru',ja:'ja'};
-const languageLabels={zh:['中','中文'],en:['英','English'],ru:['俄','Русский'],ja:['日','日本語']};
+const languageLabels={zh:['ZH','中文'],en:['EN','English'],ru:['RU','Русский'],ja:['JA','日本語']};
 export function escape(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 export function languagePath(locale,route=''){if(!locales.includes(locale)||route.includes('..')||route.startsWith('/'))throw new Error('Invalid localized route');return `/${locale}/${route}`;}
 export function loadCatalog(file){const catalog=JSON.parse(fs.readFileSync(file,'utf8'));const expected=Object.keys(catalog.en).sort();for(const locale of locales){if(!catalog[locale]||JSON.stringify(Object.keys(catalog[locale]).sort())!==JSON.stringify(expected))throw new Error(`Incomplete ${locale} UI catalog`);for(const value of Object.values(catalog[locale]))if(typeof value!=='string'||!value.trim())throw new Error('Empty UI translation');}return catalog;}
