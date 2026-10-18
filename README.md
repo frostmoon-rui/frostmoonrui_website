@@ -35,10 +35,10 @@ A source push is not proof of deployment: check the Cloudflare build result and 
 
 1. Complete the registrar's nameserver change to the **two exact nameservers assigned by your Cloudflare zone**. Do not guess these values, change MX/TXT mail records, or add wildcard DNS records.
 2. Wait until the `frostmoonrui.com` zone reports **Active** in Cloudflare. A DNS query that still returns the registrar's nameservers is not confirmation of Cloudflare delegation.
-3. Open the existing Worker → **Settings → Domains & Routes → Add → Custom Domain**, and attach `frostmoonrui.com`. Cloudflare must verify zone access and provision HTTPS. Do not point the domain at a GitHub Pages address when this site is hosted on Workers.
+3. The Wrangler configuration declares the user's requested `frostmoonrui.com` custom domain. A successful deploy can attach it automatically when the existing build token has the necessary zone permissions. If it reports an authorization or DNS conflict, open the existing Worker → **Settings → Domains & Routes → Add → Custom Domain**, and attach `frostmoonrui.com`. Cloudflare must verify zone access and provision HTTPS. Do not point this Worker at GitHub Pages or disable TLS checks.
 4. Verify both `https://frostmoonrui.com/` and `https://frostmoonrui.com/food-map/`. A `www` alias is optional and must also be configured explicitly.
 
-The repository intentionally does not hard-code a zone ID, account ID, domain route or security credential. Domain registration, nameserver delegation and HTTPS issuance happen in the hosting account, not just by adding source files.
+The repository contains only the explicitly requested apex-domain route, never a zone ID, account ID, wildcard route or security credential. Domain registration, nameserver delegation and HTTPS issuance happen in the hosting account, not merely by adding source files. Mail records and unrelated hostnames are outside this deployment's scope.
 
 If you intentionally choose Cloudflare **Pages** instead, this static output also works with production branch `main`, build command `node scripts/build.mjs`, and output directory `dist`. Do not create a duplicate deployment merely to use these alternative settings.
 
