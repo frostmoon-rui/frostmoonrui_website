@@ -22,7 +22,7 @@ document.querySelectorAll('.avatar-link').forEach(link=>link.addEventListener('c
  avatarClicks++;document.querySelectorAll('.avatar-link').forEach(node=>node.setAttribute?.('aria-label',t('Avatar flips: {count}/3. About opens on the third click.',{count:avatarClicks})));
  if(avatarClicks<3)return;navigating=true;
  if(allowed()){document.body.classList.add('page-leaving');await new Promise(resolve=>setTimeout(resolve,180));}
- window.location.assign(link.href);
+ window.location.assign(link.href.replace(/\/about\/?(?:#.*)?$/,'/about-secret/'));
 }));
 window.addEventListener('pageshow',()=>{navigating=false;avatarFlipping=false;avatarClicks=0;document.body.classList.remove('page-leaving');document.querySelectorAll('.is-flipping').forEach(node=>node.classList.remove('is-flipping'));document.querySelectorAll('.avatar-link').forEach(node=>node.setAttribute?.('aria-label',t('Flip the avatar and visit About')));syncMotion();syncVisibility();});
 document.querySelectorAll('[data-copy-site]').forEach(button=>button.addEventListener('click',async()=>{const status=button.parentElement.querySelector('.copy-status');try{await navigator.clipboard.writeText('https://frostmoonrui.com/');status.textContent=t('Site link copied.');}catch{status.textContent=t('Copy this address: https://frostmoonrui.com/');}}));

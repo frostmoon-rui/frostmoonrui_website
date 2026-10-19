@@ -1,5 +1,5 @@
 export const locales=['zh','en','ru','ja'];
-export const documents={site:'content/site.json','resources':'content/resources.json','pages-en':'content/pages.json','pages-zh':'content/pages.zh.json','pages-ru':'content/pages.ru.json','pages-ja':'content/pages.ja.json',food:'content/food-spots.json',ui:'content/ui.json'};
+export const documents={site:'content/site.json',room:'content/about-secret.json','resources':'content/resources.json','pages-en':'content/pages.json','pages-zh':'content/pages.zh.json','pages-ru':'content/pages.ru.json','pages-ja':'content/pages.ja.json',food:'content/food-spots.json',ui:'content/ui.json'};
 const fail=message=>{throw new Error(message);};
 const object=value=>value&&typeof value==='object'&&!Array.isArray(value);
 function text(value,max=4000){if(typeof value!=='string'||value.length>max||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value))fail('Invalid text');}
@@ -27,6 +27,7 @@ export function validateHtml(html){
 export function validateDocument(key,value,previous){
  if(!Object.hasOwn(documents,key))fail('Unknown editable document');
  if(key==='site')validateSite(value);
+ else if(key==='room'){fields(value,['schemaVersion','entries']);if(value.schemaVersion!==1)fail('Invalid room version');fields(value.entries,locales);for(const code of locales){const entry=value.entries[code];fields(entry,['title','intro','sections']);text(entry.title,200);text(entry.intro,4000);collection(entry.sections,40);for(const section of entry.sections){fields(section,['title','text']);text(section.title,200);text(section.text,12000);}}}
  else if(key==='resources'){fields(value,['schemaVersion','links']);if(value.schemaVersion!==1)fail('Invalid resource version');collection(value.links,100);ids(value.links);for(const link of value.links){fields(link,['id','name','url','category','description']);text(link.name,100);publicUrl(link.url);text(link.category,100);translated(link.description);}}
  else if(key.startsWith('pages-')){collection(value,100);if(!previous||JSON.stringify(value.map(p=>p.path))!==JSON.stringify(previous.map(p=>p.path)))fail('Keep page paths unchanged; edit existing pages here');for(const page of value){fields(page,['path','title','label','description','body']);for(const field of ['title','label','description'])text(page[field]);validateHtml(page.body);}}
  else if(key==='ui'){fields(value,locales);if(!previous)fail('Invalid UI catalog');const keys=Object.keys(previous.en).sort().join('\n');for(const code of locales){if(!object(value[code])||Object.keys(value[code]).sort().join('\n')!==keys)fail('Keep all translation keys');for(const [key,item] of Object.entries(value[code])){text(item,12000);if(/[<>]/.test(item))fail('UI translations must be plain text');if(JSON.stringify(item.match(/\{\w+\}/g)||[])!==JSON.stringify(key.match(/\{\w+\}/g)||[]))fail('Keep translation placeholders');}}}

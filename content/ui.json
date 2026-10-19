@@ -263,8 +263,8 @@
     "Good company, on the open web.": "Good company, on the open web.",
     "MY COMPANIONS": "MY COMPANIONS",
     "About this corner ↗": "About this corner ↗",
-    "Flip the avatar and visit About": "Flip once. Click three times to open About.",
-    "Avatar flips: {count}/3. About opens on the third click.": "Avatar flips: {count}/3. About opens on the third click.",
+    "Flip the avatar and visit About": "Flip the avatar. Three clicks open a hidden room.",
+    "Avatar flips: {count}/3. About opens on the third click.": "Avatar flips: {count}/3. The room opens on the third click.",
     "Preview page": "Preview page",
     "Sandboxed draft preview": "Sandboxed draft preview",
     "Schema version": "Schema version",
@@ -376,7 +376,14 @@
     "The repository document failed validation. Review its source JSON before publishing.": "The repository document failed validation. Review its source JSON before publishing.",
     "GitHub could not serve this document. Reload later; no write was attempted.": "GitHub could not serve this document. Reload later; no write was attempted.",
     "Loaded current public repository content. Publishing is disabled until authenticated access is restored.": "Loaded current public repository content. Publishing is disabled until authenticated access is restored.",
-    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned."
+    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.",
+    "Between code and curiosity": "Between code and curiosity",
+    "Areas I return to": "Areas I return to",
+    "An illustrated presence": "An illustrated presence",
+    "Explore the work": "Explore the work",
+    "Unlisted room": "Unlisted room",
+    "Entries": "Entries",
+    "Unlisted pages are public. Saving also puts their text in public GitHub history.": "Unlisted pages are public. Saving also puts their text in public GitHub history."
   },
   "zh": {
     "Visit website": "去串个门",
@@ -642,8 +649,8 @@
     "Good company, on the open web.": "开放网络里的好伙伴。",
     "MY COMPANIONS": "我的小伙伴们",
     "About this corner ↗": "关于这一隅 ↗",
-    "Flip the avatar and visit About": "点击翻转一次，累计三次进入关于页。",
-    "Avatar flips: {count}/3. About opens on the third click.": "头像已翻转 {count}/3 次，第三次点击后进入关于页。",
+    "Flip the avatar and visit About": "点击头像翻转，累计三次打开隐藏空间。",
+    "Avatar flips: {count}/3. About opens on the third click.": "头像已翻转 {count}/3 次，第三次打开隐藏空间。",
     "Preview page": "预览页面",
     "Sandboxed draft preview": "隔离的草稿预览",
     "Schema version": "格式版本",
@@ -755,7 +762,14 @@
     "The repository document failed validation. Review its source JSON before publishing.": "仓库文档未通过格式校验，请检查源 JSON 后再发布。",
     "GitHub could not serve this document. Reload later; no write was attempted.": "GitHub 暂时无法提供该文档，请稍后重新加载；未尝试写入。",
     "Loaded current public repository content. Publishing is disabled until authenticated access is restored.": "已加载公开仓库的当前内容。在带令牌的访问恢复前，发布按钮已禁用。",
-    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHub 拒绝发布，请核对 Contents 读写权限；没有返回保存成功回执。"
+    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHub 拒绝发布，请核对 Contents 读写权限；没有返回保存成功回执。",
+    "Between code and curiosity": "在代码与好奇之间",
+    "Areas I return to": "反复探索的方向",
+    "An illustrated presence": "一张插画，一隅自留地",
+    "Explore the work": "顺着作品继续看看",
+    "Unlisted room": "隐藏空间",
+    "Entries": "内容",
+    "Unlisted pages are public. Saving also puts their text in public GitHub history.": "隐藏页面仍然公开。保存后，文字也会进入公开 GitHub 历史记录。"
   },
   "ru": {
     "Visit website": "Заглянуть в гости",
@@ -1021,8 +1035,8 @@
     "Good company, on the open web.": "Хорошая компания в открытой сети.",
     "MY COMPANIONS": "МОИ ДРУЗЬЯ",
     "About this corner ↗": "Об этом уголке ↗",
-    "Flip the avatar and visit About": "Один щелчок — один оборот. Третий откроет страницу о сайте.",
-    "Avatar flips: {count}/3. About opens on the third click.": "Обороты аватара: {count}/3. Третий щелчок откроет страницу о сайте.",
+    "Flip the avatar and visit About": "Переверните аватар. Три нажатия откроют скрытую комнату.",
+    "Avatar flips: {count}/3. About opens on the third click.": "Перевороты: {count}/3. Комната откроется на третьем нажатии.",
     "Preview page": "Страница предпросмотра",
     "Sandboxed draft preview": "Изолированный предпросмотр черновика",
     "Schema version": "Версия схемы",
@@ -1134,7 +1148,14 @@
     "The repository document failed validation. Review its source JSON before publishing.": "Документ не прошёл проверку. Проверьте исходный JSON перед публикацией.",
     "GitHub could not serve this document. Reload later; no write was attempted.": "GitHub не смог вернуть документ. Повторите позже; запись не выполнялась.",
     "Loaded current public repository content. Publishing is disabled until authenticated access is restored.": "Загружено актуальное публичное содержимое. Публикация отключена до восстановления доступа с токеном.",
-    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHub отклонил публикацию. Проверьте права Contents на чтение и запись; сохранение не подтверждено."
+    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHub отклонил публикацию. Проверьте права Contents на чтение и запись; сохранение не подтверждено.",
+    "Between code and curiosity": "Между кодом и любопытством",
+    "Areas I return to": "Темы, к которым я возвращаюсь",
+    "An illustrated presence": "Образ этого уголка",
+    "Explore the work": "Посмотреть работы",
+    "Unlisted room": "Скрытая комната",
+    "Entries": "Записи",
+    "Unlisted pages are public. Saving also puts their text in public GitHub history.": "Скрытая страница остаётся общедоступной. Её текст также попадёт в открытую историю GitHub."
   },
   "ja": {
     "Visit website": "遊びに行く",
@@ -1400,8 +1421,8 @@
     "Good company, on the open web.": "ひらかれたウェブの、仲間たち。",
     "MY COMPANIONS": "仲間たち",
     "About this corner ↗": "この場所について ↗",
-    "Flip the avatar and visit About": "1 回クリックで 1 回転。3 回目で紹介ページを開きます。",
-    "Avatar flips: {count}/3. About opens on the third click.": "アバターの回転：{count}/3 回。3 回目のクリックで紹介ページを開きます。",
+    "Flip the avatar and visit About": "アバターを3回クリックすると、隠れた部屋が開きます。",
+    "Avatar flips: {count}/3. About opens on the third click.": "アバターの回転：{count}/3。3回目に部屋が開きます。",
     "Preview page": "プレビューするページ",
     "Sandboxed draft preview": "隔離された下書きプレビュー",
     "Schema version": "形式バージョン",
@@ -1513,6 +1534,13 @@
     "The repository document failed validation. Review its source JSON before publishing.": "文書の検証に失敗しました。公開前に元のJSONを確認してください。",
     "GitHub could not serve this document. Reload later; no write was attempted.": "GitHubから文書を取得できません。後で再読み込みしてください。書き込みは行っていません。",
     "Loaded current public repository content. Publishing is disabled until authenticated access is restored.": "公開リポジトリの現在の内容を読み込みました。トークンによるアクセスが復旧するまで公開は無効です。",
-    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHubが公開を拒否しました。Contentsの読み書き権限を確認してください。保存の成功は確認できていません。"
+    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHubが公開を拒否しました。Contentsの読み書き権限を確認してください。保存の成功は確認できていません。",
+    "Between code and curiosity": "コードと好奇心のあいだ",
+    "Areas I return to": "何度も向き合うテーマ",
+    "An illustrated presence": "この場所を彩る一枚",
+    "Explore the work": "つくったものを辿る",
+    "Unlisted room": "隠れた部屋",
+    "Entries": "内容",
+    "Unlisted pages are public. Saving also puts their text in public GitHub history.": "隠れたページも公開されています。保存すると、文章は公開 GitHub 履歴にも残ります。"
   }
 }

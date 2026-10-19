@@ -47,6 +47,9 @@ export async function handle(request,env,fetcher=fetch){
  if(/^\/(?:zh\/|en\/|ru\/|ja\/)?studio\/(?:index\.html)?$/.test(url.pathname)){
   response.headers.set('Cache-Control','private, no-store');response.headers.set('X-Robots-Tag','noindex, nofollow');response.headers.set('Referrer-Policy','no-referrer');response.headers.set('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-src 'self' about:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'");
  }
+ if(/^\/(?:zh\/|en\/|ru\/|ja\/)?about-secret(?:\/(?:index\.html)?)?$/.test(url.pathname)){
+  response.headers.set('Cache-Control','private, no-store');response.headers.set('X-Robots-Tag','noindex, nofollow, noarchive, nosnippet, noimageindex');response.headers.set('Referrer-Policy','no-referrer');
+ }
  if(/^\/(?:zh\/|en\/|ru\/|ja\/)?food-map\/(?:index\.html)?$/.test(url.pathname))response.headers.set('Content-Security-Policy',mapCsp);
  if(url.pathname==='/food-map/index.json'){
   response.headers.set('Content-Type','application/json; charset=utf-8');

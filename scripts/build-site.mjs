@@ -5,11 +5,13 @@ import {locales,htmlLanguages,escape,loadCatalog,localizeHtml,languagePath} from
 import {exportFood} from './food-export.mjs';
 import {validateSite,validateDocument} from '../shared/site-schema.js';
 import {resourcesBody,applicationBody,deskBody} from './community-pages.mjs';
+import {secretPage} from './secret-page.mjs';
 import {applyChrome,aboutBody,friendsBody} from './site-chrome.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const catalog=loadCatalog(path.join(root,'content/ui.json'));
 const site=validateSite(JSON.parse(read('content/site.json')));
+const room=validateDocument('room',JSON.parse(read('content/about-secret.json')));
 const resources=validateDocument('resources',JSON.parse(read('content/resources.json')));
 const english=JSON.parse(read('content/pages.json'));
 const source={en:english};
@@ -27,13 +29,16 @@ function article(page){return `<!doctype html><html lang="en"><head><meta charse
 function write(file,content){const destination=path.join(root,'dist',file);fs.mkdirSync(path.dirname(destination),{recursive:true});fs.writeFileSync(destination,content.replace(/\\n$/,'\n'));}
 write('food-map/index.json',JSON.stringify(exportFood(JSON.parse(read('content/food-spots.json'))),null,2)+'\n');
 for(const locale of locales){
+ const roomHtml=secretPage(room,site,locale,catalog);
+ write(`${locale}/about-secret/index.html`,roomHtml);
+ if(locale==='en')write('about-secret/index.html',roomHtml);
  const text=key=>catalog[locale][key]||key;
  const credits=source[locale].find(p=>p.path==='about').body.replace(/^<p class="lead">[\s\S]*?<\/p>/,'');
  const about=aboutBody(site,locale,catalog).replace('<section class="studio-entry">',`<section class="about-credits">${credits}</section><section class="studio-entry">`);
  const extra=[{path:'about',title:site.about[locale].title,label:text('A LITTLE INTRODUCTION'),description:site.about[locale].intro,body:about},{path:'links',title:text('Good company, on the open web.'),label:text('MY COMPANIONS'),description:text('Independent corners of the web, and the people who keep them growing.'),body:friendsBody(site,locale,catalog)}];
  extra[1].body+=applicationBody(locale,catalog);
  extra.push({path:'resources',title:text('Recommended links'),label:text('Resource collection'),description:text('A small shelf of useful places.'),body:resourcesBody(resources,locale,catalog)});
- const pages=[['',home],['food-map/',atlas],['404.html',notFound],['studio/',read('templates/studio.html')],...extra.map(p=>[p.path+'/',article(p)]),...source[locale].filter(p=>p.path!=='about').map(p=>[p.path+'/',article(p).replace('</main>',(['privacy','notes/a-map-with-boundaries'].includes(p.path)?'<p>Loading Amap contacts Amap servers; the security code stays on the server. OpenStreetMap remains an optional alternative.</p>':'')+'</main>')])];
+ const pages=[['',home],['food-map/',atlas],['404.html',notFound],['studio/',read('templates/studio.html')],...extra.map(p=>[p.path+'/',p.path==='about'?article(p).replace('class="article-layout"','class="article-layout about-layout"'):article(p)]),...source[locale].filter(p=>p.path!=='about').map(p=>[p.path+'/',article(p).replace('</main>',(['privacy','notes/a-map-with-boundaries'].includes(p.path)?'<p>Loading Amap contacts Amap servers; the security code stays on the server. OpenStreetMap remains an optional alternative.</p>':'')+'</main>')])];
  for(const [route,html] of pages){
   if(route.includes('..')||!/^([a-z/-]+|404\.html)$/.test(route||'/'))throw new Error('Invalid route');
   const leaf=route.endsWith('.html')?route:route+'index.html';

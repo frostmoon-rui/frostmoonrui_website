@@ -29,7 +29,7 @@ test('hero animation pauses outside the viewport and while the page is hidden',(
  s.document.visibilityState='hidden';s.events.visibilitychange();assert.equal(s.body.classList.contains('motion-paused'),true);s.document.visibilityState='visible';s.events.visibilitychange();assert.equal(s.body.classList.contains('motion-paused'),false);
 });
 test('canceling an avatar flip preserves click count without navigating early',async()=>{
- const s=fixture();const event=()=>({button:0,preventDefault(){}});const pending=s.events['avatar-click'](event());s.media.matches=true;s.media.change();await pending;assert.equal(s.cancels(),1);assert.equal(s.destinations.length,0);await s.events['avatar-click'](event());assert.equal(s.destinations.length,0);await s.events['avatar-click'](event());assert.equal(s.destinations.length,1);assert.equal(s.destinations[0],s.avatar.href);
+ const s=fixture();const event=()=>({button:0,preventDefault(){}});const pending=s.events['avatar-click'](event());s.media.matches=true;s.media.change();await pending;assert.equal(s.cancels(),1);assert.equal(s.destinations.length,0);await s.events['avatar-click'](event());assert.equal(s.destinations.length,0);await s.events['avatar-click'](event());assert.equal(s.destinations.length,1);assert.equal(s.destinations[0],s.avatar.href.replace('/about/','/about-secret/'));
 });
 test('restoring a cached page removes exit/flip residue',()=>{const s=fixture();s.body.classList.add('page-leaving');s.avatar.classList.add('is-flipping');s.events.pageshow();assert.equal(s.body.classList.contains('page-leaving'),false);assert.equal(s.avatar.classList.contains('is-flipping'),false);});
 test('motion is shared across pages and does not intercept studio navigation or form submission',()=>{

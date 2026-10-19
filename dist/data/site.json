@@ -31,74 +31,90 @@
   },
   "about": {
     "en": {
-      "title": "A little more about this corner.",
-      "intro": "Hi, I’m frostmoon-rui. This is a place for technical experiments, useful notes, and good food.",
+      "title": "Making things. Staying curious.",
+      "intro": "Hi, I’m frostmoon-rui. I work at the meeting point of software and hardware, keeping the small experiments and useful discoveries that are worth returning to.",
       "sections": [
         {
-          "title": "Things I work on",
-          "text": "Python and asynchronous bots, Arduino and STM32 projects, and the meeting point between hardware and software."
+          "title": "Software with room to breathe",
+          "text": "Python, asynchronous workflows and a multi-provider QQ bot are recurring threads. I care about bounded background work, useful replies and automation that does not overwhelm a conversation."
         },
         {
-          "title": "What lives here",
-          "text": "Project notes, recovered technical archives, and a public food atlas with sources kept close to each recommendation."
+          "title": "Hardware, patiently understood",
+          "text": "Arduino, STM32 and ESP32 experiments connect code to the physical world. The recovered fire-rescue archive contains camera code, infrared notes and CAD assets; it is a subsystem archive, not a claim of a complete autonomous vehicle."
         },
         {
-          "title": "A note left open",
-          "text": "A more personal introduction will come later. For now, you can explore the projects or say hello through the links below."
+          "title": "Maps, with a source attached",
+          "text": "The food atlas is a separate place to explore public recommendations. Original contributions and imported records keep their provenance; private bot locations and conversations do not belong in the map."
+        },
+        {
+          "title": "How I like to build",
+          "text": "Keep source understandable, test what can be tested, and state what remains uncertain. This site is a small multilingual static generator with a Worker backend, maintained separately from the bot's private runtime."
         }
       ]
     },
     "zh": {
-      "title": "关于这一小片地方。",
-      "intro": "你好，这里是 frostmoon-rui。这里收集技术实验、实用笔记，还有值得绕路的一顿饭。",
+      "title": "动手，也保持好奇。",
+      "intro": "你好，我是 frostmoon-rui。在软件与硬件相遇的地方折腾，把小小的实验、实际踩过的坑，以及值得再翻一遍的发现，慢慢留在这里。",
       "sections": [
         {
-          "title": "正在折腾什么",
-          "text": "Python 与异步机器人、Arduino 和 STM32 项目，以及硬件和软件相遇的地方。"
+          "title": "软件，也要有呼吸感",
+          "text": "Python、异步任务和多服务商 QQ 机器人，是经常出现在工作台上的东西。我在意后台任务的边界、真正有用的回复，以及不打扰群聊节奏的自动化。"
         },
         {
-          "title": "这里放些什么",
-          "text": "项目笔记、找回的技术档案，以及一张保留原始来源的公开美食地图。"
+          "title": "硬件，慢一点理解",
+          "text": "从 Arduino、STM32 到 ESP32，让程序与现实世界发生一点联系。找回的消防救援车档案保留了摄像头代码、红外笔记和 CAD 资源；它是子系统档案，不代表一辆完整、已验证的无人驾驶车辆。"
         },
         {
-          "title": "留一点空白",
-          "text": "更个人的自我介绍稍后再补。现在，可以先看看项目，或通过下面的链接打个招呼。"
+          "title": "地图，也带着出处",
+          "text": "美食地图单独留给公开的推荐与发现。原创内容和导入地点保留各自的来源，机器人的私人位置和对话不会被放进地图里。"
+        },
+        {
+          "title": "偏爱的制作方式",
+          "text": "让源码可以读懂，让测试验证实际能验证的部分，也如实留下不确定之处。这个四语网站使用轻量静态生成与 Worker 后端，与机器人的私有运行环境独立维护。"
         }
       ]
     },
     "ru": {
-      "title": "Немного об этом уголке.",
-      "intro": "Привет, я frostmoon-rui. Здесь живут технические эксперименты, полезные заметки и хорошая еда.",
+      "title": "Создавать. Не терять любопытства.",
+      "intro": "Привет, я frostmoon-rui. Мне интересно пересечение программного и аппаратного мира. Здесь я сохраняю небольшие эксперименты, полезные находки и опыт, к которому хочется вернуться.",
       "sections": [
         {
-          "title": "Над чем я работаю",
-          "text": "Python и асинхронные боты, проекты на Arduino и STM32, пересечение аппаратного и программного мира."
+          "title": "Программы, которые не мешают",
+          "text": "Python, асинхронные задачи и QQ-бот с несколькими провайдерами часто оказываются на моём рабочем столе. Важны ограниченные фоновые задачи, полезные ответы и автоматизация, не заглушающая разговор."
         },
         {
-          "title": "Что здесь можно найти",
-          "text": "Заметки о проектах, восстановленные технические архивы и открытая карта еды со ссылками на первоисточники."
+          "title": "Разбираться в железе постепенно",
+          "text": "Arduino, STM32 и ESP32 связывают код с физическим миром. В восстановленном архиве пожарно-спасательной машины есть код камеры, заметки об ИК-управлении и CAD-файлы. Это архив подсистем, а не подтверждение готового автономного автомобиля."
         },
         {
-          "title": "Немного свободного места",
-          "text": "Более личное знакомство появится позже. Пока можно посмотреть проекты или поздороваться по ссылкам ниже."
+          "title": "Карта с первоисточниками",
+          "text": "Гастрономический атлас существует отдельно для открытых рекомендаций. Собственные и импортированные записи сохраняют происхождение; личные координаты и переписка бота на карту не попадают."
+        },
+        {
+          "title": "Как мне нравится создавать",
+          "text": "Понятный исходный код, проверяемые тестами утверждения и честное описание неизвестного. Этот четырёхъязычный сайт использует статическую генерацию и Worker-бэкенд, отдельно от закрытой среды бота."
         }
       ]
     },
     "ja": {
-      "title": "この場所について、もう少し。",
-      "intro": "こんにちは、frostmoon-rui です。技術の実験や役立つメモ、おいしいものを集めた場所です。",
+      "title": "つくりながら、好奇心を忘れずに。",
+      "intro": "こんにちは、frostmoon-rui です。ソフトウェアとハードウェアの接点で、小さな実験や試行錯誤、また読み返したくなる発見を少しずつ残しています。",
       "sections": [
         {
-          "title": "取り組んでいること",
-          "text": "Python と非同期ボット、Arduino や STM32 のプロジェクト、そしてハードウェアとソフトウェアの接点。"
+          "title": "会話の余白を残すソフトウェア",
+          "text": "Python、非同期処理、複数のプロバイダーに対応した QQ ボットが、よく作業机に並びます。バックグラウンド処理の境界、役立つ返答、会話を邪魔しない自動化を大切にしています。"
         },
         {
-          "title": "ここにあるもの",
-          "text": "プロジェクトの記録、復元した技術資料、元の情報へのリンクを残した公開グルメマップ。"
+          "title": "ハードウェアを、ゆっくり理解する",
+          "text": "Arduino、STM32、ESP32 で、コードを現実につなげています。復元した消防救援車の資料にはカメラのコード、赤外線のメモ、CAD ファイルがあります。完成した自律走行車を示すものではなく、サブシステムの記録です。"
         },
         {
-          "title": "少しだけ余白を",
-          "text": "個人的な自己紹介は、また後で。今はプロジェクトを眺めたり、下のリンクから声をかけたりしてみてください。"
+          "title": "出典とともに残す地図",
+          "text": "グルメマップは公開のおすすめを探すための独立した場所です。独自の投稿と取り込んだ情報は、それぞれ出典を保持します。ボットの私的な位置情報や会話を地図に載せることはありません。"
+        },
+        {
+          "title": "好きなつくり方",
+          "text": "読めるソースコード、確認できる範囲を確かめるテスト、わからないことへの正直さ。この四言語サイトは静的生成と Worker バックエンドで動き、ボットの私的な実行環境とは別に管理しています。"
         }
       ]
     }
