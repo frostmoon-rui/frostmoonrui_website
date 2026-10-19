@@ -7,7 +7,7 @@ export function glassPoint(x,y,rect){
  const px=Math.max(0,Math.min(1,(x-rect.left)/Math.max(1,rect.width))),py=Math.max(0,Math.min(1,(y-rect.top)/Math.max(1,rect.height)));
  return {x:px*100,y:py*100,rx:(.5-py)*4,ry:(px-.5)*4};
 }
-export const navPaths={home:'M3 11 12 3l9 8M5 10v11h5v-7h4v7h5V10',notes:'M5 3h14v18H5zM8 7h8M8 11h8M8 15h5',projects:'M8 7V4h8v3M3 7h18v14H3zM3 12h18M10 12v3h4v-3',map:'m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zM9 3v16M15 5v16'};
+export const navPaths={resources:'M5 3h14v18H5zM9 3v8l3-2 3 2V3M8 16h8',home:'M3 11 12 3l9 8M5 10v11h5v-7h4v7h5V10',notes:'M5 3h14v18H5zM8 7h8M8 11h8M8 15h5',projects:'M8 7V4h8v3M3 7h18v14H3zM3 12h18M10 12v3h4v-3',map:'m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zM9 3v16M15 5v16'};
 if(typeof document!=='undefined'){
  const fine=matchMedia('(hover:hover) and (pointer:fine)'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const selector='a[href]:not(.skip):not(.avatar-link):not(.wordmark),button:not(:disabled),summary,.import-button';
@@ -28,7 +28,7 @@ if(typeof document!=='undefined'){
  document.addEventListener('focusin',event=>{const element=event.target.closest(selector);if(!element)return;const r=element.getBoundingClientRect();show(element,r.left,r.bottom);});
  document.addEventListener('focusout',hide);document.addEventListener('pointerdown',hide);document.addEventListener('keydown',event=>{if(event.key==='Escape')hide();});
  document.addEventListener('scroll',hide,true);window.addEventListener('resize',hide);window.addEventListener('pagehide',hide);document.addEventListener('visibilitychange',hide);reduced.addEventListener('change',hide);fine.addEventListener('change',hide);
- for(const link of document.querySelectorAll('.nav-link')){const host=link.querySelector('span');if(!host)continue;const path=link.getAttribute('href'),key=path.includes('food-map')?'map':path.includes('projects')?'projects':path.includes('#notes')?'notes':'home';const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');for(const [name,value] of Object.entries({viewBox:'0 0 24 24',width:'19',height:'19',fill:'none',stroke:'currentColor','stroke-width':'1.5','stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true'}))svg.setAttribute(name,value);const line=document.createElementNS('http://www.w3.org/2000/svg','path');line.setAttribute('d',navPaths[key]);svg.append(line);host.replaceChildren(svg);}
+ for(const link of document.querySelectorAll('.nav-link')){const host=link.querySelector('span');if(!host)continue;const path=link.getAttribute('href'),key=path.includes('resources')?'resources':path.includes('food-map')?'map':path.includes('projects')?'projects':path.includes('#notes')?'notes':'home';const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');for(const [name,value] of Object.entries({viewBox:'0 0 24 24',width:'19',height:'19',fill:'none',stroke:'currentColor','stroke-width':'1.5','stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true'}))svg.setAttribute(name,value);const line=document.createElementNS('http://www.w3.org/2000/svg','path');line.setAttribute('d',navPaths[key]);svg.append(line);host.replaceChildren(svg);}
  for(const link of document.querySelectorAll('a[href]')){
   if(link.matches('.skip,.avatar-link,.wordmark,.nav-link,[data-site-language],.leaflet-control-attribution a')||link.querySelector('svg,img'))continue;
   const walker=document.createTreeWalker(link,NodeFilter.SHOW_TEXT);let text;while((text=walker.nextNode()))text.textContent=text.textContent.replace(/[↗→←↓]/g,'');

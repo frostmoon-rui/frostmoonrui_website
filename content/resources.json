@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "links": [
+    {
+      "id": "hrt-tracker",
+      "name": "HRT Tracker",
+      "url": "https://hrt.mahiro.uk/",
+      "category": "Reference / tools",
+      "description": {
+        "en": "An HRT tracking tool; check privacy terms. Not a dosing recommendation.",
+        "zh": "HRT 记录工具；先查看隐私条款，不作为剂量建议。",
+        "ru": "Учёт HRT: проверьте конфиденциальность. Не рекомендация доз.",
+        "ja": "HRTの記録ツール。プライバシー方針を確認し、用量の判断には使わないでください。"
+      }
+    },
+    {
+      "id": "mtf-wiki",
+      "name": "MtF.wiki",
+      "url": "https://mtf.wiki/",
+      "category": "Community reference",
+      "description": {
+        "en": "Multilingual community reference. Medical information needs professional assessment.",
+        "zh": "多语言社区资料，医疗信息需结合专业人员的个体评估。",
+        "ru": "Материалы сообщества. Медицинские сведения требуют оценки специалиста.",
+        "ja": "多言語のコミュニティ資料。医療情報の適用には専門家の個別評価が必要です。"
+      }
+    },
+    {
+      "id": "wpath",
+      "name": "WPATH",
+      "url": "https://wpath.org/",
+      "category": "Professional reference",
+      "description": {
+        "en": "Professional organization and standards reference, not a personal treatment plan.",
+        "zh": "专业组织与照护标准参考，不是个人治疗方案。",
+        "ru": "Профессиональная организация и стандарты помощи, не личный план лечения.",
+        "ja": "専門団体とケア基準の資料。個人の治療計画ではありません。"
+      }
+    },
+    {
+      "id": "trans-lifeline",
+      "name": "Trans Lifeline",
+      "url": "https://translifeline.org/",
+      "category": "Peer support",
+      "description": {
+        "en": "Trans-led peer support. Check current regional coverage and opening hours.",
+        "zh": "由跨性别者运营的同伴支持，先核对服务地区与开放时间。",
+        "ru": "Поддержка транс-людей равными. Проверьте регион обслуживания и часы работы.",
+        "ja": "トランス当事者によるピアサポート。対象地域と受付時間をご確認ください。"
+      }
+    },
+    {
+      "id": "find-help",
+      "name": "Find A Helpline",
+      "url": "https://findahelpline.com/",
+      "category": "Support directory",
+      "description": {
+        "en": "Find support by country and needs; check the selected service details.",
+        "zh": "按国家和需求查找支持服务，请核对具体服务的适用条件。",
+        "ru": "Поиск поддержки по стране и запросу. Уточните условия выбранной службы.",
+        "ja": "国や相談内容から支援窓口を探せます。各窓口の利用条件をご確認ください。"
+      }
+    },
+    {
+      "id": "mdn",
+      "name": "MDN Web Docs",
+      "url": "https://developer.mozilla.org/",
+      "category": "Technical documentation",
+      "description": {
+        "en": "Web platform references and practical development guides.",
+        "zh": "Web 平台参考与实用开发指南。",
+        "ru": "Справочники веб-платформы и практические руководства.",
+        "ja": "Web標準のリファレンスと実践的な開発ガイド。"
+      }
+    }
+  ]
+}

@@ -3,12 +3,14 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {locales,htmlLanguages,escape,loadCatalog,localizeHtml,languagePath} from './i18n.mjs';
 import {exportFood} from './food-export.mjs';
-import {validateSite} from '../shared/site-schema.js';
+import {validateSite,validateDocument} from '../shared/site-schema.js';
+import {resourcesBody,applicationBody,deskBody} from './community-pages.mjs';
 import {applyChrome,aboutBody,friendsBody} from './site-chrome.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const catalog=loadCatalog(path.join(root,'content/ui.json'));
 const site=validateSite(JSON.parse(read('content/site.json')));
+const resources=validateDocument('resources',JSON.parse(read('content/resources.json')));
 const english=JSON.parse(read('content/pages.json'));
 const source={en:english};
 for(const locale of locales.filter(code=>code!=='en')){
@@ -29,12 +31,15 @@ for(const locale of locales){
  const credits=source[locale].find(p=>p.path==='about').body.replace(/^<p class="lead">[\s\S]*?<\/p>/,'');
  const about=aboutBody(site,locale,catalog).replace('<section class="studio-entry">',`<section class="about-credits">${credits}</section><section class="studio-entry">`);
  const extra=[{path:'about',title:site.about[locale].title,label:text('A LITTLE INTRODUCTION'),description:site.about[locale].intro,body:about},{path:'links',title:text('Good company, on the open web.'),label:text('MY COMPANIONS'),description:text('Independent corners of the web, and the people who keep them growing.'),body:friendsBody(site,locale,catalog)}];
+ extra[1].body+=applicationBody(locale,catalog);
+ extra.push({path:'resources',title:text('Recommended links'),label:text('Resource collection'),description:text('A small shelf of useful places.'),body:resourcesBody(resources,locale,catalog)});
  const pages=[['',home],['food-map/',atlas],['404.html',notFound],['studio/',read('templates/studio.html')],...extra.map(p=>[p.path+'/',article(p)]),...source[locale].filter(p=>p.path!=='about').map(p=>[p.path+'/',article(p).replace('</main>',(['privacy','notes/a-map-with-boundaries'].includes(p.path)?'<p>Loading Amap contacts Amap servers; the security code stays on the server. OpenStreetMap remains an optional alternative.</p>':'')+'</main>')])];
  for(const [route,html] of pages){
   if(route.includes('..')||!/^([a-z/-]+|404\.html)$/.test(route||'/'))throw new Error('Invalid route');
   const leaf=route.endsWith('.html')?route:route+'index.html';
   const navigationHtml=html.includes('class="mobile-topbar"')?html:html.replace('<body>',`<body>${mobileNav}${html.includes('id="site-sidebar"')?'':`<div class="mobile-only-drawer">${aside}</div>`}`);
-  const moduleHtml=navigationHtml.replace('<script src="/assets/site.js" defer>','<script type="module" src="/assets/site.js">');
+  let moduleHtml=navigationHtml.replace('<script src="/assets/site.js" defer>','<script type="module" src="/assets/site.js">');
+  if(route==='studio/')moduleHtml=moduleHtml.replace('</section></main>',deskBody(locale,catalog)+'</section></main>');
   write(`${locale}/${leaf}`,applyChrome(localizeHtml(moduleHtml,locale,route,catalog),site,locale,route,catalog));
   if(locale==='en')write(leaf,applyChrome(localizeHtml(moduleHtml,locale,route,catalog,{defaultEntry:true}),site,locale,route,catalog));
  }
@@ -50,7 +55,8 @@ write('assets/i18n.js',runtime);
 write('assets/site-schema.js',read('shared/site-schema.js'));
 write('assets/appearance.css',`:root{--accent:${site.appearance.accent};--gold:${site.appearance.highlight};--surface-radius:${site.appearance.radius}px}.dark{--accent:color-mix(in srgb,${site.appearance.accent} 50%,white)}\n`);
 write('data/site.json',JSON.stringify(site,null,2)+'\n');
-const routes=[...new Set(['','food-map/','about/','links/',...english.map(p=>p.path+'/')])];
+write('data/bot-site.json',JSON.stringify({schemaVersion:1,origin:'https://frostmoonrui.com',pages:{home:'',about:'about/',friends:'links/',resources:'resources/',food:'food-map/',projects:'projects/'},locales,resources:resources.links},null,2)+'\n');
+const routes=[...new Set(['','food-map/','about/','links/','resources/',...english.map(p=>p.path+'/')])];
 const urls=[...routes.map(route=>'https://frostmoonrui.com/'+route),...locales.flatMap(code=>routes.map(route=>'https://frostmoonrui.com'+languagePath(code,route)))];
 write('sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(url=>`<url><loc>${url}</loc></url>`).join('')}</urlset>\n`);
 console.log(`Built ${locales.length} complete site languages, ${urls.length} public routes and localized 404 pages.`);

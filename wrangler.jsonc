@@ -3,7 +3,8 @@
   "name": "frostmoonrui-website",
   "main": "src/worker.js",
   "keep_vars": true,
-  "ratelimits": [{"name":"ADMIN_LOGIN_LIMIT","namespace_id":"73620491","simple":{"limit":5,"period":60}}],
+  "d1_databases": [{"binding":"WEBSITE_DB","database_name":"frostmoon-community","database_id":"70cce382-9bc3-455a-a9df-1edb487c3625","migrations_dir":"migrations"}],
+  "ratelimits": [{"name":"ADMIN_LOGIN_LIMIT","namespace_id":"73620491","simple":{"limit":5,"period":60}},{"name":"FRIEND_APPLY_LIMIT","namespace_id":"73620492","simple":{"limit":3,"period":60}}],
   "compatibility_date": "2026-10-18",
   "routes": [
     {"pattern": "frostmoonrui.com/*", "zone_name": "frostmoonrui.com"}

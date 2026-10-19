@@ -8,5 +8,8 @@ html{background-color:var(--bg);min-height:100%}body{background-color:var(--bg);
 .theme-transition::view-transition-new(root){clip-path:circle(0px at var(--theme-x,50%) var(--theme-y,50%));opacity:1}
 .theme-transition::view-transition-old(root){opacity:1}
 .theme-transition.theme-reverse::view-transition-new(root){clip-path:none}
-.theme-transition.theme-reverse::view-transition-old(root){clip-path:circle(var(--theme-radius,200vmax) at var(--theme-x,50%) var(--theme-y,50%))}
+.theme-transition.theme-reverse::view-transition-old(root){clip-path:none}
+/* Keep the old snapshot fully covering the canvas until WAAPI starts its reverse reveal. */
+.theme-transition *,.theme-transition *:before,.theme-transition *:after{transition:none!important}
+.theme-transition::view-transition-old(root),.theme-transition::view-transition-new(root){animation:none!important;mix-blend-mode:normal;opacity:1}
 .wordmark img,.intro-emblem img{border-radius:30%;object-fit:cover}.companion-buddy img{border-radius:inherit}

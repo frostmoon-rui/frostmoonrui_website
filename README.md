@@ -138,4 +138,6 @@ Official references: [Workers static assets](https://developers.cloudflare.com/w
 
 ## Shared fallback artwork
 
+Friend applications, the private review console, the recommended-links page and public bot route feed are documented in [D1 setup and integration](D1_SETUP.md). Complete the one-time schema setup before accepting applications. The homepage contact strip is intentionally omitted; contact buttons remain in the sidebar.
+
 Missing or failed companion portraits reveal a shared transparent pixel-cat placeholder at `/assets/companions/blank-cat.png`. Existing portraits stay on top; reduced-motion GIF suppression also reveals the same neutral artwork. The original blank-faced silhouette was generated with the built-in image generation tool from the approved reference: pale gray chibi cat, icy-blue pixel outline, tiny decorative speech bubble, transparent background. It does not represent any companion's identity.
