@@ -13,11 +13,12 @@ for(const button of buttons)button.addEventListener('click',async event=>{
   if(moving&&document.startViewTransition){
    const rect=button.getBoundingClientRect(),x=event.clientX||rect.left+rect.width/2,y=event.clientY||rect.top+rect.height/2;
    const radius=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
-   document.documentElement.classList.add('theme-transition');
+   document.documentElement.classList.add('theme-transition');document.documentElement.classList.toggle('theme-reverse',!next);
    const transition=activeTransition=document.startViewTransition(()=>apply(next));await transition.ready;
    if(reduced.matches||document.body.dataset.motion==='false'||document.visibilityState==='hidden'){transition.skipTransition?.();return;}
-   activeAnimation=document.documentElement.animate({clipPath:[`circle(0px at ${x}px ${y}px)`,`circle(${radius}px at ${x}px ${y}px)`]},{duration:550,easing:'cubic-bezier(.22,1,.36,1)',pseudoElement:'::view-transition-new(root)'});await activeAnimation.finished;
+   const small=`circle(0px at ${x}px ${y}px)`,large=`circle(${radius}px at ${x}px ${y}px)`;
+   activeAnimation=document.documentElement.animate({clipPath:next?[small,large]:[large,small]},{duration:550,easing:'cubic-bezier(.22,1,.36,1)',pseudoElement:next?'::view-transition-new(root)':'::view-transition-old(root)'});await activeAnimation.finished;
    await transition.finished;
   }else{if(moving)document.documentElement.classList.add('theme-fade');apply(next);if(moving)await new Promise(resolve=>setTimeout(resolve,350));}
- }catch{apply(next);}finally{activeTransition=activeAnimation=null;document.documentElement.classList.remove('theme-transition','theme-fade');for(const item of buttons)item.disabled=false;changing=false;}
+ }catch{apply(next);}finally{activeTransition=activeAnimation=null;document.documentElement.classList.remove('theme-transition','theme-reverse','theme-fade');for(const item of buttons)item.disabled=false;changing=false;}
 });

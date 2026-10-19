@@ -1,5 +1,11 @@
 {
   "en": {
+    "Visit website": "Visit website",
+    "Send a little hello to {name}": "Send a little hello to {name}",
+    "A little hello for {name}.": "A little hello for {name}.",
+    "Public links collected from a shared neighborhood, not a claim of reciprocal friendship.": "Public links collected from a shared neighborhood, not a claim of reciprocal friendship.",
+    "Avatar image": "Avatar image",
+    "Invalid companion avatar": "Choose a local companion image path.",
     "Check draft": "Check draft",
     "Restore loaded version": "Restore loaded version",
     "Draft is valid. Nothing has been published.": "Draft is valid. Nothing has been published.",
@@ -307,6 +313,12 @@
     "UI translations must be plain text": "UI translations must be plain text"
   },
   "zh": {
+    "Visit website": "去串个门",
+    "Send a little hello to {name}": "和 {name} 贴贴",
+    "A little hello for {name}.": "和 {name} 轻轻贴贴。",
+    "Public links collected from a shared neighborhood, not a claim of reciprocal friendship.": "从共同的网络邻里整理来的公开站点，不代表彼此已互加友链。",
+    "Avatar image": "头像图片",
+    "Invalid companion avatar": "请选择本地小伙伴头像路径。",
     "Check draft": "检查草稿",
     "Restore loaded version": "恢复已加载版本",
     "Draft is valid. Nothing has been published.": "草稿检查通过，尚未发布任何内容。",
@@ -614,6 +626,12 @@
     "UI translations must be plain text": "界面翻译必须是纯文本"
   },
   "ru": {
+    "Visit website": "Заглянуть в гости",
+    "Send a little hello to {name}": "Поприветствовать {name}",
+    "A little hello for {name}.": "Тёплый привет для {name}.",
+    "Public links collected from a shared neighborhood, not a claim of reciprocal friendship.": "Публичные ссылки из общего веб-соседства; это не означает взаимного добавления в друзья.",
+    "Avatar image": "Изображение аватара",
+    "Invalid companion avatar": "Укажите локальный путь к аватару друга.",
     "Check draft": "Проверить черновик",
     "Restore loaded version": "Восстановить загруженную версию",
     "Draft is valid. Nothing has been published.": "Черновик корректен. Ничего не опубликовано.",
@@ -921,6 +939,12 @@
     "UI translations must be plain text": "Переводы интерфейса должны быть обычным текстом"
   },
   "ja": {
+    "Visit website": "遊びに行く",
+    "Send a little hello to {name}": "{name} にそっとごあいさつ",
+    "A little hello for {name}.": "{name} に、そっと寄り添うごあいさつ。",
+    "Public links collected from a shared neighborhood, not a claim of reciprocal friendship.": "同じウェブの界隈から集めた公開リンクです。相互リンクや直接の友人関係を意味するものではありません。",
+    "Avatar image": "アバター画像",
+    "Invalid companion avatar": "ローカルの仲間の画像パスを指定してください。",
     "Check draft": "下書きを確認",
     "Restore loaded version": "読み込み時の状態に戻す",
     "Draft is valid. Nothing has been published.": "下書きに問題はありません。まだ公開されていません。",

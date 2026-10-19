@@ -180,7 +180,198 @@
         "zh": "云边的小旅店 · 技术笔记，还有一张一起分享的美食地图。",
         "ru": "A Little Inn by the Clouds · технические заметки и общая карта еды.",
         "ja": "雲のそばの小さな宿 · 技術メモと、共有するグルメマップ。"
+      },
+      "avatar": "/assets/companions/cachetide.jpg"
+    },
+    {
+      "id": "cxzlw",
+      "name": "创新者老王",
+      "url": "https://blog.cxzlw.top/",
+      "linksUrl": "https://blog.cxzlw.top/",
+      "description": {
+        "en": "CXZLW's blog",
+        "zh": "创新者老王的博客",
+        "ru": "Блог CXZLW",
+        "ja": "CXZLW のブログ"
+      },
+      "avatar": "/assets/companions/cxzlw.ico"
+    },
+    {
+      "id": "orange",
+      "name": "橙子",
+      "url": "https://orangestd.cn/",
+      "linksUrl": "https://orangestd.cn/",
+      "description": {
+        "en": "Orange's corner · enjoy freedom",
+        "zh": "橙子的小站 · 享受自由",
+        "ru": "Уголок Orange · наслаждайтесь свободой",
+        "ja": "Orange の小さなサイト · 自由を楽しもう"
+      },
+      "avatar": "/assets/companions/orange.jpg"
+    },
+    {
+      "id": "snowmiku",
+      "name": "雪葱",
+      "url": "https://snowmiku-home.top/",
+      "linksUrl": "https://snowmiku-home.top/",
+      "description": {
+        "en": "A little fantasy world",
+        "zh": "葱酱的幻想乡",
+        "ru": "Маленький мир фантазии",
+        "ja": "小さな幻想郷"
       }
+    },
+    {
+      "id": "tenchsu",
+      "name": "tenchsu",
+      "url": "https://tenchsu.com/",
+      "linksUrl": "https://tenchsu.com/",
+      "description": {
+        "en": "tenchsu's personal blog",
+        "zh": "tenchsu 的个人博客",
+        "ru": "Личный блог tenchsu",
+        "ja": "tenchsu の個人ブログ"
+      },
+      "avatar": "/assets/companions/tenchsu.jpg"
+    },
+    {
+      "id": "dorimu",
+      "name": "Dorimu",
+      "url": "https://dorimu.cn/",
+      "linksUrl": "https://dorimu.cn/",
+      "description": {
+        "en": "Dorimu's blog",
+        "zh": "Dorimu 的博客",
+        "ru": "Блог Dorimu",
+        "ja": "Dorimu のブログ"
+      },
+      "avatar": "/assets/companions/dorimu.png"
+    },
+    {
+      "id": "hikaru",
+      "name": "HikaruQwQ",
+      "url": "https://www.mengxiblog.top/",
+      "linksUrl": "https://www.mengxiblog.top/",
+      "description": {
+        "en": "Hikaru Lab · memories worth keeping",
+        "zh": "Hikaru Lab · 值得珍藏的记忆",
+        "ru": "Hikaru Lab · воспоминания, которые стоит хранить",
+        "ja": "Hikaru Lab · 大切にしたい記憶"
+      },
+      "avatar": "/assets/companions/hikaru.png"
+    },
+    {
+      "id": "starneko",
+      "name": "牛奶猫",
+      "url": "https://starneko.com/",
+      "linksUrl": "https://starneko.com/",
+      "description": {
+        "en": "Milk Cat's hunter notes",
+        "zh": "牛奶猫的猎人笔记",
+        "ru": "Охотничьи заметки Milk Cat",
+        "ja": "Milk Cat のハンターノート"
+      },
+      "avatar": "/assets/companions/starneko.jpg"
+    },
+    {
+      "id": "misaka-fish",
+      "name": "御坂鱼板",
+      "url": "https://xiongzikun0106.github.io/my-first-personal-webside/",
+      "linksUrl": "https://xiongzikun0106.github.io/my-first-personal-webside/",
+      "description": {
+        "en": "Misaka Fish's little site",
+        "zh": "御坂鱼板的小站点",
+        "ru": "Маленький сайт Misaka Fish",
+        "ja": "Misaka Fish の小さなサイト"
+      }
+    },
+    {
+      "id": "mint",
+      "name": "薄荷",
+      "url": "https://www.hoshiroko.com/",
+      "linksUrl": "https://www.hoshiroko.com/",
+      "description": {
+        "en": "Mint's little house",
+        "zh": "薄荷的小屋",
+        "ru": "Маленький домик Mint",
+        "ja": "Mint の小さな家"
+      }
+    },
+    {
+      "id": "misakae",
+      "name": "MisakaE",
+      "url": "https://misakae.live/",
+      "linksUrl": "https://misakae.live/",
+      "description": {
+        "en": "MisakaE's personal corner",
+        "zh": "MisakaE 的个人角落",
+        "ru": "Личный уголок MisakaE",
+        "ja": "MisakaE の個人的な場所"
+      }
+    },
+    {
+      "id": "zer0ptr",
+      "name": "zer0ptr",
+      "url": "https://blog.zer0ptr.icu/",
+      "linksUrl": "https://blog.zer0ptr.icu/",
+      "description": {
+        "en": "zer0ptr's blog",
+        "zh": "zer0ptr 的博客",
+        "ru": "Блог zer0ptr",
+        "ja": "zer0ptr のブログ"
+      },
+      "avatar": "/assets/companions/zer0ptr.jpg"
+    },
+    {
+      "id": "qijie",
+      "name": "祈杰",
+      "url": "https://qijieya.cn/",
+      "linksUrl": "https://qijieya.cn/",
+      "description": {
+        "en": "Qijie's blog · to an imperfect tomorrow",
+        "zh": "祈杰的博客 · 敬不完美的明天",
+        "ru": "Блог Qijie · за несовершенное завтра",
+        "ja": "Qijie のブログ · 不完全な明日へ"
+      }
+    },
+    {
+      "id": "sorrowrain",
+      "name": "SorrowRain",
+      "url": "https://0xsr.dev/",
+      "linksUrl": "https://0xsr.dev/",
+      "description": {
+        "en": "SorrowRain's personal blog",
+        "zh": "SorrowRain 的个人博客",
+        "ru": "Личный блог SorrowRain",
+        "ja": "SorrowRain の個人ブログ"
+      },
+      "avatar": "/assets/companions/sorrowrain.jpg"
+    },
+    {
+      "id": "ziantt",
+      "name": "Ziantt",
+      "url": "https://ziantt.top/",
+      "linksUrl": "https://ziantt.top/",
+      "description": {
+        "en": "Ziantt's blog",
+        "zh": "Ziantt 的博客",
+        "ru": "Блог Ziantt",
+        "ja": "Ziantt のブログ"
+      },
+      "avatar": "/assets/companions/ziantt.webp"
+    },
+    {
+      "id": "spheniscidition",
+      "name": "Spheniscidition",
+      "url": "https://icarusfell.top/",
+      "linksUrl": "https://icarusfell.top/",
+      "description": {
+        "en": "Spheniscidition's personal blog",
+        "zh": "Spheniscidition 的个人博客",
+        "ru": "Личный блог Spheniscidition",
+        "ja": "Spheniscidition の個人ブログ"
+      },
+      "avatar": "/assets/companions/spheniscidition.jpg"
     }
   ]
 }

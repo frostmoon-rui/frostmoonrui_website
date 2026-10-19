@@ -28,7 +28,7 @@ test('every locale has accessible contact icons, localized avatar links, About a
   const home=read(`dist/${code}/index.html`),about=read(`dist/${code}/about/index.html`),friends=read(`dist/${code}/links/index.html`);
   assert.match(home,new RegExp(`class="avatar-link" href="/${code}/about/"`));assert.ok(home.includes('class="contact-strip"'));assert.ok(home.includes('class="contact-tooltip" role="tooltip"'));
   for(const contact of site.contacts){assert.ok(home.includes(`href="${escape(contact.url)}"`));assert.ok(home.includes(`title="${escape(contact.note[code])}"`));}
-  assert.ok(about.includes(`href="/${code}/studio/"`));assert.ok(about.indexOf('class="studio-entry"')>about.indexOf('class="about-credits"'));assert.match(about,/CacheTide/);assert.doesNotMatch(friends,/CacheTide/);assert.ok(friends.includes('data-copy-site'));
+  assert.ok(about.includes(`href="/${code}/studio/"`));assert.ok(about.indexOf('class="studio-entry"')>about.indexOf('class="about-credits"'));assert.match(about,/CacheTide/);assert.match(friends,/CacheTide/);assert.ok(friends.includes('data-copy-site'));
  }
 });
 test('studio is excluded from the public sitemap and previews are isolated',()=>{

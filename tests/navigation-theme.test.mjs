@@ -39,6 +39,11 @@ test('theme switching uses a circular transition and synchronizes all theme butt
 test('theme changes respect reduced motion and owner preferences',async()=>{
  for(const options of [{reduced:true},{}]){const s=themeFixture(options);if(!options.reduced)s.body.dataset.motion='false';await s.buttons[0].events.click({});assert.equal(s.count(),0);assert.equal(s.animations.length,0);assert.equal(s.body.classList.contains('dark'),true);}
 });
+
+test('dark expands the new snapshot and light reverses by shrinking the old one',async()=>{
+ const s=themeFixture();await s.buttons[0].events.click({clientX:120,clientY:95});await s.buttons[0].events.click({clientX:120,clientY:95});
+ const [dark,light]=s.animations;assert.equal(dark.options.pseudoElement,'::view-transition-new(root)');assert.equal(light.options.pseudoElement,'::view-transition-old(root)');assert.deepEqual([...light.frames.clipPath],[...dark.frames.clipPath].reverse());assert.equal(s.body.classList.contains('dark'),false);assert.equal(s.root.classList.contains('theme-reverse'),false);
+});
 test('theme switching still works without view transitions or local storage',async()=>{
  for(const options of [{transitions:false},{transitions:false,storageFails:true}]){const s=themeFixture(options);await s.buttons[0].events.click({});assert.equal(s.body.classList.contains('dark'),true);assert.equal(s.root.classList.contains('theme-fade'),false);}
 });

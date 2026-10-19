@@ -15,7 +15,7 @@ export function validateSite(site){
  const a=site.appearance;if(!object(a)||!/^#[0-9a-f]{6}$/i.test(a.accent)||!/^#[0-9a-f]{6}$/i.test(a.highlight)||!Number.isInteger(a.radius)||a.radius<0||a.radius>32||typeof a.motion!=='boolean')fail('Invalid appearance settings');
  for(const code of locales){const home=site.home?.[code],about=site.about?.[code];fields(home,['eyebrow','title','description']);fields(about,['title','intro','sections']);for(const key of ['eyebrow','title','description'])text(home[key]);text(about.title);text(about.intro);collection(about.sections,20);for(const section of about.sections){fields(section,['title','text']);text(section.title,200);text(section.text,12000);}}
  collection(site.contacts,12);ids(site.contacts);for(const item of site.contacts){fields(item,['id','url','label','note']);publicUrl(item.url,{mail:true});translated(item.label);translated(item.note);}
- collection(site.friends,40);ids(site.friends);for(const item of site.friends){fields(item,['id','name','url','linksUrl','description']);text(item.name,100);publicUrl(item.url);publicUrl(item.linksUrl);translated(item.description);}
+ collection(site.friends,40);ids(site.friends);for(const item of site.friends){fields(item,['id','name','url','linksUrl','description','avatar']);text(item.name,100);publicUrl(item.url);publicUrl(item.linksUrl);translated(item.description);if(item.avatar!==undefined&&!/^\/assets\/companions\/[a-z0-9-]+\.(?:png|jpg|jpeg|webp|gif|ico)$/.test(item.avatar))fail('Invalid companion avatar');}
  return site;
 }
 export function validateHtml(html){
