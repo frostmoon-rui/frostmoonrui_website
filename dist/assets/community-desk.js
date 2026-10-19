@@ -13,7 +13,7 @@ async function refresh(){
   const session=await api('session',{},signal);if(!session.authenticated){locked();return;}
   const [health,queue]=await Promise.all([api('health',{},signal),api('community?status='+$('review-filter').value+'&page='+page,{},signal).catch(()=>null)]);
   if(current!==epoch)return;host.replaceChildren();$('studio-health').replaceChildren();dirty=false;
-  for(const [key,label] of [['database','Private review database'],['applicationProtection','Application rate protection'],['githubPublishing','GitHub publishing'],['map','Amap configuration']]){const row=node('div');row.className='health-line';row.append(node('span',t(label)),node('strong',t(health[key]?'Ready':'Not configured')));$('studio-health').append(row);}
+  for(const [key,label] of [['database','Private review database'],['applicationProtection','Application rate protection'],['githubPublishing','GitHub token configured'],['map','Amap configuration']]){const row=node('div');row.className='health-line';row.append(node('span',t(label)),node('strong',t(health[key]?'Ready':'Not configured')));$('studio-health').append(row);}
   const feed=node('a',t('Public bot feed'));feed.href='/data/bot-site.json';feed.className='text-link';feed.target='_blank';feed.rel='noopener';$('studio-health').append(feed);
   if(!queue){$('review-status').textContent=t('Applications are not open yet. The owner needs to connect the private review database.');return;}
   $('review-prev').disabled=page===0;$('review-next').disabled=queue.applications.length<100;

@@ -3,7 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {locales,htmlLanguages,escape,loadCatalog,localizeHtml,languagePath} from './i18n.mjs';
 import {exportFood} from './food-export.mjs';
-import {validateSite,validateDocument} from '../shared/site-schema.js';
+import {documents,validateSite,validateDocument} from '../shared/site-schema.js';
 import {resourcesBody,applicationBody,deskBody} from './community-pages.mjs';
 import {secretPage} from './secret-page.mjs';
 import {applyChrome,aboutBody,friendsBody} from './site-chrome.mjs';
@@ -59,6 +59,7 @@ const runtime=[
 write('assets/i18n.js',runtime);
 write('assets/site-schema.js',read('shared/site-schema.js'));
 write('assets/appearance.css',`:root{--accent:${site.appearance.accent};--gold:${site.appearance.highlight};--surface-radius:${site.appearance.radius}px}.dark{--accent:color-mix(in srgb,${site.appearance.accent} 50%,white)}\n`);
+for(const [key,file] of Object.entries(documents)){const content=read(file);const value=JSON.parse(content);validateDocument(key,value,value);write('__studio/'+key+'.json',content);}
 write('data/site.json',JSON.stringify(site,null,2)+'\n');
 write('data/bot-site.json',JSON.stringify({schemaVersion:1,origin:'https://frostmoonrui.com',pages:{home:'',about:'about/',friends:'links/',resources:'resources/',food:'food-map/',projects:'projects/'},locales,resources:resources.links},null,2)+'\n');
 const routes=[...new Set(['','food-map/','about/','links/','resources/',...english.map(p=>p.path+'/')])];

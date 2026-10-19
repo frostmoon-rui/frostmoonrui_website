@@ -1,0 +1,396 @@
+{
+  "schemaVersion": 1,
+  "displayName": "frostmoon-rui",
+  "appearance": {
+    "accent": "#587e92",
+    "highlight": "#b69b70",
+    "radius": 16,
+    "motion": true
+  },
+  "home": {
+    "en": {
+      "eyebrow": "AN INDEPENDENT LITTLE CORNER",
+      "title": "A quiet place\nfor curious things.",
+      "description": "Hardware on the desk. Ideas in the margins.\nA few things built, a few things learned — collected here."
+    },
+    "zh": {
+      "eyebrow": "一隅自留地，慢慢生长",
+      "title": "安静一点，\n好奇多一点。",
+      "description": "桌上是硬件，页边是灵感。\n把做过的东西、学到的事情，慢慢收集在这里。"
+    },
+    "ru": {
+      "eyebrow": "НЕБОЛЬШОЙ НЕЗАВИСИМЫЙ УГОЛОК",
+      "title": "Тихое место\nдля любопытных вещей.",
+      "description": "На столе — электроника, на полях — идеи.\nЗдесь собирается то, что удалось сделать и узнать."
+    },
+    "ja": {
+      "eyebrow": "ゆっくり育つ、小さな居場所",
+      "title": "静かな場所に、\n小さな好奇心を。",
+      "description": "机の上にはハードウェア、余白にはアイデア。\n作ったものと学んだことを、少しずつ集めています。"
+    }
+  },
+  "about": {
+    "en": {
+      "title": "Making things. Staying curious.",
+      "intro": "Hi, I’m frostmoon-rui. I work at the meeting point of software and hardware, keeping the small experiments and useful discoveries that are worth returning to.",
+      "sections": [
+        {
+          "title": "Software with room to breathe",
+          "text": "Python, asynchronous workflows and a multi-provider QQ bot are recurring threads. I care about bounded background work, useful replies and automation that does not overwhelm a conversation."
+        },
+        {
+          "title": "Hardware, patiently understood",
+          "text": "Arduino, STM32 and ESP32 experiments connect code to the physical world. The recovered fire-rescue archive contains camera code, infrared notes and CAD assets; it is a subsystem archive, not a claim of a complete autonomous vehicle."
+        },
+        {
+          "title": "Maps, with a source attached",
+          "text": "The food atlas is a separate place to explore public recommendations. Original contributions and imported records keep their provenance; private bot locations and conversations do not belong in the map."
+        },
+        {
+          "title": "How I like to build",
+          "text": "Keep source understandable, test what can be tested, and state what remains uncertain. This site is a small multilingual static generator with a Worker backend, maintained separately from the bot's private runtime."
+        }
+      ]
+    },
+    "zh": {
+      "title": "动手，也保持好奇。",
+      "intro": "你好，我是 frostmoon-rui。在软件与硬件相遇的地方折腾，把小小的实验、实际踩过的坑，以及值得再翻一遍的发现，慢慢留在这里。",
+      "sections": [
+        {
+          "title": "软件，也要有呼吸感",
+          "text": "Python、异步任务和多服务商 QQ 机器人，是经常出现在工作台上的东西。我在意后台任务的边界、真正有用的回复，以及不打扰群聊节奏的自动化。"
+        },
+        {
+          "title": "硬件，慢一点理解",
+          "text": "从 Arduino、STM32 到 ESP32，让程序与现实世界发生一点联系。找回的消防救援车档案保留了摄像头代码、红外笔记和 CAD 资源；它是子系统档案，不代表一辆完整、已验证的无人驾驶车辆。"
+        },
+        {
+          "title": "地图，也带着出处",
+          "text": "美食地图单独留给公开的推荐与发现。原创内容和导入地点保留各自的来源，机器人的私人位置和对话不会被放进地图里。"
+        },
+        {
+          "title": "偏爱的制作方式",
+          "text": "让源码可以读懂，让测试验证实际能验证的部分，也如实留下不确定之处。这个四语网站使用轻量静态生成与 Worker 后端，与机器人的私有运行环境独立维护。"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Создавать. Не терять любопытства.",
+      "intro": "Привет, я frostmoon-rui. Мне интересно пересечение программного и аппаратного мира. Здесь я сохраняю небольшие эксперименты, полезные находки и опыт, к которому хочется вернуться.",
+      "sections": [
+        {
+          "title": "Программы, которые не мешают",
+          "text": "Python, асинхронные задачи и QQ-бот с несколькими провайдерами часто оказываются на моём рабочем столе. Важны ограниченные фоновые задачи, полезные ответы и автоматизация, не заглушающая разговор."
+        },
+        {
+          "title": "Разбираться в железе постепенно",
+          "text": "Arduino, STM32 и ESP32 связывают код с физическим миром. В восстановленном архиве пожарно-спасательной машины есть код камеры, заметки об ИК-управлении и CAD-файлы. Это архив подсистем, а не подтверждение готового автономного автомобиля."
+        },
+        {
+          "title": "Карта с первоисточниками",
+          "text": "Гастрономический атлас существует отдельно для открытых рекомендаций. Собственные и импортированные записи сохраняют происхождение; личные координаты и переписка бота на карту не попадают."
+        },
+        {
+          "title": "Как мне нравится создавать",
+          "text": "Понятный исходный код, проверяемые тестами утверждения и честное описание неизвестного. Этот четырёхъязычный сайт использует статическую генерацию и Worker-бэкенд, отдельно от закрытой среды бота."
+        }
+      ]
+    },
+    "ja": {
+      "title": "つくりながら、好奇心を忘れずに。",
+      "intro": "こんにちは、frostmoon-rui です。ソフトウェアとハードウェアの接点で、小さな実験や試行錯誤、また読み返したくなる発見を少しずつ残しています。",
+      "sections": [
+        {
+          "title": "会話の余白を残すソフトウェア",
+          "text": "Python、非同期処理、複数のプロバイダーに対応した QQ ボットが、よく作業机に並びます。バックグラウンド処理の境界、役立つ返答、会話を邪魔しない自動化を大切にしています。"
+        },
+        {
+          "title": "ハードウェアを、ゆっくり理解する",
+          "text": "Arduino、STM32、ESP32 で、コードを現実につなげています。復元した消防救援車の資料にはカメラのコード、赤外線のメモ、CAD ファイルがあります。完成した自律走行車を示すものではなく、サブシステムの記録です。"
+        },
+        {
+          "title": "出典とともに残す地図",
+          "text": "グルメマップは公開のおすすめを探すための独立した場所です。独自の投稿と取り込んだ情報は、それぞれ出典を保持します。ボットの私的な位置情報や会話を地図に載せることはありません。"
+        },
+        {
+          "title": "好きなつくり方",
+          "text": "読めるソースコード、確認できる範囲を確かめるテスト、わからないことへの正直さ。この四言語サイトは静的生成と Worker バックエンドで動き、ボットの私的な実行環境とは別に管理しています。"
+        }
+      ]
+    }
+  },
+  "contacts": [
+    {
+      "id": "bilibili",
+      "url": "https://b23.tv/MvEXDNe",
+      "label": {
+        "en": "Bilibili",
+        "zh": "哔哩哔哩",
+        "ru": "Bilibili",
+        "ja": "Bilibili"
+      },
+      "note": {
+        "en": "Frostmoon Rui · main channel",
+        "zh": "霜月琉依的个人空间",
+        "ru": "Frostmoon Rui · основной канал",
+        "ja": "Frostmoon Rui · メインチャンネル"
+      }
+    },
+    {
+      "id": "bilibili-overseas",
+      "url": "https://b23.tv/Hgyyy3p",
+      "label": {
+        "en": "Overseas channel",
+        "zh": "海外版频道",
+        "ru": "Зарубежный канал",
+        "ja": "海外チャンネル"
+      },
+      "note": {
+        "en": "Frostmoon Rui · overseas Bilibili",
+        "zh": "霜月琉依—海外版的个人空间",
+        "ru": "Frostmoon Rui · зарубежный Bilibili",
+        "ja": "Frostmoon Rui · 海外版 Bilibili"
+      }
+    },
+    {
+      "id": "email",
+      "url": "mailto:ericwang2795@email.com",
+      "label": {
+        "en": "Email",
+        "zh": "邮箱",
+        "ru": "Почта",
+        "ja": "メール"
+      },
+      "note": {
+        "en": "Write to ericwang2795@email.com",
+        "zh": "发送邮件至 ericwang2795@email.com",
+        "ru": "Написать на ericwang2795@email.com",
+        "ja": "ericwang2795@email.com にメールする"
+      }
+    },
+    {
+      "id": "x",
+      "url": "https://x.com/rui_frostmoon",
+      "label": {
+        "en": "X / Twitter",
+        "zh": "X / Twitter",
+        "ru": "X / Twitter",
+        "ja": "X / Twitter"
+      },
+      "note": {
+        "en": "@rui_frostmoon",
+        "zh": "@rui_frostmoon",
+        "ru": "@rui_frostmoon",
+        "ja": "@rui_frostmoon"
+      }
+    }
+  ],
+  "friends": [
+    {
+      "id": "cachetide",
+      "name": "CacheTide",
+      "url": "https://cachetide.top",
+      "linksUrl": "https://cachetide.top/links/",
+      "description": {
+        "en": "A Little Inn by the Clouds · technical notes and a shared food map.",
+        "zh": "云边的小旅店 · 技术笔记，还有一张一起分享的美食地图。",
+        "ru": "A Little Inn by the Clouds · технические заметки и общая карта еды.",
+        "ja": "雲のそばの小さな宿 · 技術メモと、共有するグルメマップ。"
+      },
+      "avatar": "/assets/companions/cachetide.jpg"
+    },
+    {
+      "id": "cxzlw",
+      "name": "创新者老王",
+      "url": "https://blog.cxzlw.top/",
+      "linksUrl": "https://blog.cxzlw.top/",
+      "description": {
+        "en": "CXZLW's blog",
+        "zh": "创新者老王的博客",
+        "ru": "Блог CXZLW",
+        "ja": "CXZLW のブログ"
+      },
+      "avatar": "/assets/companions/cxzlw.ico"
+    },
+    {
+      "id": "orange",
+      "name": "橙子",
+      "url": "https://orangestd.cn/",
+      "linksUrl": "https://orangestd.cn/",
+      "description": {
+        "en": "Orange's corner · enjoy freedom",
+        "zh": "橙子的小站 · 享受自由",
+        "ru": "Уголок Orange · наслаждайтесь свободой",
+        "ja": "Orange の小さなサイト · 自由を楽しもう"
+      },
+      "avatar": "/assets/companions/orange.jpg"
+    },
+    {
+      "id": "snowmiku",
+      "name": "雪葱",
+      "url": "https://snowmiku-home.top/",
+      "linksUrl": "https://snowmiku-home.top/",
+      "description": {
+        "en": "Snowmiku's Dreamland",
+        "zh": "葱酱的梦境世界",
+        "ru": "Мир грёз Snowmiku",
+        "ja": "Snowmiku の夢の世界"
+      },
+      "avatar": "/assets/companions/snowmiku.jpg"
+    },
+    {
+      "id": "tenchsu",
+      "name": "tenchsu",
+      "url": "https://tenchsu.com/",
+      "linksUrl": "https://tenchsu.com/",
+      "description": {
+        "en": "tenchsu's personal blog",
+        "zh": "tenchsu 的个人博客",
+        "ru": "Личный блог tenchsu",
+        "ja": "tenchsu の個人ブログ"
+      },
+      "avatar": "/assets/companions/tenchsu.jpg"
+    },
+    {
+      "id": "dorimu",
+      "name": "Dorimu",
+      "url": "https://dorimu.cn/",
+      "linksUrl": "https://dorimu.cn/",
+      "description": {
+        "en": "Dorimu's blog",
+        "zh": "Dorimu 的博客",
+        "ru": "Блог Dorimu",
+        "ja": "Dorimu のブログ"
+      },
+      "avatar": "/assets/companions/dorimu.png"
+    },
+    {
+      "id": "hikaru",
+      "name": "HikaruQwQ",
+      "url": "https://www.mengxiblog.top/",
+      "linksUrl": "https://www.mengxiblog.top/",
+      "description": {
+        "en": "Hikaru Lab · memories worth keeping",
+        "zh": "Hikaru Lab · 值得珍藏的记忆",
+        "ru": "Hikaru Lab · воспоминания, которые стоит хранить",
+        "ja": "Hikaru Lab · 大切にしたい記憶"
+      },
+      "avatar": "/assets/companions/hikaru.png"
+    },
+    {
+      "id": "starneko",
+      "name": "牛奶猫",
+      "url": "https://starneko.com/",
+      "linksUrl": "https://starneko.com/",
+      "description": {
+        "en": "Milk Cat's hunter notes",
+        "zh": "牛奶猫的猎人笔记",
+        "ru": "Охотничьи заметки Milk Cat",
+        "ja": "Milk Cat のハンターノート"
+      },
+      "avatar": "/assets/companions/starneko.jpg"
+    },
+    {
+      "id": "misaka-fish",
+      "name": "御坂鱼板",
+      "url": "https://xiongzikun0106.github.io/my-first-personal-webside/",
+      "linksUrl": "https://xiongzikun0106.github.io/my-first-personal-webside/",
+      "description": {
+        "en": "A personal website by 御坂鱼板.",
+        "zh": "御坂鱼板的小站点",
+        "ru": "Личный сайт 御坂鱼板.",
+        "ja": "御坂鱼板 の個人サイト。"
+      },
+      "avatar": "/assets/companions/misaka-fish.jpg"
+    },
+    {
+      "id": "mint",
+      "name": "薄荷",
+      "url": "https://www.hoshiroko.com/",
+      "linksUrl": "https://www.hoshiroko.com/",
+      "description": {
+        "en": "Mint's little house",
+        "zh": "薄荷的小屋",
+        "ru": "Маленький домик Mint",
+        "ja": "Mint の小さな家"
+      },
+      "avatar": "/assets/companions/mint.webp"
+    },
+    {
+      "id": "misakae",
+      "name": "MisakaE",
+      "url": "https://misakae.live/",
+      "linksUrl": "https://misakae.live/",
+      "description": {
+        "en": "MisakaE's personal corner",
+        "zh": "MisakaE 的个人角落",
+        "ru": "Личный уголок MisakaE",
+        "ja": "MisakaE の個人的な場所"
+      }
+    },
+    {
+      "id": "zer0ptr",
+      "name": "zer0ptr",
+      "url": "https://blog.zer0ptr.icu/",
+      "linksUrl": "https://blog.zer0ptr.icu/",
+      "description": {
+        "en": "zer0ptr's blog",
+        "zh": "zer0ptr 的博客",
+        "ru": "Блог zer0ptr",
+        "ja": "zer0ptr のブログ"
+      },
+      "avatar": "/assets/companions/zer0ptr.jpg"
+    },
+    {
+      "id": "qijie",
+      "name": "锦木祈杰",
+      "url": "https://qijieya.cn/",
+      "linksUrl": "https://qijieya.cn/",
+      "description": {
+        "en": "A blog by 锦木祈杰 · stories that exist because of you.",
+        "zh": "锦木祈杰的博客 · 因你而在的故事",
+        "ru": "Блог 锦木祈杰 · истории, существующие благодаря вам.",
+        "ja": "锦木祈杰 のブログ · あなたがいるから生まれる物語。"
+      }
+    },
+    {
+      "id": "sorrowrain",
+      "name": "SorrowRain",
+      "url": "https://0xsr.dev/",
+      "linksUrl": "https://0xsr.dev/",
+      "description": {
+        "en": "SorrowRain's personal blog",
+        "zh": "SorrowRain 的个人博客",
+        "ru": "Личный блог SorrowRain",
+        "ja": "SorrowRain の個人ブログ"
+      },
+      "avatar": "/assets/companions/sorrowrain.jpg"
+    },
+    {
+      "id": "ziantt",
+      "name": "Ziantt",
+      "url": "https://ziantt.top/",
+      "linksUrl": "https://ziantt.top/",
+      "description": {
+        "en": "Ziantt's blog",
+        "zh": "Ziantt 的博客",
+        "ru": "Блог Ziantt",
+        "ja": "Ziantt のブログ"
+      },
+      "avatar": "/assets/companions/ziantt.webp"
+    },
+    {
+      "id": "spheniscidition",
+      "name": "Spheniscidition",
+      "url": "https://icarusfell.top/",
+      "linksUrl": "https://icarusfell.top/",
+      "description": {
+        "en": "Spheniscidition's personal blog",
+        "zh": "Spheniscidition 的个人博客",
+        "ru": "Личный блог Spheniscidition",
+        "ja": "Spheniscidition の個人ブログ"
+      },
+      "avatar": "/assets/companions/spheniscidition.jpg"
+    }
+  ]
+}

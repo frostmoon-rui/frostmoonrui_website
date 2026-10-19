@@ -15,6 +15,9 @@ export function proxyTarget(url,env){
 }
 export async function handle(request,env,fetcher=fetch){
  const url=new URL(request.url);
+ let assetPath=url.pathname;try{for(let i=0;i<4;i++){const decoded=decodeURIComponent(assetPath);if(decoded===assetPath)break;assetPath=decoded;}}catch{return new Response('Not found',{status:404});}
+ if(assetPath.toLowerCase().includes('__studio'))return new Response('Not found',{status:404,headers:{'Cache-Control':'no-store','X-Robots-Tag':'noindex, nofollow'}});
+
  if(url.pathname.startsWith('/api/community/')||['/api/studio/community','/api/studio/health'].includes(url.pathname))return handleCommunity(request,env);
  if(url.pathname.startsWith('/api/studio/'))return handleStudio(request,env,fetcher);
  if(url.pathname==='/api/map-config'){
