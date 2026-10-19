@@ -78,6 +78,8 @@ On mobile, the upper-left menu opens a sliding drawer with a dimmed backdrop, co
 
 The shared motion layer covers article introductions, About sections, cards, atlas results and studio feedback. Scroll reveals use bounded stagger delays; only the first eight venue results animate, and selected markers pulse twice rather than continuously. Decorative hero motion pauses offscreen and in background tabs. Changes to reduced-motion or owner preferences cancel active effects without hiding content or blocking navigation. Observer failures reveal content immediately, return navigation clears temporary states, and no generic link handler bypasses the studio's unsaved-draft warning.
 
+`tests/motion-interruption.test.mjs` exercises queued drawer-close timers and theme cancellation before and during the reveal, including reduced-motion changes, owner preferences, background tabs and rejected transition readiness. These offline cases supplement browser layout checks; they do not verify owner credentials or publish test content.
+
 ## Password-protected owner studio
 
 Open the entry at the bottom of About, or `/zh/studio/` (`/en/`, `/ru/` and `/ja/` are also supported). In the existing Cloudflare Worker's **production runtime Secrets**, configure:
