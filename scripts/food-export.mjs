@@ -13,5 +13,5 @@ export function exportFood(data){
   row.source={id:'local',name:'frostmoon-rui',homepage:'https://frostmoonrui.com/',jsonUrl:feedUrl,type:'local'};
   return row;
  });
- return {schema:'https://valaxy.site/schemas/food-map.v1.json',schemaVersion:1,generator:{name:'frostmoon-food-atlas',version:'1.0.0'},owner:{name:'frostmoon-rui',avatar:'https://frostmoonrui.com/assets/avatar.jpg'},site:{title:'Frostmoon Food Atlas',url:'https://frostmoonrui.com/',homepage:'https://frostmoonrui.com/'},generatedAt:data.generatedAt,coordinateSystem:'GCJ-02',spots:[...new Map(spots.map(p=>[p.id,p])).values()].sort((a,b)=>a.id.localeCompare(b.id))};
+ return {schema:'https://valaxy.site/schemas/food-map.v1.json',schemaVersion:1,generator:{name:'frostmoon-food-atlas',version:'1.0.0'},owner:{name:'frostmoon-rui',avatar:'https://frostmoonrui.com/assets/avatar-cute.jpg'},site:{title:'Frostmoon Food Atlas',url:'https://frostmoonrui.com/',homepage:'https://frostmoonrui.com/'},generatedAt:data.generatedAt,coordinateSystem:'GCJ-02',spots:[...new Map(spots.map(p=>[p.id,p])).values()].sort((a,b)=>a.id.localeCompare(b.id))};
 }

@@ -1,0 +1,3 @@
+// This cookie is a non-sensitive display preference, never an authentication token.
+export function themePreference(request){const value=(request.headers.get('Cookie')||'').match(/(?:^|;\s*)frostmoon_theme=(dark|light)(?:;|$)/);return value?.[1]||null;}
+export function stampTheme(html,theme){if(!['dark','light'].includes(theme))return html;return html.replace(/<html\b([^>]*)>/i,(_,attributes)=>'<html'+attributes.replace(/\sdata-theme="[^"]*"/gi,'')+' data-theme="'+theme+'">').replace(/(<meta\b[^>]*name="color-scheme"[^>]*content=")[^"]*(")/i,'$1'+theme+'$2').replace(/(<meta\b[^>]*name="theme-color"[^>]*content=")[^"]*(")/i,'$1'+(theme==='dark'?'#17242d':'#f5f6f2')+'$2');}

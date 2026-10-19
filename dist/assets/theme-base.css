@@ -1,0 +1,12 @@
+/* Root canvas and loader colors exist before any application module runs. */
+:root{--bg:#f5f6f2;--paper:#fcfcf8;--ink:#263b4a;--muted:#6c7b81;--line:#dfe5e2;--accent:#587e92;--soft:#e8efed;--side:#edf1ee;color-scheme:light;background:#f5f6f2}
+:root[data-theme=dark]{--bg:#17242d;--paper:#20313c;--ink:#e1e9e9;--muted:#a0b1b8;--line:#334652;--accent:#accbd0;--soft:#2b4049;--side:#1c2b34;color-scheme:dark;background:#17242d}
+@media(prefers-color-scheme:dark){:root:not([data-theme]){color-scheme:dark;background:#17242d}}
+html{background-color:var(--bg);min-height:100%}body{background-color:var(--bg);color:var(--ink);min-height:100svh}
+:root[data-theme=dark] body{background-image:radial-gradient(ellipse at 80% 5%,#547f8520,transparent 40%),radial-gradient(ellipse at 15% 70%,#b69b7008,transparent 35%)}
+.theme-transition::view-transition-group(root){animation:none!important}.theme-transition::view-transition-image-pair(root){isolation:isolate}
+.theme-transition::view-transition-new(root){clip-path:circle(0px at var(--theme-x,50%) var(--theme-y,50%));opacity:1}
+.theme-transition::view-transition-old(root){opacity:1}
+.theme-transition.theme-reverse::view-transition-new(root){clip-path:none}
+.theme-transition.theme-reverse::view-transition-old(root){clip-path:circle(var(--theme-radius,200vmax) at var(--theme-x,50%) var(--theme-y,50%))}
+.wordmark img,.intro-emblem img{border-radius:30%;object-fit:cover}.companion-buddy img{border-radius:inherit}

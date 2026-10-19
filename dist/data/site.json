@@ -215,11 +215,12 @@
       "url": "https://snowmiku-home.top/",
       "linksUrl": "https://snowmiku-home.top/",
       "description": {
-        "en": "A little fantasy world",
-        "zh": "葱酱的幻想乡",
-        "ru": "Маленький мир фантазии",
-        "ja": "小さな幻想郷"
-      }
+        "en": "Snowmiku's Dreamland",
+        "zh": "葱酱的梦境世界",
+        "ru": "Мир грёз Snowmiku",
+        "ja": "Snowmiku の夢の世界"
+      },
+      "avatar": "/assets/companions/snowmiku.jpg"
     },
     {
       "id": "tenchsu",
@@ -279,11 +280,12 @@
       "url": "https://xiongzikun0106.github.io/my-first-personal-webside/",
       "linksUrl": "https://xiongzikun0106.github.io/my-first-personal-webside/",
       "description": {
-        "en": "Misaka Fish's little site",
+        "en": "A personal website by 御坂鱼板.",
         "zh": "御坂鱼板的小站点",
-        "ru": "Маленький сайт Misaka Fish",
-        "ja": "Misaka Fish の小さなサイト"
-      }
+        "ru": "Личный сайт 御坂鱼板.",
+        "ja": "御坂鱼板 の個人サイト。"
+      },
+      "avatar": "/assets/companions/misaka-fish.jpg"
     },
     {
       "id": "mint",
@@ -295,7 +297,8 @@
         "zh": "薄荷的小屋",
         "ru": "Маленький домик Mint",
         "ja": "Mint の小さな家"
-      }
+      },
+      "avatar": "/assets/companions/mint.webp"
     },
     {
       "id": "misakae",
@@ -324,14 +327,14 @@
     },
     {
       "id": "qijie",
-      "name": "祈杰",
+      "name": "锦木祈杰",
       "url": "https://qijieya.cn/",
       "linksUrl": "https://qijieya.cn/",
       "description": {
-        "en": "Qijie's blog · to an imperfect tomorrow",
-        "zh": "祈杰的博客 · 敬不完美的明天",
-        "ru": "Блог Qijie · за несовершенное завтра",
-        "ja": "Qijie のブログ · 不完全な明日へ"
+        "en": "A blog by 锦木祈杰 · stories that exist because of you.",
+        "zh": "锦木祈杰的博客 · 因你而在的故事",
+        "ru": "Блог 锦木祈杰 · истории, существующие благодаря вам.",
+        "ja": "锦木祈杰 のブログ · あなたがいるから生まれる物語。"
       }
     },
     {

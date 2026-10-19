@@ -30,9 +30,13 @@ test('a greeting is bounded, ignores repeated taps and never navigates',()=>{
 test('offscreen breathing rests and greeting timers stop when leaving the viewport',()=>{
  const s=fixture();assert.equal(s.button.classList.contains('is-resting'),true);s.observers[0]([{target:s.button,isIntersecting:true}]);assert.equal(s.button.classList.contains('is-resting'),false);s.events.click();s.observers[0]([{target:s.button,isIntersecting:false}]);assert.equal(s.button.classList.contains('is-hugging'),false);assert.equal(s.timers[0].canceled,true);
 });
-test('failed images expose the monogram and reduced motion keeps a textual greeting',()=>{
+test('failed images expose the shared cat placeholder and reduced motion keeps a textual greeting',()=>{
  const s=fixture({reduced:true});s.events['image-error']();assert.equal(s.image.hidden,true);s.events.click();assert.equal(s.timers.length,0);assert.match(s.status.textContent,/Public fixture/);
  const owner=fixture({owner:true});owner.events.click();assert.equal(owner.timers.length,0);
+});
+test('every companion has a local blank cat beneath optional real portraits',()=>{
+ for(const code of ['en','zh','ru','ja']){const html=read(`dist/${code}/links/index.html`);assert.equal((html.match(/class="companion-placeholder"/g)||[]).length,16);assert.match(html,/companions\/blank-cat\.png/);}
+ const png=fs.readFileSync(new URL('../dist/assets/companions/blank-cat.png',import.meta.url));assert.equal(png.subarray(1,4).toString(),'PNG');assert.equal(png[25],6);
 });
 test('backgrounding clears greetings and mobile layout remains single-column',()=>{
  const s=fixture();s.events.click();s.document.visibilityState='hidden';s.events.visibilitychange();assert.equal(s.button.classList.contains('is-hugging'),false);const css=read('dist/assets/companions.css');assert.match(css,/grid-template-columns:1fr/);assert.match(css,/prefers-reduced-motion/);assert.match(css,/animation-play-state:paused/);assert.match(css,/theme-reverse::view-transition-old\(root\)\{z-index:2\}/);
