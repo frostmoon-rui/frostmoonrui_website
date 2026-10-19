@@ -10,18 +10,17 @@ function motionFixture(reduced=false){
  const flipper={animate:(frames,timing)=>{animations.push({frames,timing});return {finished:Promise.resolve()};}};
  const link={href:'https://frostmoonrui.com/zh/about/',classList:classes(),querySelector:()=>flipper,addEventListener:(key,handler)=>{events[key]=handler;}};
  const body={dataset:{motion:'true'},classList:classes()};
- const context={matchMedia:()=>({matches:reduced}),document:{body,documentElement:{classList:classes(),dataset:{}},querySelectorAll:selector=>selector==='.avatar-link'?[link]:[]},window:{location:{assign:url=>destinations.push(url)},addEventListener:(key,handler)=>{events[key]=handler;}},setTimeout:callback=>callback(),navigator:{}};
+ const context={t:key=>key,matchMedia:()=>({matches:reduced}),document:{body,documentElement:{classList:classes(),dataset:{}},querySelectorAll:selector=>selector==='.avatar-link'?[link]:[]},window:{location:{assign:url=>destinations.push(url)},addEventListener:(key,handler)=>{events[key]=handler;}},setTimeout:callback=>callback(),navigator:{}};
  vm.runInNewContext(read('dist/assets/motion.js').replace(/^import[^\n]*\n/,''),context);
  return {animations,destinations,events,link,body};
 }
 const click=overrides=>({button:0,preventDefault(){this.prevented=true;},...overrides});
-test('avatar activation runs exactly three flips then navigates once',async()=>{
- const state=motionFixture();const event=click();await Promise.all([state.events.click(event),state.events.click(click())]);assert.equal(event.prevented,true);assert.equal(state.animations.length,1);assert.equal(state.animations[0].timing.iterations,3);assert.equal(state.animations[0].timing.duration,460);assert.equal(state.destinations.length,1);assert.equal(state.destinations[0],state.link.href);
- state.events.pageshow();assert.equal(state.body.classList.contains('page-leaving'),false);
+test('three separate avatar activations flip once each and only the third navigates',async()=>{
+ const state=motionFixture();const event=click();await Promise.all([state.events.click(event),state.events.click(click())]);assert.equal(event.prevented,true);assert.equal(state.animations.length,1);assert.equal(state.animations[0].timing.iterations,1);assert.equal(state.animations[0].timing.duration,460);assert.equal(state.destinations.length,0);await state.events.click(click());assert.equal(state.animations.length,2);assert.equal(state.destinations.length,0);await state.events.click(click());assert.equal(state.animations.length,3);assert.equal(state.destinations.length,1);assert.equal(state.destinations[0],state.link.href);
+ state.events.pageshow();assert.equal(state.body.classList.contains('page-leaving'),false);await state.events.click(click());assert.equal(state.destinations.length,1);assert.equal(state.animations.length,4);
 });
 test('reduced motion and owner motion preference keep navigation functional without flips',async()=>{
- const reduced=motionFixture(true);await reduced.events.click(click());assert.equal(reduced.animations.length,0);assert.equal(reduced.destinations.length,1);
- const disabled=motionFixture();disabled.body.dataset.motion='false';await disabled.events.click(click());assert.equal(disabled.animations.length,0);assert.equal(disabled.destinations.length,1);
+ for(const state of [motionFixture(true),motionFixture()]){state.body.dataset.motion='false';await state.events.click(click());await state.events.click(click());assert.equal(state.destinations.length,0);await state.events.click(click());assert.equal(state.animations.length,0);assert.equal(state.destinations.length,1);}
 });
 test('modified clicks keep native link behavior',async()=>{const state=motionFixture();const event=click({ctrlKey:true});await state.events.click(event);assert.equal(event.prevented,undefined);assert.equal(state.animations.length,0);assert.equal(state.destinations.length,0);});
 test('every locale has accessible contact icons, localized avatar links, About and an owner entry',()=>{

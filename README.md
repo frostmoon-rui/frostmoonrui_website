@@ -70,7 +70,9 @@ There is no anonymous write API. The password-protected owner studio can publish
 
 ## About, contacts and motion
 
-The avatar is a real link to `/about/` (and the corresponding locale route). A normal click or touch runs three complete flips, then fades into the separate About page. Keyboard activation works too; modifier clicks keep normal browser behavior. Reduced-motion visitors and the owner's motion setting skip the animation without blocking navigation.
+The avatar is a real link to `/about/` (and the corresponding locale route). Each normal click or touch runs one complete flip; only the third separate activation fades into About. Clicks received during a flip are ignored, not queued. Desktop and mobile avatars share the count within the current page; returning or reloading resets it. The accessible label reports the count. Keyboard activation works too; modifier clicks keep normal browser behavior. Reduced-motion visitors and the owner's motion setting skip flips but retain the three-activation rule. Ordinary About navigation links remain direct.
+
+Every page has the same 960 ms moon-emblem opening before its content entrance. This is a decorative entry transition, not a network progress estimate; it does not wait for map APIs or block links, forms or assistive technology. CSS dismisses it even without JavaScript. Cached back/forward returns replay it, while reduced motion or the owner preference hides it. The original animation references the fade/progress rhythm of CacheTide's public Valaxy/Yun site without copying its assets or application code. The layout uses intrinsic sizing, wrapping controls and narrower-screen stacking for all four language densities instead of clipping translated labels.
 
 Homepage contact icons include the two supplied Bilibili channels, email and X, with hover notes and accessible labels. `/links/` provides a public companion-link collection and a copyable backlink card. CacheTide's acknowledgement and companion link remain on About rather than recurring around the site. The About introduction is an editable technical placeholder; no sensitive biography is inferred.
 

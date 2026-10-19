@@ -3,6 +3,7 @@ import './motion.js';
 import './navigation.js';
 import './theme.js';
 import './glass.js';
+import './entry.js';
 try {
   const saved=localStorage.getItem('frostmoon-language');
   if(document.documentElement.dataset.defaultEntry==='true' && ['zh','ru','ja'].includes(saved)){

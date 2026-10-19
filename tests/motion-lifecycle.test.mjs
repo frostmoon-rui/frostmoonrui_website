@@ -13,7 +13,7 @@ function fixture({reduced=false,observerFails=false}={}){
  const document={body,documentElement:root,visibilityState:'visible',addEventListener:(key,callback)=>{events[key]=callback;},querySelector:()=>hero,querySelectorAll:selector=>selector==='.avatar-link'?[avatar]:selector==='.is-flipping'?[avatar]:selector==='[data-copy-site]'?[]:cards};
  class IntersectionObserver{constructor(callback){this.callback=callback;this.targets=[];observers.push(this);}observe(node){if(observerFails)throw Error('fixture observer unavailable');this.targets.push(node);}unobserve(node){this.targets=this.targets.filter(value=>value!==node);}disconnect(){this.disconnected=true;}}
  class MutationObserver{constructor(callback){events.preference=callback;}observe(){}}
- vm.runInNewContext(read('dist/assets/motion.js').replace(/^import[^\n]*\n/,''),{document,matchMedia:()=>media,IntersectionObserver,MutationObserver,window:{IntersectionObserver,MutationObserver,location:{assign:url=>destinations.push(url)},addEventListener:(key,callback)=>{events[key]=callback;}},setTimeout:(callback,delay)=>{timers.push({callback,delay});return timers.length;},navigator:{}});
+ vm.runInNewContext(read('dist/assets/motion.js').replace(/^import[^\n]*\n/,''),{t:key=>key,document,matchMedia:()=>media,IntersectionObserver,MutationObserver,window:{IntersectionObserver,MutationObserver,location:{assign:url=>destinations.push(url)},addEventListener:(key,callback)=>{events[key]=callback;}},setTimeout:(callback,delay)=>{timers.push({callback,delay});return timers.length;},navigator:{}});
  return {observers,events,destinations,timers,cards,media,root,body,document,avatar,cancels:()=>cancelCount};
 }
 test('scroll reveal has bounded stagger and only settles observed content once',()=>{
@@ -28,8 +28,8 @@ test('hero animation pauses outside the viewport and while the page is hidden',(
  const s=fixture();s.observers[1].callback([{isIntersecting:false}]);assert.equal(s.body.classList.contains('hero-at-rest'),true);s.observers[1].callback([{isIntersecting:true}]);assert.equal(s.body.classList.contains('hero-at-rest'),false);
  s.document.visibilityState='hidden';s.events.visibilitychange();assert.equal(s.body.classList.contains('motion-paused'),true);s.document.visibilityState='visible';s.events.visibilitychange();assert.equal(s.body.classList.contains('motion-paused'),false);
 });
-test('changing reduced motion during avatar flipping cancels it and still navigates',async()=>{
- const s=fixture();const pending=s.events['avatar-click']({button:0,preventDefault(){}});s.media.matches=true;s.media.change();await pending;assert.equal(s.cancels(),1);assert.equal(s.destinations.length,1);assert.equal(s.destinations[0],s.avatar.href);
+test('canceling an avatar flip preserves click count without navigating early',async()=>{
+ const s=fixture();const event=()=>({button:0,preventDefault(){}});const pending=s.events['avatar-click'](event());s.media.matches=true;s.media.change();await pending;assert.equal(s.cancels(),1);assert.equal(s.destinations.length,0);await s.events['avatar-click'](event());assert.equal(s.destinations.length,0);await s.events['avatar-click'](event());assert.equal(s.destinations.length,1);assert.equal(s.destinations[0],s.avatar.href);
 });
 test('restoring a cached page removes exit/flip residue',()=>{const s=fixture();s.body.classList.add('page-leaving');s.avatar.classList.add('is-flipping');s.events.pageshow();assert.equal(s.body.classList.contains('page-leaving'),false);assert.equal(s.avatar.classList.contains('is-flipping'),false);});
 test('motion is shared across pages and does not intercept studio navigation or form submission',()=>{
