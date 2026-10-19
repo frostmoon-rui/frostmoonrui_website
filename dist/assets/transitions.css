@@ -1,0 +1,36 @@
+/* Shared timing and bounded, non-blocking feedback. */
+:root{--motion-fast:160ms;--motion-normal:280ms;--motion-enter:650ms}
+.about-elsewhere .contact-links{position:relative;min-width:0}.about-elsewhere .contact-link{position:static;transform:none}.about-elsewhere .contact-tooltip{left:0;max-width:100%;overflow-wrap:anywhere;transform:translateY(5px)}.about-elsewhere .contact-link:hover .contact-tooltip,.about-elsewhere .contact-link:focus-visible .contact-tooltip{transform:translateY(0)}
+.is-loaded .article-layout>h1,.is-loaded .article-layout>.lead,.is-loaded .about-portrait,.is-loaded .atlas-intro,.is-loaded .studio-intro,.is-loaded .login-card{animation:content-enter var(--motion-enter) var(--ease) both}
+.is-loaded .article-layout>.lead{animation-delay:60ms}.is-loaded .about-portrait{animation-delay:100ms}.is-loaded .login-card{animation-delay:100ms}
+.motion-ready .reveal-item,.motion-ready .reveal-item.is-revealed{transition-delay:var(--reveal-delay,0ms);transition-duration:var(--motion-enter)}.motion-ready .reveal-item.motion-settled{transition-delay:0ms;transition-duration:var(--motion-normal)}
+.motion-paused .hero-art,.hero-at-rest .hero-art{animation-play-state:paused!important}
+button,.primary-button,.copy-link,.studio-primary,.map-tools select,.atlas-toolbar select{touch-action:manipulation;transition:background-color var(--motion-normal),color var(--motion-normal),border-color var(--motion-normal),box-shadow var(--motion-normal),opacity var(--motion-fast),transform var(--motion-fast)}
+button:not(:disabled):active,.primary-button:active,.copy-link:active{transform:scale(.97)}button:disabled{cursor:default}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+input,textarea,select,.rich-body{transition:border-color var(--motion-normal),box-shadow var(--motion-normal),background-color var(--motion-normal)}
+input:focus-visible,textarea:focus-visible,select:focus-visible,.rich-body:focus-visible{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 12%,transparent)}
+.nav-link>span,.companions-link svg,.contact-link svg,.friend-self img,.language-switch a{transition:transform var(--motion-normal),color var(--motion-normal),background-color var(--motion-normal)}
+.language-switch a[aria-current=page]{box-shadow:inset 0 -1px color-mix(in srgb,var(--accent) 35%,transparent)}
+.is-loaded #results>.venue-card:nth-child(-n+8){animation:list-enter 320ms var(--ease) both}.is-loaded #results>.venue-card:nth-child(2){animation-delay:25ms}.is-loaded #results>.venue-card:nth-child(3){animation-delay:50ms}
+.atlas-pin[aria-pressed=true] .atlas-pin-face{animation:pin-selection 550ms ease-out 2}
+.map-navigation button:active,.mobile-theme:active,.menu-toggle:active{transform:scale(.92)}
+.nav-scrim{pointer-events:none}.nav-open .nav-scrim{pointer-events:auto}
+.menu-toggle[aria-expanded=true] span:first-child{transform:translateY(5.5px) rotate(45deg)}.menu-toggle[aria-expanded=true] span:nth-child(2){opacity:0}.menu-toggle[aria-expanded=true] span:last-child{transform:translateY(-5.5px) rotate(-45deg)}.menu-toggle span{transition:transform var(--motion-normal),opacity var(--motion-fast)}
+.mobile-theme{transition:transform 500ms var(--ease),background-color var(--motion-normal),color var(--motion-normal)}
+.studio-help[open]>p{animation:disclosure-enter 240ms ease both}
+#studio-editor[aria-busy=true] .studio-primary:after{content:'';display:inline-block;width:11px;height:11px;margin-inline-start:9px;border:1.5px solid currentColor;border-right-color:transparent;border-radius:50%;vertical-align:-2px;animation:working 850ms linear infinite}
+@media(hover:hover) and (pointer:fine){
+ .motion-ready .note-card.is-revealed:hover,.motion-ready .margin-card.is-revealed:hover,.motion-ready .friend-card.is-revealed:hover{transform:translateY(-3px)}
+ .contact-link:hover svg,.companions-link:hover svg{transform:translateY(-2px) rotate(-5deg)}.friend-self:hover img{transform:rotate(-4deg) scale(1.04)}.nav-link:hover>span{transform:translateX(2px)}
+ .primary-button:hover,.copy-link:hover,.studio-primary:not(:disabled):hover{box-shadow:0 7px 20px color-mix(in srgb,var(--accent) 16%,transparent)}
+}
+@keyframes content-enter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes list-enter{from{opacity:.3;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pin-selection{from{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 45%,transparent)}to{box-shadow:0 0 0 10px transparent}}
+@keyframes disclosure-enter{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes working{to{transform:rotate(360deg)}}
+html[data-motion=false]::view-transition-old(root),html[data-motion=false]::view-transition-new(root){animation:none!important}
+body[data-motion=false] .reveal-item{opacity:1!important;transform:none!important}
+body[data-motion=false] *,body[data-motion=false] *:before,body[data-motion=false] *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.motion-ready .reveal-item{opacity:1;transform:none}::view-transition-old(root),::view-transition-new(root){animation:none!important}}

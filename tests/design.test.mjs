@@ -6,11 +6,11 @@ import {escape} from '../scripts/i18n.mjs';
 const read=file=>fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
 const site=JSON.parse(read('content/site.json'));
 function motionFixture(reduced=false){
- const animations=[],destinations=[],events={},classes=()=>{const set=new Set();return {add:value=>set.add(value),remove:value=>set.delete(value),contains:value=>set.has(value)};};
+ const animations=[],destinations=[],events={},classes=()=>{const set=new Set();return {add:value=>set.add(value),remove:value=>set.delete(value),contains:value=>set.has(value),toggle(value,on){on?set.add(value):set.delete(value);return on;}};};
  const flipper={animate:(frames,timing)=>{animations.push({frames,timing});return {finished:Promise.resolve()};}};
  const link={href:'https://frostmoonrui.com/zh/about/',classList:classes(),querySelector:()=>flipper,addEventListener:(key,handler)=>{events[key]=handler;}};
  const body={dataset:{motion:'true'},classList:classes()};
- const context={matchMedia:()=>({matches:reduced}),document:{body,documentElement:{classList:classes()},querySelectorAll:selector=>selector==='.avatar-link'?[link]:[]},window:{location:{assign:url=>destinations.push(url)},addEventListener:(key,handler)=>{events[key]=handler;}},setTimeout:callback=>callback(),navigator:{}};
+ const context={matchMedia:()=>({matches:reduced}),document:{body,documentElement:{classList:classes(),dataset:{}},querySelectorAll:selector=>selector==='.avatar-link'?[link]:[]},window:{location:{assign:url=>destinations.push(url)},addEventListener:(key,handler)=>{events[key]=handler;}},setTimeout:callback=>callback(),navigator:{}};
  vm.runInNewContext(read('dist/assets/motion.js').replace(/^import[^\n]*\n/,''),context);
  return {animations,destinations,events,link,body};
 }

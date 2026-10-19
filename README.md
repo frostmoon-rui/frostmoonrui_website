@@ -76,6 +76,8 @@ Homepage contact icons include the two supplied Bilibili channels, email and X, 
 
 On mobile, the upper-left menu opens a sliding drawer with a dimmed backdrop, contact links and a theme toggle. Escape, the close button and the backdrop dismiss it; focus stays inside while open. The top bar also keeps the avatar and theme control available. Light/dark switching uses a circular View Transition where supported, a color fade otherwise, and no animation when reduced motion is requested.
 
+The shared motion layer covers article introductions, About sections, cards, atlas results and studio feedback. Scroll reveals use bounded stagger delays; only the first eight venue results animate, and selected markers pulse twice rather than continuously. Decorative hero motion pauses offscreen and in background tabs. Changes to reduced-motion or owner preferences cancel active effects without hiding content or blocking navigation. Observer failures reveal content immediately, return navigation clears temporary states, and no generic link handler bypasses the studio's unsaved-draft warning.
+
 ## Password-protected owner studio
 
 Open the entry at the bottom of About, or `/zh/studio/` (`/en/`, `/ru/` and `/ja/` are also supported). In the existing Cloudflare Worker's **production runtime Secrets**, configure:
