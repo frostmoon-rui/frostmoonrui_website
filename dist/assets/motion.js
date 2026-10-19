@@ -17,7 +17,7 @@ document.addEventListener?.('visibilitychange',syncVisibility);syncVisibility();
 
 document.querySelectorAll('.avatar-link').forEach(link=>link.addEventListener('click',async event=>{
  if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
- event.preventDefault();if(navigating||avatarFlipping)return;avatarFlipping=true;link.classList.add('is-flipping');
+ event.preventDefault();if(navigating||avatarFlipping)return;avatarFlipping=true;link.setAttribute?.('data-flip-stage',String(avatarClicks+1));link.classList.add('is-flipping');
  try{const flipper=link.querySelector('.avatar-flipper');if(allowed()&&flipper?.animate){avatarAnimation=flipper.animate([{transform:'rotateY(0deg)'},{transform:'rotateY(360deg)'}],{duration:460,iterations:1,easing:'cubic-bezier(.45,0,.55,1)'});await avatarAnimation.finished;}}catch{}finally{avatarAnimation=null;avatarFlipping=false;link.classList.remove('is-flipping');}
  avatarClicks++;document.querySelectorAll('.avatar-link').forEach(node=>node.setAttribute?.('aria-label',t('Avatar flips: {count}/3. About opens on the third click.',{count:avatarClicks})));
  if(avatarClicks<3)return;navigating=true;

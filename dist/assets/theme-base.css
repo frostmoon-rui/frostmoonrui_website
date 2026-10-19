@@ -1,7 +1,7 @@
 /* Root canvas and loader colors exist before any application module runs. */
-:root{--bg:#f5f6f2;--paper:#fcfcf8;--ink:#263b4a;--muted:#6c7b81;--line:#dfe5e2;--accent:#587e92;--soft:#e8efed;--side:#edf1ee;color-scheme:light;background:#f5f6f2}
-:root[data-theme=dark]{--bg:#17242d;--paper:#20313c;--ink:#e1e9e9;--muted:#a0b1b8;--line:#334652;--accent:#accbd0;--soft:#2b4049;--side:#1c2b34;color-scheme:dark;background:#17242d}
-@media(prefers-color-scheme:dark){:root:not([data-theme]){color-scheme:dark;background:#17242d}}
+:root{--bg:#f3f6f8;--paper:rgba(255,255,255,.82);--ink:#182836;--muted:#5e7382;--line:#d9e4eb;--accent:#587e92;--soft:#e7eef3;--side:#eaf0f5;color-scheme:light;background:#f3f6f8}
+:root[data-theme=dark]{--bg:#0c141d;--paper:rgba(22,36,49,.78);--ink:#eaf2f5;--muted:#94adb8;--line:rgba(140,185,205,.16);--accent:#accbd0;--soft:#1d3344;--side:#111f2c;color-scheme:dark;background:#0c141d}
+@media(prefers-color-scheme:dark){:root:not([data-theme]){color-scheme:dark;background:#0c141d}}
 html{background-color:var(--bg);min-height:100%}body{background-color:var(--bg);color:var(--ink);min-height:100svh}
 :root[data-theme=dark] body{background-image:radial-gradient(ellipse at 80% 5%,#547f8520,transparent 40%),radial-gradient(ellipse at 15% 70%,#b69b7008,transparent 35%)}
 .theme-transition::view-transition-group(root){animation:none!important}.theme-transition::view-transition-image-pair(root){isolation:isolate}
