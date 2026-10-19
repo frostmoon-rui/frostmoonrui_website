@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "displayName": "frostmoon-rui",
+  "appearance": {
+    "accent": "#587e92",
+    "highlight": "#b69b70",
+    "radius": 16,
+    "motion": true
+  },
+  "home": {
+    "en": {
+      "eyebrow": "AN INDEPENDENT LITTLE CORNER",
+      "title": "A quiet place\nfor curious things.",
+      "description": "Hardware on the desk. Ideas in the margins.\nA few things built, a few things learned — collected here."
+    },
+    "zh": {
+      "eyebrow": "一隅自留地，慢慢生长",
+      "title": "安静一点，\n好奇多一点。",
+      "description": "桌上是硬件，页边是灵感。\n把做过的东西、学到的事情，慢慢收集在这里。"
+    },
+    "ru": {
+      "eyebrow": "НЕБОЛЬШОЙ НЕЗАВИСИМЫЙ УГОЛОК",
+      "title": "Тихое место\nдля любопытных вещей.",
+      "description": "На столе — электроника, на полях — идеи.\nЗдесь собирается то, что удалось сделать и узнать."
+    },
+    "ja": {
+      "eyebrow": "ゆっくり育つ、小さな居場所",
+      "title": "静かな場所に、\n小さな好奇心を。",
+      "description": "机の上にはハードウェア、余白にはアイデア。\n作ったものと学んだことを、少しずつ集めています。"
+    }
+  },
+  "about": {
+    "en": {
+      "title": "A little more about this corner.",
+      "intro": "Hi, I’m frostmoon-rui. This is a place for technical experiments, useful notes, and good food.",
+      "sections": [
+        {
+          "title": "Things I work on",
+          "text": "Python and asynchronous bots, Arduino and STM32 projects, and the meeting point between hardware and software."
+        },
+        {
+          "title": "What lives here",
+          "text": "Project notes, recovered technical archives, and a public food atlas with sources kept close to each recommendation."
+        },
+        {
+          "title": "A note left open",
+          "text": "A more personal introduction will come later. For now, you can explore the projects or say hello through the links below."
+        }
+      ]
+    },
+    "zh": {
+      "title": "关于这一小片地方。",
+      "intro": "你好，这里是 frostmoon-rui。这里收集技术实验、实用笔记，还有值得绕路的一顿饭。",
+      "sections": [
+        {
+          "title": "正在折腾什么",
+          "text": "Python 与异步机器人、Arduino 和 STM32 项目，以及硬件和软件相遇的地方。"
+        },
+        {
+          "title": "这里放些什么",
+          "text": "项目笔记、找回的技术档案，以及一张保留原始来源的公开美食地图。"
+        },
+        {
+          "title": "留一点空白",
+          "text": "更个人的自我介绍稍后再补。现在，可以先看看项目，或通过下面的链接打个招呼。"
+        }
+      ]
+    },
+    "ru": {
+      "title": "Немного об этом уголке.",
+      "intro": "Привет, я frostmoon-rui. Здесь живут технические эксперименты, полезные заметки и хорошая еда.",
+      "sections": [
+        {
+          "title": "Над чем я работаю",
+          "text": "Python и асинхронные боты, проекты на Arduino и STM32, пересечение аппаратного и программного мира."
+        },
+        {
+          "title": "Что здесь можно найти",
+          "text": "Заметки о проектах, восстановленные технические архивы и открытая карта еды со ссылками на первоисточники."
+        },
+        {
+          "title": "Немного свободного места",
+          "text": "Более личное знакомство появится позже. Пока можно посмотреть проекты или поздороваться по ссылкам ниже."
+        }
+      ]
+    },
+    "ja": {
+      "title": "この場所について、もう少し。",
+      "intro": "こんにちは、frostmoon-rui です。技術の実験や役立つメモ、おいしいものを集めた場所です。",
+      "sections": [
+        {
+          "title": "取り組んでいること",
+          "text": "Python と非同期ボット、Arduino や STM32 のプロジェクト、そしてハードウェアとソフトウェアの接点。"
+        },
+        {
+          "title": "ここにあるもの",
+          "text": "プロジェクトの記録、復元した技術資料、元の情報へのリンクを残した公開グルメマップ。"
+        },
+        {
+          "title": "少しだけ余白を",
+          "text": "個人的な自己紹介は、また後で。今はプロジェクトを眺めたり、下のリンクから声をかけたりしてみてください。"
+        }
+      ]
+    }
+  },
+  "contacts": [
+    {
+      "id": "bilibili",
+      "url": "https://b23.tv/MvEXDNe",
+      "label": {
+        "en": "Bilibili",
+        "zh": "哔哩哔哩",
+        "ru": "Bilibili",
+        "ja": "Bilibili"
+      },
+      "note": {
+        "en": "Frostmoon Rui · main channel",
+        "zh": "霜月琉依的个人空间",
+        "ru": "Frostmoon Rui · основной канал",
+        "ja": "Frostmoon Rui · メインチャンネル"
+      }
+    },
+    {
+      "id": "bilibili-overseas",
+      "url": "https://b23.tv/Hgyyy3p",
+      "label": {
+        "en": "Overseas channel",
+        "zh": "海外版频道",
+        "ru": "Зарубежный канал",
+        "ja": "海外チャンネル"
+      },
+      "note": {
+        "en": "Frostmoon Rui · overseas Bilibili",
+        "zh": "霜月琉依—海外版的个人空间",
+        "ru": "Frostmoon Rui · зарубежный Bilibili",
+        "ja": "Frostmoon Rui · 海外版 Bilibili"
+      }
+    },
+    {
+      "id": "email",
+      "url": "mailto:ericwang2795@email.com",
+      "label": {
+        "en": "Email",
+        "zh": "邮箱",
+        "ru": "Почта",
+        "ja": "メール"
+      },
+      "note": {
+        "en": "Write to ericwang2795@email.com",
+        "zh": "发送邮件至 ericwang2795@email.com",
+        "ru": "Написать на ericwang2795@email.com",
+        "ja": "ericwang2795@email.com にメールする"
+      }
+    },
+    {
+      "id": "x",
+      "url": "https://x.com/rui_frostmoon",
+      "label": {
+        "en": "X / Twitter",
+        "zh": "X / Twitter",
+        "ru": "X / Twitter",
+        "ja": "X / Twitter"
+      },
+      "note": {
+        "en": "@rui_frostmoon",
+        "zh": "@rui_frostmoon",
+        "ru": "@rui_frostmoon",
+        "ja": "@rui_frostmoon"
+      }
+    }
+  ],
+  "friends": [
+    {
+      "id": "cachetide",
+      "name": "CacheTide",
+      "url": "https://cachetide.top",
+      "linksUrl": "https://cachetide.top/links/",
+      "description": {
+        "en": "A Little Inn by the Clouds · technical notes and a shared food map.",
+        "zh": "云边的小旅店 · 技术笔记，还有一张一起分享的美食地图。",
+        "ru": "A Little Inn by the Clouds · технические заметки и общая карта еды.",
+        "ja": "雲のそばの小さな宿 · 技術メモと、共有するグルメマップ。"
+      }
+    }
+  ]
+}

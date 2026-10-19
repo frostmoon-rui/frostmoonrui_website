@@ -10,11 +10,14 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<aside class="sidebar">
+<!--MOBILE_NAV_START-->
+<header class="mobile-topbar"><button class="menu-toggle" type="button" aria-label="Open navigation" aria-controls="site-sidebar" aria-expanded="false"><span></span><span></span><span></span></button><a class="wordmark" href="/">frostmoon<span>✦</span></a><a class="avatar-link mobile-avatar" href="/about/" aria-label="Flip the avatar and visit About"><span class="avatar-flipper"><img class="avatar" src="/assets/avatar.jpg" width="36" height="36" alt="Frostmoon's illustrated avatar"><span class="avatar-back" aria-hidden="true">FR<span>✦</span></span></span></a><button class="theme-button mobile-theme" type="button" aria-label="Switch color theme">◐</button></header><button class="nav-scrim" type="button" aria-label="Close navigation" tabindex="-1" hidden></button>
+<!--MOBILE_NAV_END-->
+<aside class="sidebar" id="site-sidebar"><button class="drawer-close" type="button" aria-label="Close navigation">×</button>
   <a class="wordmark" href="/" aria-label="Frostmoon home"><img src="/assets/moon.svg" width="28" height="28" alt=""> frostmoon<span>✦</span></a>
-  <div class="profile"><img class="avatar" src="/assets/avatar.jpg" width="88" height="88" alt="Frostmoon's illustrated avatar"><h2>frostmoon-rui</h2><p>Little experiments.<br>Long-lived curiosity.</p></div>
+  <div class="profile"><a class="avatar-link" href="/about/" aria-label="Flip the avatar and visit About"><span class="avatar-flipper"><img class="avatar" src="/assets/avatar.jpg" width="88" height="88" alt="Frostmoon's illustrated avatar"><span class="avatar-back" aria-hidden="true">FR<span>✦</span></span></span></a><h2>frostmoon-rui</h2><p>Little experiments.<br>Long-lived curiosity.</p></div>
   <nav aria-label="Main navigation"><a class="nav-link active" href="/" aria-current="page"><span>⌂</span> Home <small>01</small></a><a class="nav-link" href="#notes"><span>≋</span> Field notes <small>02</small></a><a class="nav-link" href="/projects/"><span>⌘</span> Projects <small>03</small></a><a class="nav-link" href="/food-map/"><span>◎</span> Food atlas <small>04</small></a></nav>
-  <div class="sidebar-bottom"><a href="https://github.com/frostmoon-rui" target="_blank" rel="noopener noreferrer">GitHub ↗</a><button class="theme-button" type="button" aria-label="Switch color theme">◐ <span>Change theme</span></button><span class="quiet-label">An independently built little corner.</span></div>
+  <div class="sidebar-bottom"><!--PROFILE_CONTACTS--><a href="https://github.com/frostmoon-rui" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/about/">About this corner ↗</a><a href="/links/">My companions ↗</a><button class="theme-button" type="button" aria-label="Switch color theme">◐ <span>Change theme</span></button><span class="quiet-label">An independently built little corner.</span></div>
 </aside>
 <div class="page">
   <header class="topline"><span>NOTES / PROJECTS / SMALL DISCOVERIES</span><a href="/food-map/">Take the scenic route ↗</a></header>
@@ -24,6 +27,7 @@
       <img class="hero-art" src="/assets/moon-landscape.svg" width="640" height="520" alt="An original illustration of a crescent moon above quiet blue mountains">
       <span class="hero-caption">SOMEWHERE BETWEEN AN IDEA AND A WORKING PROTOTYPE</span>
     </section>
+    <!--CONTACT_STRIP-->
     <div class="content-grid">
       <section id="notes" class="notes"><div class="section-head"><div><p class="eyebrow">THE NOTEBOOK</p><h2>Things worth keeping</h2></div><span class="small-muted">03 field notes</span></div>
       <div class="filters" aria-label="Filter field notes"><button type="button" data-filter="all" aria-pressed="true">All notes <span>3</span></button><button type="button" data-filter="software" aria-pressed="false">Software</button><button type="button" data-filter="hardware" aria-pressed="false">Hardware</button></div>

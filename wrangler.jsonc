@@ -3,6 +3,7 @@
   "name": "frostmoonrui-website",
   "main": "src/worker.js",
   "keep_vars": true,
+  "ratelimits": [{"name":"ADMIN_LOGIN_LIMIT","namespace_id":"73620491","simple":{"limit":5,"period":60}}],
   "compatibility_date": "2026-10-18",
   "routes": [
     {"pattern": "frostmoonrui.com/*", "zone_name": "frostmoonrui.com"}

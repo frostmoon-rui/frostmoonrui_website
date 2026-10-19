@@ -5,7 +5,7 @@ import {mapStyle,markerKind,createPin} from '../dist/assets/map-appearance.js';
 const read=file=>fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
 test('official map themes follow the website without filtering satellite imagery',()=>{
  assert.equal(mapStyle(false),'amap://styles/whitesmoke');assert.equal(mapStyle(true),'amap://styles/darkblue');
- const runtime=read('dist/assets/food-map.js');assert.match(runtime,/new MutationObserver\(syncTheme\)/);assert.match(runtime,/setMapStyle\(mapStyle/);assert.match(runtime,/mapStyle:mapStyle/);
+ const runtime=read('dist/assets/food-map.js');assert.match(runtime,/new MutationObserver\(syncTheme\)/);assert.match(runtime,/setMapStyle\(style\)/);assert.match(runtime,/style!==lastMapStyle/);assert.match(runtime,/mapStyle:mapStyle/);
  assert.doesNotMatch(read('dist/assets/atlas-polish.css'),/map-canvas[^}]*filter:|amap-layer[^}]*filter:/);
 });
 test('category icons have deterministic safe fallbacks',()=>{

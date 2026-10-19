@@ -1,4 +1,7 @@
 import {translate as t} from './i18n.js';
+import './motion.js';
+import './navigation.js';
+import './theme.js';
 try {
   const saved=localStorage.getItem('frostmoon-language');
   if(document.documentElement.dataset.defaultEntry==='true' && ['zh','ru','ja'].includes(saved)){
@@ -7,12 +10,6 @@ try {
     window.location.replace(target.href);
   }
 } catch {}
-try { if (localStorage.getItem('frostmoon-theme') === 'dark') document.body.classList.add('dark'); } catch {}
-document.querySelectorAll('.theme-button').forEach(button => button.addEventListener('click', () => {
-  const dark = document.body.classList.toggle('dark');
-  button.setAttribute('aria-label', t(dark ? 'Use light theme' : 'Use dark theme'));
-  try { localStorage.setItem('frostmoon-theme', dark ? 'dark' : 'light'); } catch {}
-}));
 document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click', () => {
   const choice = button.dataset.filter;
   document.querySelectorAll('[data-filter]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));

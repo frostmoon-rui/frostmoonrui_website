@@ -1,3 +1,4 @@
+import {handleStudio} from './studio.js';
 const paths=new Set(['/v4/map/styles','/v3/config/district','/v3/place/text','/v3/place/around','/v3/geocode/geo','/v3/geocode/regeo']);
 const mapCsp="default-src 'self'; script-src 'self' 'unsafe-eval' https://webapi.amap.com https://*.amap.com https://*.autonavi.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.amap.com https://*.autonavi.com https://tile.openstreetmap.org; connect-src 'self' https://*.amap.com https://*.autonavi.com https://*.amap.com.cn https://*.amapcdn.com; worker-src 'self' blob:; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests";
 function json(data,status=200){return Response.json(data,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'strict-origin-when-cross-origin'}});}
@@ -12,6 +13,7 @@ export function proxyTarget(url,env){
 }
 export async function handle(request,env,fetcher=fetch){
  const url=new URL(request.url);
+ if(url.pathname.startsWith('/api/studio/'))return handleStudio(request,env,fetcher);
  if(url.pathname==='/api/map-config'){
   if(request.method!=='GET')return json({error:'Method not allowed'},405);
   const missing=['AMAP_JS_KEY','AMAP_SECURITY_CODE'].filter(name=>!env[name]);
@@ -34,6 +36,9 @@ export async function handle(request,env,fetcher=fetch){
  if(!['GET','HEAD'].includes(request.method))return json({error:'Read-only website'},405);
  const asset=await env.ASSETS.fetch(request);
  const response=new Response(asset.body,asset);
+ if(/^\/(?:zh\/|en\/|ru\/|ja\/)?studio\/(?:index\.html)?$/.test(url.pathname)){
+  response.headers.set('Cache-Control','private, no-store');response.headers.set('X-Robots-Tag','noindex, nofollow');response.headers.set('Referrer-Policy','no-referrer');response.headers.set('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-src 'self' about:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'");
+ }
  if(/^\/(?:zh\/|en\/|ru\/|ja\/)?food-map\/(?:index\.html)?$/.test(url.pathname))response.headers.set('Content-Security-Policy',mapCsp);
  if(url.pathname==='/food-map/index.json'){
   response.headers.set('Content-Type','application/json; charset=utf-8');

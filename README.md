@@ -66,7 +66,31 @@ Source-link compatibility: CacheTide's September 2026 Valaxy bundle encodes alre
 
 The atlas defaults to Amap JS API 2.0, with standard/satellite imagery and optional traffic layers using the original GCJ-02 coordinates. The SDK loads only on request. Traffic does not auto-refresh. OpenStreetMap remains a manually selected fallback using approximate WGS84 conversion. Neither provider requests location permission. Keep the vendored Leaflet license and OSM attribution; never bulk-download map tiles.
 
-This deployment has no public write API. Local bot food submissions are not automatically published: only this explicitly configured public feed is imported. Add any future reviewed publisher separately, with a public-field allowlist and no contact/profile data.
+There is no anonymous write API. The password-protected owner studio can publish reviewed original venues; local bot submissions are never imported automatically. The original feed contains only approved public venue fields, never contacts or profiles.
+
+## About, contacts and motion
+
+The avatar is a real link to `/about/` (and the corresponding locale route). A normal click or touch runs three complete flips, then fades into the separate About page. Keyboard activation works too; modifier clicks keep normal browser behavior. Reduced-motion visitors and the owner's motion setting skip the animation without blocking navigation.
+
+Homepage contact icons include the two supplied Bilibili channels, email and X, with hover notes and accessible labels. `/links/` provides a public companion-link collection and a copyable backlink card. CacheTide's acknowledgement and companion link remain on About rather than recurring around the site. The About introduction is an editable technical placeholder; no sensitive biography is inferred.
+
+On mobile, the upper-left menu opens a sliding drawer with a dimmed backdrop, contact links and a theme toggle. Escape, the close button and the backdrop dismiss it; focus stays inside while open. The top bar also keeps the avatar and theme control available. Light/dark switching uses a circular View Transition where supported, a color fade otherwise, and no animation when reduced motion is requested.
+
+## Password-protected owner studio
+
+Open the entry at the bottom of About, or `/zh/studio/` (`/en/`, `/ru/` and `/ja/` are also supported). In the existing Cloudflare Worker's **production runtime Secrets**, configure:
+
+- `ADMIN_PASSWORD`: an owner-chosen password of 16–256 characters.
+- `ADMIN_SESSION_SECRET`: a securely generated random string of at least 32 characters, generated once and retained until rotation.
+- `WEBSITE_GITHUB_TOKEN`: a fine-grained GitHub token scoped only to `frostmoon-rui/frostmoonrui_website`, with repository **Contents: read and write**. No account, workflow or other-repository permissions are needed.
+
+Never put these values into Wrangler source, build variables, browser storage or the public JSON. `keep_vars: true` retains dashboard-managed runtime settings. The Worker verifies the password and issues a Secure, HTTPOnly, SameSite=Strict session cookie for one hour. Password/session-key rotation invalidates existing sessions. Native `ADMIN_LOGIN_LIMIT` protection allows five login attempts per minute per hashed IP at a Cloudflare location; this is approximate per-edge protection, not a globally synchronized account lockout. Login fails closed without the binding. Writes require both a same-origin JSON request and a session CSRF nonce.
+
+The editor offers visual fields, supported rich-text article formatting, a sandboxed live preview, JSON editing, draft import/export and explicit GitHub publication. It edits public home/About text, contacts, appearance, companion links, existing articles in all languages, UI translations and original food entries. About acknowledgement text is in the matching article's About body. Page paths, application code, runtime secrets, DNS and account permissions cannot be edited here. `content/site.json` and all published drafts are public content, not secret storage.
+
+Every save reads and compares the current file SHA before updating the fixed website repository on `main`. Conflicts do not overwrite newer changes; uncertain network results are not replayed automatically. Drafts remain in browser memory, with an unload warning, and can be exported before reloading. A successful save returns a GitHub commit receipt, not proof of a completed deployment.
+
+The `Render studio content` Action builds and checks owner-created `Studio: ` commits, then synchronizes only generated `dist/` files with a normal push. A concurrent branch update makes that push fail rather than force-overwriting anything. Existing Cloudflare Git integration builds the selected source commit independently. Check both the repository checks and Cloudflare build before considering the public site updated. End-to-end owner login and a real studio publication must be verified by the owner with their own password; offline fixtures do not prove live credential permissions.
 
 ### Amap server configuration
 
