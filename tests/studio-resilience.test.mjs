@@ -12,14 +12,14 @@ const env=()=>({ADMIN_PASSWORD:'fixture-only-owner-password',ADMIN_SESSION_SECRE
 const documentResponse=()=>Response.json({encoding:'base64',content:content.toString('base64'),size:content.length,sha});
 const unavailable=async()=>{throw new TypeError('offline fixture');};
 test('transient read transport errors receive one bounded retry and no write',async()=>{
- let calls=0;const result=await readRepository('site',env(),async(url,options)=>{calls++;assert.equal(options.method,undefined);assert.equal(options.redirect,'error');assert.equal(new URL(url).hostname,'api.github.com');if(calls===1)throw Error('offline');return documentResponse();},{fallback:true});
+ let calls=0;const result=await readRepository('site',env(),async(url,options)=>{calls++;assert.equal(options.method,'GET');assert.equal(options.redirect,'manual');assert.equal(new URL(url).hostname,'api.github.com');if(calls===1)throw Error('offline');return documentResponse();},{fallback:true});
  assert.equal(calls,2);assert.equal(result.access.attempts,2);assert.equal(result.access.canPublish,true);
 });
 test('a temporary upstream 503 is retried once, not indefinitely',async()=>{
  let calls=0;const result=await readRepository('site',env(),async()=>++calls===1?new Response('',{status:503}):documentResponse(),{fallback:true});assert.equal(calls,2);assert.equal(result.access.canPublish,true);
 });
 test('raw fallback pins the repository, omits credentials and computes a Git blob revision',async()=>{
- let calls=0;const configuration=env();const result=await readRepository('site',configuration,async(url,options)=>{calls++;if(new URL(url).hostname==='api.github.com')throw Error('offline');assert.equal(url,'https://raw.githubusercontent.com/frostmoon-rui/frostmoonrui_website/main/content/site.json');assert.equal(options.headers.Authorization,undefined);assert.equal(options.redirect,'error');return new Response(content);},{fallback:true});
+ let calls=0;const configuration=env();const result=await readRepository('site',configuration,async(url,options)=>{calls++;if(new URL(url).hostname==='api.github.com')throw Error('offline');assert.equal(url,'https://raw.githubusercontent.com/frostmoon-rui/frostmoonrui_website/main/content/site.json');assert.equal(options.headers.Authorization,undefined);assert.equal(options.redirect,'manual');return new Response(content);},{fallback:true});
  assert.equal(calls,3);assert.equal(result.access.mode,'raw');assert.equal(result.access.canPublish,false);assert.equal(result.sha,createHash('sha1').update('blob '+content.length+'\0').update(content).digest('hex'));assert.ok(!JSON.stringify(result).includes(configuration.WEBSITE_GITHUB_TOKEN));
 });
 test('all external read failures fall back to the actual deployed source without enabling publication',async()=>{

@@ -35,7 +35,8 @@ export async function handle(request,env,fetcher=fetch){
   if(!env.AMAP_JS_KEY||!env.AMAP_SECURITY_CODE)return json({error:'Map configuration is incomplete'},503);
   let target;try{target=proxyTarget(url,env);}catch{return json({error:'Unsupported map service'},404);}
   try{
-   const upstream=await fetcher(target,{method:'GET',redirect:'error',signal:AbortSignal.timeout(10000),headers:{Accept:'*/*'}});
+   const upstream=await fetcher(target,{method:'GET',redirect:'manual',signal:AbortSignal.timeout(10000),headers:{Accept:'*/*'}});
+   if(upstream.status>=300&&upstream.status<400){await upstream.body?.cancel().catch(()=>{});return json({error:'Map provider redirect refused'},502);}
    const headers=new Headers({'Content-Type':upstream.headers.get('Content-Type')||'application/octet-stream','X-Content-Type-Options':'nosniff','Cache-Control':upstream.ok?'private, max-age=120':'no-store'});
    return new Response(upstream.body,{status:upstream.status,headers});
   }catch{return json({error:'Map provider unavailable'},502);}

@@ -66,7 +66,7 @@ test('anonymous reads and writes are denied before any GitHub request',async()=>
 });
 test('authenticated document reads use the fixed repository and hide authorization',async()=>{
  const env=environment(),auth=await signed(env);let called=false;
- const response=await handleStudio(request('document?key=site','GET',undefined,auth),env,async(url,options)=>{called=true;assert.equal(url,'https://api.github.com/repos/frostmoon-rui/frostmoonrui_website/contents/content/site.json?ref=main');assert.equal(options.headers.Authorization,'Bearer '+env.WEBSITE_GITHUB_TOKEN);assert.equal(options.redirect,'error');return documentResponse();});
+ const response=await handleStudio(request('document?key=site','GET',undefined,auth),env,async(url,options)=>{called=true;assert.equal(url,'https://api.github.com/repos/frostmoon-rui/frostmoonrui_website/contents/content/site.json?ref=main');assert.equal(options.headers.Authorization,'Bearer '+env.WEBSITE_GITHUB_TOKEN);assert.equal(options.redirect,'manual');return documentResponse();});
  assert.equal(response.status,200);assert.equal((await response.json()).sha,sha);assert.equal(called,true);
 });
 test('CSRF, path and method protections reject authenticated invalid writes',async()=>{
@@ -81,16 +81,16 @@ test('optimistic revision checks prevent stale edits from being published',async
 });
 test('publication validates content, uses expected SHA and returns only a safe commit receipt',async()=>{
  const env=environment(),auth=await signed(env),value=fixture('site');value.displayName='Fixture edit';let calls=0;
- const response=await handleStudio(request('document?key=site','PUT',{sha,value},auth),env,async(url,options)=>{calls++;if(!options.method)return documentResponse();assert.equal(url,'https://api.github.com/repos/frostmoon-rui/frostmoonrui_website/contents/content/site.json');const body=JSON.parse(options.body);assert.equal(body.sha,sha);assert.equal(body.branch,'main');assert.equal(body.message,'Studio: update site');assert.deepEqual(JSON.parse(Buffer.from(body.content,'base64').toString('utf8')),value);assert.ok(!options.body.includes(env.WEBSITE_GITHUB_TOKEN));return Response.json({commit:{sha:commit},content:{sha:nextSha}});});
+ const response=await handleStudio(request('document?key=site','PUT',{sha,value},auth),env,async(url,options)=>{calls++;if(options.method==='GET')return documentResponse();assert.equal(url,'https://api.github.com/repos/frostmoon-rui/frostmoonrui_website/contents/content/site.json');const body=JSON.parse(options.body);assert.equal(body.sha,sha);assert.equal(body.branch,'main');assert.equal(body.message,'Studio: update site');assert.deepEqual(JSON.parse(Buffer.from(body.content,'base64').toString('utf8')),value);assert.ok(!options.body.includes(env.WEBSITE_GITHUB_TOKEN));return Response.json({commit:{sha:commit},content:{sha:nextSha}});});
  assert.equal(response.status,200);assert.equal(calls,2);assert.deepEqual(await response.json(),{saved:true,sha:nextSha,commit,url:'https://github.com/frostmoon-rui/frostmoonrui_website/commit/'+commit});
 });
 test('publication errors keep conflicts explicit and never automatically retry uncertain writes',async()=>{
  const env=environment(),auth=await signed(env),body={sha,value:fixture('site')};
- for(const status of [409,422,403]){let writes=0;const response=await handleStudio(request('document?key=site','PUT',body,auth),env,async(_,options)=>{if(!options.method)return documentResponse();writes++;return new Response('',{status});});assert.equal(response.status,status===403?502:409);assert.equal(writes,1);}
- let writes=0;const uncertain=await handleStudio(request('document?key=site','PUT',body,auth),env,async(_,options)=>{if(!options.method)return documentResponse();writes++;throw Error('network failed');});assert.equal(uncertain.status,502);assert.match((await uncertain.json()).error,/uncertain/);assert.equal(writes,1);
+ for(const status of [409,422,403]){let writes=0;const response=await handleStudio(request('document?key=site','PUT',body,auth),env,async(_,options)=>{if(options.method==='GET')return documentResponse();writes++;return new Response('',{status});});assert.equal(response.status,status===403?502:409);assert.equal(writes,1);}
+ let writes=0;const uncertain=await handleStudio(request('document?key=site','PUT',body,auth),env,async(_,options)=>{if(options.method==='GET')return documentResponse();writes++;throw Error('network failed');});assert.equal(uncertain.status,502);assert.match((await uncertain.json()).error,/uncertain/);assert.equal(writes,1);
 });
 test('invalid and oversized drafts cannot reach the GitHub write endpoint',async()=>{
- const env=environment(),auth=await signed(env);let writes=0;const remote=async(_,options)=>{if(options.method)writes++;return documentResponse();};const invalid=fixture('site');invalid.apiKey='not allowed';
+ const env=environment(),auth=await signed(env);let writes=0;const remote=async(_,options)=>{if(options.method==='PUT')writes++;return documentResponse();};const invalid=fixture('site');invalid.apiKey='not allowed';
  assert.equal((await handleStudio(request('document?key=site','PUT',{sha,value:invalid},auth),env,remote)).status,400);
  assert.equal((await handleStudio(request('document?key=site','PUT',{sha,value:'x'.repeat(300001)},auth),env,remote)).status,400);assert.equal(writes,0);
  assert.equal((await handleStudio(request('document?key=site','PUT',{sha,value:fixture('site')},auth),{...env,WEBSITE_GITHUB_TOKEN:''},remote)).status,503);

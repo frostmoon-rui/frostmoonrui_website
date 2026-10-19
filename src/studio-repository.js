@@ -80,7 +80,8 @@ export async function readRepository(key,env,fetcher,{fallback=false}={}){
   const headers=repositoryHeaders(env,auth);
   for(let attempt=0;attempt<(retry?2:1);attempt++){
    attempts++;
-   try{const response=await fetcher(url,{headers,redirect:'error',signal:AbortSignal.timeout(timeout)});if(retry&&attempt===0&&[502,503,504].includes(response.status)){await response.body?.cancel().catch(()=>{});continue;}return response;}
+   // Workers rejects redirect:error before sending. Manual mode never forwards credentials.
+   try{const response=await fetcher(url,{method:'GET',headers,redirect:'manual',signal:AbortSignal.timeout(timeout)});if(retry&&attempt===0&&[502,503,504].includes(response.status)){await response.body?.cancel().catch(()=>{});continue;}return response;}
    catch(error){if(retry&&attempt===0)continue;throw repositoryError(['AbortError','TimeoutError'].includes(error?.name)?'github-timeout':'github-network');}
   }
  }

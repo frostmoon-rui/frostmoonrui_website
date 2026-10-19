@@ -63,7 +63,7 @@ export async function handleStudio(request,env,fetcher=fetch){
  try{validateDocument(name,input.value,previous.value);}catch(error){return reply({error:error.message},400);}
  const content=encoder.encode(JSON.stringify(input.value,null,2)+'\n');if(content.length>maxBody)return reply({error:'Document too large'},413);
  try{
-  const result=await fetcher(github+documents[name],{method:'PUT',headers:{...headers(env),'Content-Type':'application/json'},body:JSON.stringify({message:'Studio: update '+name,content:base64(content),sha:input.sha,branch:'main'}),redirect:'error',signal:AbortSignal.timeout(15000)});
+  const result=await fetcher(github+documents[name],{method:'PUT',headers:{...headers(env),'Content-Type':'application/json'},body:JSON.stringify({message:'Studio: update '+name,content:base64(content),sha:input.sha,branch:'main'}),redirect:'manual',signal:AbortSignal.timeout(15000)});
   if(result.status===409||result.status===422)return reply({error:'Repository conflict or branch rule prevented publication. Reload the document before retrying.'},409);
   if(result.status>=500||result.status===408)throw new Error('Uncertain upstream write outcome');
   if(!result.ok)return reply({error:'GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.',code:'github-publish-rejected',operation:'write',upstreamStatus:result.status},502);
