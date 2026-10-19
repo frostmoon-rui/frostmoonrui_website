@@ -367,7 +367,16 @@
     "Technical documentation": "Technical documentation",
     "Resource collection": "Resource collection",
     "Previous page": "Previous page",
-    "Next page": "Next page"
+    "Next page": "Next page",
+    "GitHub rejected the configured token. Update the production WEBSITE_GITHUB_TOKEN secret.": "GitHub rejected the configured token. Update the production WEBSITE_GITHUB_TOKEN secret.",
+    "GitHub denied repository access. Check the selected repository and Contents permission.": "GitHub denied repository access. Check the selected repository and Contents permission.",
+    "GitHub rate limit reached. Wait before reloading; no write was attempted.": "GitHub rate limit reached. Wait before reloading; no write was attempted.",
+    "Could not reach GitHub. Reload the document; no write was attempted.": "Could not reach GitHub. Reload the document; no write was attempted.",
+    "GitHub returned an unexpected document response. No write was attempted.": "GitHub returned an unexpected document response. No write was attempted.",
+    "The repository document failed validation. Review its source JSON before publishing.": "The repository document failed validation. Review its source JSON before publishing.",
+    "GitHub could not serve this document. Reload later; no write was attempted.": "GitHub could not serve this document. Reload later; no write was attempted.",
+    "Loaded current public repository content. Publishing is disabled until authenticated access is restored.": "Loaded current public repository content. Publishing is disabled until authenticated access is restored.",
+    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned."
   },
   "zh": {
     "Visit website": "去串个门",
@@ -737,7 +746,16 @@
     "Technical documentation": "技术文档",
     "Resource collection": "推荐资源集",
     "Previous page": "上一页",
-    "Next page": "下一页"
+    "Next page": "下一页",
+    "GitHub rejected the configured token. Update the production WEBSITE_GITHUB_TOKEN secret.": "GitHub 拒绝了配置的令牌，请更新生产运行时密钥 WEBSITE_GITHUB_TOKEN。",
+    "GitHub denied repository access. Check the selected repository and Contents permission.": "GitHub 拒绝仓库访问，请核对令牌选中的仓库及 Contents 权限。",
+    "GitHub rate limit reached. Wait before reloading; no write was attempted.": "GitHub 请求已限流，请稍后重新加载；未尝试写入。",
+    "Could not reach GitHub. Reload the document; no write was attempted.": "暂时无法连接 GitHub，请重新加载文档；未尝试写入。",
+    "GitHub returned an unexpected document response. No write was attempted.": "GitHub 返回的文档响应格式异常；未尝试写入。",
+    "The repository document failed validation. Review its source JSON before publishing.": "仓库文档未通过格式校验，请检查源 JSON 后再发布。",
+    "GitHub could not serve this document. Reload later; no write was attempted.": "GitHub 暂时无法提供该文档，请稍后重新加载；未尝试写入。",
+    "Loaded current public repository content. Publishing is disabled until authenticated access is restored.": "已加载公开仓库的当前内容。在带令牌的访问恢复前，发布按钮已禁用。",
+    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHub 拒绝发布，请核对 Contents 读写权限；没有返回保存成功回执。"
   },
   "ru": {
     "Visit website": "Заглянуть в гости",
@@ -1107,7 +1125,16 @@
     "Technical documentation": "Техническая документация",
     "Resource collection": "Подборка ресурсов",
     "Previous page": "Предыдущая страница",
-    "Next page": "Следующая страница"
+    "Next page": "Следующая страница",
+    "GitHub rejected the configured token. Update the production WEBSITE_GITHUB_TOKEN secret.": "GitHub отклонил токен. Обновите секрет WEBSITE_GITHUB_TOKEN в рабочем окружении.",
+    "GitHub denied repository access. Check the selected repository and Contents permission.": "GitHub отказал в доступе. Проверьте выбранный репозиторий и разрешение Contents.",
+    "GitHub rate limit reached. Wait before reloading; no write was attempted.": "Достигнут лимит GitHub. Повторите загрузку позже; запись не выполнялась.",
+    "Could not reach GitHub. Reload the document; no write was attempted.": "Не удалось подключиться к GitHub. Перезагрузите документ; запись не выполнялась.",
+    "GitHub returned an unexpected document response. No write was attempted.": "Неожиданный формат ответа GitHub. Запись не выполнялась.",
+    "The repository document failed validation. Review its source JSON before publishing.": "Документ не прошёл проверку. Проверьте исходный JSON перед публикацией.",
+    "GitHub could not serve this document. Reload later; no write was attempted.": "GitHub не смог вернуть документ. Повторите позже; запись не выполнялась.",
+    "Loaded current public repository content. Publishing is disabled until authenticated access is restored.": "Загружено актуальное публичное содержимое. Публикация отключена до восстановления доступа с токеном.",
+    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHub отклонил публикацию. Проверьте права Contents на чтение и запись; сохранение не подтверждено."
   },
   "ja": {
     "Visit website": "遊びに行く",
@@ -1477,6 +1504,15 @@
     "Technical documentation": "技術ドキュメント",
     "Resource collection": "おすすめリンク集",
     "Previous page": "前のページ",
-    "Next page": "次のページ"
+    "Next page": "次のページ",
+    "GitHub rejected the configured token. Update the production WEBSITE_GITHUB_TOKEN secret.": "GitHubがトークンを拒否しました。本番のシークレット WEBSITE_GITHUB_TOKEN を更新してください。",
+    "GitHub denied repository access. Check the selected repository and Contents permission.": "GitHubへのアクセスが拒否されました。対象リポジトリと Contents 権限を確認してください。",
+    "GitHub rate limit reached. Wait before reloading; no write was attempted.": "GitHubのレート制限に達しました。時間をおいて再読み込みしてください。書き込みは行っていません。",
+    "Could not reach GitHub. Reload the document; no write was attempted.": "GitHubに接続できません。文書を再読み込みしてください。書き込みは行っていません。",
+    "GitHub returned an unexpected document response. No write was attempted.": "GitHubの文書応答が想定外の形式です。書き込みは行っていません。",
+    "The repository document failed validation. Review its source JSON before publishing.": "文書の検証に失敗しました。公開前に元のJSONを確認してください。",
+    "GitHub could not serve this document. Reload later; no write was attempted.": "GitHubから文書を取得できません。後で再読み込みしてください。書き込みは行っていません。",
+    "Loaded current public repository content. Publishing is disabled until authenticated access is restored.": "公開リポジトリの現在の内容を読み込みました。トークンによるアクセスが復旧するまで公開は無効です。",
+    "GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.": "GitHubが公開を拒否しました。Contentsの読み書き権限を確認してください。保存の成功は確認できていません。"
   }
 }

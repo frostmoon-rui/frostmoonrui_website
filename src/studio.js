@@ -23,12 +23,32 @@ export async function readSession(request,env,now=Math.floor(Date.now()/1000)){
 }
 const cookie=(token,age=lifetime)=>`${cookieName}=${token}; Path=/; Max-Age=${age}; HttpOnly; Secure; SameSite=Strict`;
 async function boundedJson(source,limit=maxBody){const length=source.headers.get('Content-Length');if(length&&(Number(length)>limit||Number(length)<0))throw new Error('Request too large');const reader=source.body?.getReader();if(!reader)throw new Error('Missing JSON body');const pieces=[];let size=0;try{while(true){const chunk=await reader.read();if(chunk.done)break;size+=chunk.value.byteLength;if(size>limit)throw new Error('Request too large');pieces.push(chunk.value);}}finally{await reader.cancel().catch(()=>{});}const joined=new Uint8Array(size);let offset=0;for(const piece of pieces){joined.set(piece,offset);offset+=piece.length;}return JSON.parse(decoder.decode(joined));}
-function headers(env){return {Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'frostmoon-site-studio',...(env.WEBSITE_GITHUB_TOKEN?{Authorization:'Bearer '+env.WEBSITE_GITHUB_TOKEN}:{})};}
-async function readDocument(key,env,fetcher){
- const response=await fetcher(github+documents[key]+'?ref=main',{headers:headers(env),redirect:'error',signal:AbortSignal.timeout(12000)});
- if(!response.ok)throw new Error('Repository read unavailable ('+response.status+')');const file=await boundedJson(response,600000);
- if(file.encoding!=='base64'||typeof file.content!=='string'||!/^[a-f0-9]{40}$/.test(file.sha)||file.size>maxBody)throw new Error('Unexpected repository document');
- const text=decoder.decode(unbase64(file.content.replace(/\s/g,'')));if(encoder.encode(text).length>maxBody)throw new Error('Document too large');const value=JSON.parse(text);validateDocument(key,value,value);return {sha:file.sha,value};
+const tokenFor=env=>typeof env.WEBSITE_GITHUB_TOKEN==='string'?env.WEBSITE_GITHUB_TOKEN.trim():'';
+function headers(env,authenticated=true){return {Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'frostmoon-site-studio',...(authenticated&&tokenFor(env)?{Authorization:'Bearer '+tokenFor(env)}:{})};}
+const readMessages={
+ 'github-token-invalid':'GitHub rejected the configured token. Update the production WEBSITE_GITHUB_TOKEN secret.',
+ 'github-permission':'GitHub denied repository access. Check the selected repository and Contents permission.',
+ 'github-rate-limit':'GitHub rate limit reached. Wait before reloading; no write was attempted.',
+ 'github-network':'Could not reach GitHub. Reload the document; no write was attempted.',
+ 'github-response-invalid':'GitHub returned an unexpected document response. No write was attempted.',
+ 'github-document-invalid':'The repository document failed validation. Review its source JSON before publishing.',
+ 'github-unavailable':'GitHub could not serve this document. Reload later; no write was attempted.'
+};
+function readError(code,upstreamStatus){return Object.assign(new Error(readMessages[code]),{code,...(upstreamStatus?{upstreamStatus}:{})});}
+function responseError(response){const status=response.status;return readError(status===401?'github-token-invalid':status===429||status===403&&(response.headers.get('X-RateLimit-Remaining')==='0'||response.headers.has('Retry-After'))?'github-rate-limit':[403,404].includes(status)?'github-permission':'github-unavailable',status);}
+function readFailure(error){const safe=Object.hasOwn(readMessages,error?.code)?error:readError('github-response-invalid');return reply({error:safe.message,code:safe.code,operation:'read',...(safe.upstreamStatus?{upstreamStatus:safe.upstreamStatus}:{})},502);}
+async function readDocument(key,env,fetcher,allowPublicFallback=false){
+ let authenticated=!!tokenFor(env),warning=null;
+ async function fetchDocument(){try{return await fetcher(github+documents[key]+'?ref=main',{headers:headers(env,authenticated),redirect:'error',signal:AbortSignal.timeout(12000)});}catch{throw readError('github-network');}}
+ let response=await fetchDocument();
+ if(!response.ok&&authenticated&&allowPublicFallback&&[401,403,404,429].includes(response.status)){
+  warning=responseError(response);await response.body?.cancel().catch(()=>{});authenticated=false;response=await fetchDocument();
+ }
+ if(!response.ok)throw responseError(response);
+ let value,file;
+ try{file=await boundedJson(response,600000);if(file.encoding!=='base64'||typeof file.content!=='string'||!/^[a-f0-9]{40}$/.test(file.sha)||!Number.isInteger(file.size)||file.size<0||file.size>maxBody)throw Error();const text=decoder.decode(unbase64(file.content.replace(/\s/g,'')));if(encoder.encode(text).length>maxBody)throw Error();value=JSON.parse(text);}catch{throw readError('github-response-invalid');}
+ try{validateDocument(key,value,value);}catch{throw readError('github-document-invalid');}
+ return {sha:file.sha,value,access:{mode:authenticated?'authenticated':'public',canPublish:authenticated,...(warning?{warningCode:warning.code,upstreamStatus:warning.upstreamStatus}:{})}};
 }
 export async function handleStudio(request,env,fetcher=fetch){
  const url=new URL(request.url),path=url.pathname;
@@ -52,19 +72,19 @@ export async function handleStudio(request,env,fetcher=fetch){
  if(path==='/api/studio/logout'&&request.method==='POST')return reply({authenticated:false},200,{'Set-Cookie':cookie('',0)});
  if(path!=='/api/studio/document')return reply({error:'Unknown studio operation'},404);
  const name=url.searchParams.get('key');if(!Object.hasOwn(documents,name||''))return reply({error:'Unknown editable document'},400);
- if(request.method==='GET'){try{return reply(await readDocument(name,env,fetcher));}catch{return reply({error:'Could not read the repository document; check token access and retry'},502);}}
+ if(request.method==='GET'){try{return reply(await readDocument(name,env,fetcher,true));}catch(error){return readFailure(error);}}
  if(request.method!=='PUT')return reply({error:'Method not allowed'},405);
- if(!env.WEBSITE_GITHUB_TOKEN)return reply({error:'Publishing is not configured; export your draft instead'},503);
+ if(!tokenFor(env))return reply({error:'Publishing is not configured; export your draft instead'},503);
  let input;try{input=await boundedJson(request);}catch{return reply({error:'Invalid or oversized document'},400);}
  if(!input||typeof input.sha!=='string'||!/^[a-f0-9]{40}$/.test(input.sha))return reply({error:'A current document revision is required'},400);
- let previous;try{previous=await readDocument(name,env,fetcher);}catch{return reply({error:'Could not verify the current repository revision'},502);}
+ let previous;try{previous=await readDocument(name,env,fetcher);}catch(error){return readFailure(error);}
  if(previous.sha!==input.sha)return reply({error:'The document changed elsewhere. Export your draft, then reload before saving.'},409);
  try{validateDocument(name,input.value,previous.value);}catch(error){return reply({error:error.message},400);}
  const content=encoder.encode(JSON.stringify(input.value,null,2)+'\n');if(content.length>maxBody)return reply({error:'Document too large'},413);
  try{
   const result=await fetcher(github+documents[name],{method:'PUT',headers:{...headers(env),'Content-Type':'application/json'},body:JSON.stringify({message:'Studio: update '+name,content:base64(content),sha:input.sha,branch:'main'}),redirect:'error',signal:AbortSignal.timeout(15000)});
   if(result.status===409||result.status===422)return reply({error:'Repository conflict or branch rule prevented publication. Reload the document before retrying.'},409);
-  if(!result.ok)return reply({error:'GitHub rejected publication ('+result.status+'). Check token permissions and expiration.'},502);
+  if(!result.ok)return reply({error:'GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.',code:'github-publish-rejected',operation:'write',upstreamStatus:result.status},502);
   const saved=await boundedJson(result,100000);if(!/^[a-f0-9]{40}$/.test(saved.commit?.sha||'')||!/^[a-f0-9]{40}$/.test(saved.content?.sha||''))throw new Error('Missing publication receipt');
   return reply({saved:true,sha:saved.content.sha,commit:saved.commit.sha,url:'https://github.com/frostmoon-rui/frostmoonrui_website/commit/'+saved.commit.sha});
  }catch{return reply({error:'Publication status is uncertain. Check GitHub before retrying; your draft is retained.'},502);}

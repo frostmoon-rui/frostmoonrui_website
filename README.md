@@ -136,8 +136,16 @@ Keep the private Chinese bot, public English bot checkout and this website in se
 
 Official references: [Workers static assets](https://developers.cloudflare.com/workers/static-assets/), [Workers custom domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/), [Build configuration](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/), and [OSM tile policy](https://operations.osmfoundation.org/policies/tiles/).
 
-## Shared fallback artwork
+## Repository access diagnostics
+
+Studio document reads distinguish rejected tokens, repository permissions, rate limits, transport failures and invalid source documents. The fixed public website repository can be read without credentials for preview if a configured token is rejected; the UI explicitly disables publishing in this mode. Saving never uses an unauthenticated fallback and still verifies the current file SHA before its single GitHub write. Read failures do not imply an attempted publication. Unknown write outcomes are never automatically retried.
+
+If Studio reports `github-token-invalid` (HTTP 401), update only the production `WEBSITE_GITHUB_TOKEN` runtime secret. For HTTP 403/404 permission errors, verify the fine-grained token owner, the selected `frostmoonrui_website` repository, expiration/approval status, and **Contents: Read and write**. A successful public preview is not proof of write permission. Never paste token values into chat, logs or repository files. Reload the document after fixing the secret; the existing draft/export controls remain available.
+
+## Community integration
 
 Friend applications, the private review console, the recommended-links page and public bot route feed are documented in [D1 setup and integration](D1_SETUP.md). Complete the one-time schema setup before accepting applications. The homepage contact strip is intentionally omitted; contact buttons remain in the sidebar.
+
+## Shared fallback artwork
 
 Missing or failed companion portraits reveal a shared transparent pixel-cat placeholder at `/assets/companions/blank-cat.png`. Existing portraits stay on top; reduced-motion GIF suppression also reveals the same neutral artwork. The original blank-faced silhouette was generated with the built-in image generation tool from the approved reference: pale gray chibi cat, icy-blue pixel outline, tiny decorative speech bubble, transparent background. It does not represent any companion's identity.
