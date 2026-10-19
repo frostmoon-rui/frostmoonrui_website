@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   render:
-    if: startsWith(github.event.head_commit.message, 'Studio: ')
+    if: "startsWith(github.event.head_commit.message, 'Studio: ')"
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

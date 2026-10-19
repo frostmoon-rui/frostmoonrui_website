@@ -25,5 +25,5 @@ jobs:
         run: python -m unittest discover -s tests -q
       - name: Require generated assets to match source
         # The dedicated renderer synchronizes generated files after studio source commits.
-        if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Studio: ') }}
+        if: "${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Studio: ') }}"
         run: git diff --exit-code -- dist/
