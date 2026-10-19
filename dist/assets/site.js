@@ -2,6 +2,7 @@ import {translate as t} from './i18n.js';
 import './motion.js';
 import './navigation.js';
 import './theme.js';
+import './glass.js';
 try {
   const saved=localStorage.getItem('frostmoon-language');
   if(document.documentElement.dataset.defaultEntry==='true' && ['zh','ru','ja'].includes(saved)){

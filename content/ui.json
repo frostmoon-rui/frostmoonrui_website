@@ -1,5 +1,10 @@
 {
   "en": {
+    "Check draft": "Check draft",
+    "Restore loaded version": "Restore loaded version",
+    "Draft is valid. Nothing has been published.": "Draft is valid. Nothing has been published.",
+    "Loaded version restored. Nothing has been published.": "Loaded version restored. Nothing has been published.",
+    "Preview follows site theme.": "Preview follows site theme.",
     "Open navigation": "Open navigation",
     "Close navigation": "Close navigation",
     "Map provider": "Map provider",
@@ -301,6 +306,11 @@
     "UI translations must be plain text": "UI translations must be plain text"
   },
   "zh": {
+    "Check draft": "检查草稿",
+    "Restore loaded version": "恢复已加载版本",
+    "Draft is valid. Nothing has been published.": "草稿检查通过，尚未发布任何内容。",
+    "Loaded version restored. Nothing has been published.": "已恢复到本次加载的版本，尚未发布任何内容。",
+    "Preview follows site theme.": "预览随网站主题切换。",
     "Open navigation": "打开导航菜单",
     "Close navigation": "关闭导航菜单",
     "Map provider": "地图服务",
@@ -602,6 +612,11 @@
     "UI translations must be plain text": "界面翻译必须是纯文本"
   },
   "ru": {
+    "Check draft": "Проверить черновик",
+    "Restore loaded version": "Восстановить загруженную версию",
+    "Draft is valid. Nothing has been published.": "Черновик корректен. Ничего не опубликовано.",
+    "Loaded version restored. Nothing has been published.": "Загруженная версия восстановлена. Ничего не опубликовано.",
+    "Preview follows site theme.": "Предпросмотр использует тему сайта.",
     "Open navigation": "Открыть навигацию",
     "Close navigation": "Закрыть навигацию",
     "Map provider": "Поставщик карты",
@@ -903,6 +918,11 @@
     "UI translations must be plain text": "Переводы интерфейса должны быть обычным текстом"
   },
   "ja": {
+    "Check draft": "下書きを確認",
+    "Restore loaded version": "読み込み時の状態に戻す",
+    "Draft is valid. Nothing has been published.": "下書きに問題はありません。まだ公開されていません。",
+    "Loaded version restored. Nothing has been published.": "読み込み時の状態に戻しました。まだ公開されていません。",
+    "Preview follows site theme.": "プレビューもサイトのテーマに連動します。",
     "Open navigation": "ナビゲーションを開く",
     "Close navigation": "ナビゲーションを閉じる",
     "Map provider": "地図プロバイダー",
