@@ -1,5 +1,5 @@
 import {documents,validateDocument} from '../shared/site-schema.js';
-import {readRepository,readDeployedDocument,repositoryMessages as readMessages,repositoryError as readError,repositoryHeaders as headers,repositoryToken as tokenFor} from './studio-repository.js';
+import {readRepository,readDeployedDocument,diagnoseRepository,repositoryMessages as readMessages,repositoryError as readError,repositoryHeaders as headers,repositoryToken as tokenFor} from './studio-repository.js';
 const encoder=new TextEncoder(),decoder=new TextDecoder('utf-8',{fatal:true});
 const cookieName='__Host-frostmoon_studio',lifetime=3600,maxBody=300000;
 const github='https://api.github.com/repos/frostmoon-rui/frostmoonrui_website/contents/';
@@ -45,6 +45,11 @@ export async function handleStudio(request,env,fetcher=fetch){
  }
  if(!session)return reply({error:'Authentication required'},401);
  if(writing&&request.headers.get('X-Studio-CSRF')!==session.csrf)return reply({error:'Session verification failed'},403);
+ if(path==='/api/studio/diagnostics'&&request.method==='GET'){
+  const name=url.searchParams.get('key')||'site';
+  if(!Object.hasOwn(documents,name))return reply({error:'Unknown editable document'},400);
+  return reply(await diagnoseRepository(env,fetcher,name));
+ }
  if(path==='/api/studio/logout'&&request.method==='POST')return reply({authenticated:false},200,{'Set-Cookie':cookie('',0)});
  if(path!=='/api/studio/document')return reply({error:'Unknown studio operation'},404);
  const name=url.searchParams.get('key');if(!Object.hasOwn(documents,name||''))return reply({error:'Unknown editable document'},400);

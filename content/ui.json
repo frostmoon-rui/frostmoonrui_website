@@ -404,7 +404,11 @@
     "GitHub now matches the submitted draft. No additional write was sent.": "GitHub now matches the submitted draft. No additional write was sent.",
     "The write outcome is still unresolved. Export your draft and inspect GitHub before reloading.": "The write outcome is still unresolved. Export your draft and inspect GitHub before reloading.",
     "GitHub connection verified. Your unsaved edits are preserved.": "GitHub connection verified. Your unsaved edits are preserved.",
-    "GitHub token configured": "GitHub token configured"
+    "GitHub token configured": "GitHub token configured",
+    "Diagnose GitHub connection": "Diagnose GitHub connection",
+    "Read-only connection report": "Read-only connection report",
+    "Running read-only connection diagnostics…": "Running read-only connection diagnostics…",
+    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "Diagnostics ready. Copy the report below; it contains no password, token or draft content."
   },
   "zh": {
     "Visit website": "去串个门",
@@ -811,7 +815,11 @@
     "GitHub now matches the submitted draft. No additional write was sent.": "GitHub 当前内容已与提交的草稿一致，未再次发送写入。",
     "The write outcome is still unresolved. Export your draft and inspect GitHub before reloading.": "写入结果仍未确认。请先导出草稿并检查 GitHub，再重新加载。",
     "GitHub connection verified. Your unsaved edits are preserved.": "GitHub 鉴权读取已核验，未保存的修改已保留。",
-    "GitHub token configured": "GitHub 令牌已配置"
+    "GitHub token configured": "GitHub 令牌已配置",
+    "Diagnose GitHub connection": "诊断 GitHub 连接",
+    "Read-only connection report": "只读连接诊断报告",
+    "Running read-only connection diagnostics…": "正在进行只读连接诊断，不会发送写入…",
+    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "诊断完成。请复制下方报告；其中不包含密码、令牌或草稿内容。"
   },
   "ru": {
     "Visit website": "Заглянуть в гости",
@@ -1218,7 +1226,11 @@
     "GitHub now matches the submitted draft. No additional write was sent.": "Содержимое GitHub совпадает с отправленным черновиком. Повторная запись не отправлена.",
     "The write outcome is still unresolved. Export your draft and inspect GitHub before reloading.": "Результат записи всё ещё неизвестен. Экспортируйте черновик и проверьте GitHub перед перезагрузкой.",
     "GitHub connection verified. Your unsaved edits are preserved.": "Авторизованное чтение GitHub проверено. Несохранённые изменения сохранены в редакторе.",
-    "GitHub token configured": "Токен GitHub настроен"
+    "GitHub token configured": "Токен GitHub настроен",
+    "Diagnose GitHub connection": "Диагностика связи с GitHub",
+    "Read-only connection report": "Отчёт о проверке соединения",
+    "Running read-only connection diagnostics…": "Проверяем соединение без записи данных…",
+    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "Диагностика завершена. Скопируйте отчёт ниже: в нём нет пароля, токена или текста черновика."
   },
   "ja": {
     "Visit website": "遊びに行く",
@@ -1625,6 +1637,10 @@
     "GitHub now matches the submitted draft. No additional write was sent.": "GitHub の内容が送信した下書きと一致しています。追加の書き込みは送信していません。",
     "The write outcome is still unresolved. Export your draft and inspect GitHub before reloading.": "書き込み結果はまだ不明です。下書きをエクスポートし、GitHub を確認してから再読み込みしてください。",
     "GitHub connection verified. Your unsaved edits are preserved.": "GitHub の認証済み読み取りを確認しました。未保存の編集は保持されています。",
-    "GitHub token configured": "GitHub トークン設定"
+    "GitHub token configured": "GitHub トークン設定",
+    "Diagnose GitHub connection": "GitHub 接続を診断",
+    "Read-only connection report": "読み取り専用の接続診断レポート",
+    "Running read-only connection diagnostics…": "接続を診断中です。書き込みは行いません…",
+    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "診断が完了しました。下のレポートをコピーしてください。パスワード・トークン・下書きは含まれません。"
   }
 }

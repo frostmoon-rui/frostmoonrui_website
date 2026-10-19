@@ -7,12 +7,13 @@ import './entry.js';
 import './companions.js';
 import './community.js';
 import {createNoteFilter} from './note-filter.js';
+// The Worker serves the preferred language in the first HTML response.
+// Persist explicit locale pages for the next unprefixed visit; never reload here.
 try {
-  const saved=localStorage.getItem('frostmoon-language');
-  if(document.documentElement.dataset.defaultEntry==='true' && ['zh','ru','ja'].includes(saved)){
-    const target=new URL(window.location.href);
-    target.pathname='/'+saved+target.pathname;
-    window.location.replace(target.href);
+  const code=document.documentElement.dataset.locale;
+  if(['zh','en','ru','ja'].includes(code)&&document.documentElement.dataset.defaultEntry!=='true'){
+    document.cookie='frostmoon_language='+code+'; Path=/; Max-Age=31536000; SameSite=Lax'+(location.protocol==='https:'?'; Secure':'');
+    localStorage.setItem('frostmoon-language',code);
   }
 } catch {}
 const noteCards=[...document.querySelectorAll('.note-card')],noteFilter=createNoteFilter(noteCards),noteMotion=matchMedia('(prefers-reduced-motion: reduce)');
@@ -32,6 +33,7 @@ document.querySelectorAll('[data-site-language]').forEach(link => {
   target.hash=window.location.hash;
   link.href=target.href;
   link.addEventListener('click',()=>{
+    document.cookie='frostmoon_language='+link.dataset.siteLanguage+'; Path=/; Max-Age=31536000; SameSite=Lax'+(location.protocol==='https:'?'; Secure':'');
     try { localStorage.setItem('frostmoon-language',link.dataset.siteLanguage); } catch {}
   });
 });

@@ -21,6 +21,39 @@ export function repositoryHeaders(env,authenticated=true){
  if(authenticated&&token&&(!/^[\x21-\x7e]{1,512}$/.test(token)||/^Bearer\s/i.test(token)||/["'`]/.test(token)))throw repositoryError('github-token-format');
  return {Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'frostmoon-site-studio',...(authenticated&&token?{Authorization:'Bearer '+token}:{})};
 }
+export function transportCategory(error){
+ const code=error?.cause?.code||error?.code;
+ if(['ENOTFOUND','EAI_AGAIN'].includes(code))return 'dns';
+ if(['ECONNRESET','ECONNREFUSED','ETIMEDOUT','UND_ERR_CONNECT_TIMEOUT'].includes(code))return 'connection';
+ if(['AbortError','TimeoutError'].includes(error?.name))return 'timeout';
+ if(/illegal invocation/i.test(error?.message||''))return 'runtime-binding';
+ if(/certificate|\btls\b|\bssl\b/i.test(error?.message||''))return 'tls';
+ if(/redirect/i.test(error?.message||''))return 'redirect';
+ return 'transport';
+}
+// Authenticated, fixed-destination GET probes only. Never return raw exceptions,
+// tokens, upstream bodies or arbitrary response headers to the browser or logs.
+export async function diagnoseRepository(env,fetcher,key='site'){
+ if(!Object.hasOwn(documents,key))throw repositoryError('github-document-invalid');
+ const id=crypto.randomUUID();
+ const probes=[['authenticated-api',api+documents[key]+'?ref=main',true],['public-api',api+documents[key]+'?ref=main',false],['public-raw',raw+documents[key],false]];
+ const results=await Promise.all(probes.map(async([probe,url,authenticated])=>{
+  const start=Date.now();
+  if(authenticated&&!repositoryToken(env))return {probe,outcome:'token-missing',elapsedMs:0};
+  try{
+   const headers=repositoryHeaders(env,authenticated);
+   const response=await fetcher(url,{method:'GET',headers,redirect:'manual',signal:AbortSignal.timeout(5000)});
+   const status=response.status;
+   const outcome=status>=300&&status<400?'redirect':response.ok?'reachable':rejected(response).code;
+   const requestId=response.headers.get('X-GitHub-Request-Id');
+   const result={probe,outcome,status,elapsedMs:Date.now()-start,...(/^[A-Fa-f0-9:]{8,100}$/.test(requestId||'')?{requestId}:{})};
+   await response.body?.cancel().catch(()=>{});return result;
+  }catch(error){return {probe,outcome:error?.code==='github-token-format'?'github-token-format':transportCategory(error),elapsedMs:Date.now()-start};}
+ }));
+ const report={id,checkedAt:new Date().toISOString(),repository:'frostmoon-rui/frostmoonrui_website',branch:'main',document:key,tokenConfigured:!!repositoryToken(env),writeAttempted:false,results};
+ console.log('[Studio GitHub diagnostics]',JSON.stringify(report));
+ return report;
+}
 function rejected(response){const status=response.status;return repositoryError(status===401?'github-token-invalid':status===429||status===403&&(response.headers.get('X-RateLimit-Remaining')==='0'||response.headers.has('Retry-After'))?'github-rate-limit':[403,404].includes(status)?'github-permission':'github-unavailable',status);}
 async function bytes(response,max=limit){
  const length=Number(response.headers.get('Content-Length'));if(length<0||length>max)throw repositoryError('github-response-invalid');

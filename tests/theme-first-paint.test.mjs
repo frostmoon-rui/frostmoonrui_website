@@ -22,7 +22,7 @@ test('personalized HTML cannot leak through shared cache and keeps security head
 });
 test('rewritten HTML removes stale compression headers and preserves existing vary keys',async()=>{
  const env={ASSETS:{fetch:async()=>new Response('<html><body>Page</body></html>',{headers:{'Content-Type':'text/html','Content-Encoding':'gzip',Vary:'Accept-Encoding'}})}};
- const response=await handle(new Request('https://frostmoonrui.com/',{headers:{Cookie:'frostmoon_theme=dark'}}),env);assert.equal(response.headers.get('Content-Encoding'),null);assert.equal(response.headers.get('Vary'),'Accept-Encoding, Cookie');assert.match(await response.text(),/data-theme="dark"/);
+ const response=await handle(new Request('https://frostmoonrui.com/',{headers:{Cookie:'frostmoon_theme=dark'}}),env);assert.equal(response.headers.get('Content-Encoding'),null);assert.equal(response.headers.get('Vary'),'Accept-Encoding, Cookie, Accept-Language');assert.match(await response.text(),/data-theme="dark"/);
 });
 test('every language loads synchronous theme initialization before page CSS and modules',()=>{
  for(const code of ['en','zh','ru','ja'])for(const route of ['','about/','links/','studio/','food-map/','projects/']){const html=read(`dist/${code}/${route}index.html`);assert.ok(html.indexOf('/assets/theme-base.css')<html.indexOf('/assets/site.css'));assert.ok(html.indexOf('/assets/theme-init.js')<html.indexOf('/assets/site.css'));const tag=html.match(/<script[^>]*src="\/assets\/theme-init.js"[^>]*>/)[0];assert.doesNotMatch(tag,/\bdefer\b|\basync\b|type="module"/);assert.match(tag,/data-cfasync="false"/);}

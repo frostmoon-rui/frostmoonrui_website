@@ -1,5 +1,25 @@
 # Studio recovery and publication safety
 
+## First-response language and form layout
+
+Known unprefixed page URLs are served internally from a localized asset in one response. The validated `frostmoon_language` cookie takes priority over the browser's weighted Accept-Language header, with English as the final fallback. Explicit `/zh/`, `/en/`, `/ru/` and `/ja/` URLs always win. Language-specific navigation writes the preference cookie; there is no late `location.replace` reload. Personalized entry responses use private/no-store caching and vary on Cookie and Accept-Language. Static assets, JSON feeds, API calls and unknown paths are not rewritten.
+
+The visual editor keeps each document's disclosure states and its internal scroll offset in memory when fields are rebuilt after array edits, language/view changes, reloads or restoration. Document contents and credentials are not stored in localStorage. A browser refresh still requires exporting unsaved drafts first.
+
+## Collecting a safe connection report
+
+Sign in to the deployed studio and click **Diagnose GitHub connection**. Copy the JSON under **Read-only connection report**. The diagnostic request is available only after owner authentication. It performs three parallel GET probes with five-second budgets: authenticated Contents API, public Contents API and public raw source, all pinned to the existing repository and allowlisted document. Redirects are reported rather than followed. This does not replace strict revision verification or grant publishing capability.
+
+The report contains a correlation ID, timestamp, document key, token-presence boolean, HTTP statuses, elapsed times, allowlisted transport categories and optional GitHub request IDs. It never includes a token, password, cookie, draft, upstream body, destination redirect or raw exception. The same sanitized report appears in Worker logs as `[Studio GitHub diagnostics]`.
+
+- Authenticated 401 with successful public probes: update the existing production runtime token yourself; do not send its value in chat.
+- Authenticated 403/404 with successful public probes: inspect the token's repository selection, expiration/approval and Contents permissions for `frostmoon-rui/frostmoonrui_website`.
+- All three transport/timeout failures: use the correlation ID and timestamp in Cloudflare Worker logs; changing the local VPN does not test the Worker's outbound connection.
+- `runtime-binding`, `dns`, `tls`, `connection` or `redirect`: share the sanitized report so the failing runtime/path can be examined rather than assuming a token fault.
+- All probes reachable: use **Verify GitHub connection** to validate and compare the actual document before publishing. Diagnostics do not validate source JSON or prove write permission.
+
+No test publication is necessary to obtain this report. Keep the current tab open or export its draft before reloading an updated deployment.
+
 ## Read path
 
 The editor no longer depends on one outbound GitHub request. An authenticated document read first calls the fixed repository Contents API. Transport failures and HTTP 502/503/504 receive at most one immediate retry, with an eight-second budget per request. Authentication/permission/rate errors can fall back to a public read of that same fixed endpoint. A fixed raw-file URL, without any credentials, is the next read-only source (six seconds). Finally, the Worker can read the exact source bytes packaged with the current deployment through its ASSETS binding.
