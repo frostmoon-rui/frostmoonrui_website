@@ -12,4 +12,4 @@ html{background-color:var(--bg);min-height:100%}body{background-color:var(--bg);
 /* Keep the old snapshot fully covering the canvas until WAAPI starts its reverse reveal. */
 .theme-transition *,.theme-transition *:before,.theme-transition *:after{transition:none!important}
 .theme-transition::view-transition-old(root),.theme-transition::view-transition-new(root){animation:none!important;mix-blend-mode:normal;opacity:1}
-.wordmark img,.intro-emblem img{border-radius:30%;corner-shape:var(--corner-curve, superellipse(2));object-fit:cover}.companion-buddy img{border-radius:inherit;corner-shape:inherit}
+.wordmark img,.intro-emblem img{border-radius:30%;corner-shape:var(--corner-curve, superellipse(1.5));object-fit:cover}.companion-buddy img{border-radius:inherit;corner-shape:inherit}

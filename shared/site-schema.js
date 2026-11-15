@@ -37,5 +37,5 @@ export function validateDocument(key,value,previous){
 
 // Snap legacy numeric appearance settings to the shared corner scale.
 export function surfaceCornerRadius(size) {
-  return !size ? 0 : size <= 6 ? 4 : size <= 16 ? 12 : size <= 28 ? 24 : 32;
+  return !size ? 0 : size <= 6 ? 8 : size <= 16 ? 18 : size <= 28 ? 32 : 44;
 }
