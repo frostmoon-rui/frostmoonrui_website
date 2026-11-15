@@ -1,5 +1,7 @@
 # Frostmoon · a curious corner
 
+![Frostmoon — A multilingual notebook and food atlas](dist/assets/project-cover.svg)
+
 An independent technical notebook and public food atlas for **frostmoonrui.com**, with complete Chinese / English / Russian / Japanese versions. The homepage is a personal technical site. Acknowledgements and public-data attribution are collected on **`/about/`**, rather than repeated across the site. The food atlas lives at **`/food-map/`** or its locale-prefixed equivalent, never on the homepage.
 
 The atlas uses a quiet card layout with numbered, category-specific SVG pins. The list and map share stable venue numbers and selection state. Amap vector maps follow the site's light/dark theme using the official `whitesmoke` / `darkblue` styles; satellite imagery is not recolored. Marker chrome and information cards use the site's CSS colors, including in the optional OpenStreetMap view. Theme switching reuses the loaded map, and reduced-motion preferences are respected. Maps still load only on request, without geolocation access.
