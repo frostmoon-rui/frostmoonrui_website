@@ -16,5 +16,27 @@
   },
   "generatedAt": "2026-10-18T15:49:38Z",
   "coordinateSystem": "GCJ-02",
-  "spots": []
+  "spots": [
+    {
+      "name": "雯雯点心店",
+      "city": "上海市",
+      "address": "中山东路143号(方东小区北2门西150米)",
+      "lng": 121.249399,
+      "lat": 31.006949,
+      "coordinateSystem": "GCJ-02",
+      "category": "Food",
+      "articleUrl": "",
+      "amapUrl": "https://surl.amap.com/2RbDjCcSEdh9",
+      "id": "bbc0ba4cf7c68b62843ee054",
+      "price": 30,
+      "rating": 4.6,
+      "source": {
+        "id": "local",
+        "name": "frostmoon-rui",
+        "homepage": "https://frostmoonrui.com/",
+        "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
+        "type": "local"
+      }
+    }
+  ]
 }
