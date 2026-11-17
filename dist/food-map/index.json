@@ -37,6 +37,27 @@
         "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
         "type": "local"
       }
+    },
+    {
+      "name": "郭淑芬鲜切牛肉自助老火锅",
+      "city": "苏州市",
+      "address": "苏州市吴中区郭新东路199号叠翠峰(尹山湖地铁站5号口步行60米)",
+      "lng": 120.697309,
+      "lat": 31.248427,
+      "coordinateSystem": "GCJ-02",
+      "category": "Food",
+      "articleUrl": "https://frostmoonrui.com/notes/food/fa289b8e06952559f45a9574/",
+      "amapUrl": "https://surl.amap.com/2VlcPSPQ1jdVK",
+      "id": "fa289b8e06952559f45a9574",
+      "price": 75,
+      "rating": 4.5,
+      "source": {
+        "id": "local",
+        "name": "frostmoon-rui",
+        "homepage": "https://frostmoonrui.com/",
+        "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
+        "type": "local"
+      }
     }
   ]
 }

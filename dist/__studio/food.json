@@ -28,6 +28,18 @@
       "amapUrl": "https://surl.amap.com/2RbDjCcSEdh9",
       "price": 30,
       "rating": 4.6
+    },
+    {
+      "name": "郭淑芬鲜切牛肉自助老火锅",
+      "city": "苏州市",
+      "address": "苏州市吴中区郭新东路199号叠翠峰(尹山湖地铁站5号口步行60米)",
+      "lng": 120.697309,
+      "lat": 31.248427,
+      "category": "Food",
+      "articleUrl": "",
+      "amapUrl": "https://surl.amap.com/2VlcPSPQ1jdVK",
+      "price": 75,
+      "rating": 4.5
     }
   ]
 }
