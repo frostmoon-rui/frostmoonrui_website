@@ -19,5 +19,5 @@ test('all imported article links are adapted without modifying the exchange cach
  for(const place of feed.spots){const url=new URL(articleLink(place));assert.equal(url.origin,'https://cachetide.top');assert.equal(url.pathname,encodeURI(new URL(place.articleUrl).pathname));}
  assert.equal(JSON.stringify(feed),snapshot);
  const runtime=fs.readFileSync(new URL('../dist/assets/food-map.js',import.meta.url),'utf8');
- assert.equal((runtime.match(/const original=articleLink\(p\)/g)||[]).length,2);
+ assert.equal((runtime.match(/const original=articleLink\(p,locale\)/g)||[]).length,2);
 });

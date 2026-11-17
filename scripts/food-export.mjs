@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+export const foodNotePath=id=>`notes/food/${id}`;
 export const feedUrl='https://frostmoonrui.com/food-map/index.json';
 const safeUrl=value=>{if(value==='')return '';const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password)throw new Error('Expected public HTTPS URL');return u.href;};
 const text=(value,required=false)=>{if(typeof value!=='string'||value.length>500||/[\x00-\x1f]/.test(value)||(required&&!value.trim()))throw new Error('Invalid public food text');return value.trim();};
@@ -9,6 +10,7 @@ export function exportFood(data){
   const row={name:text(p.name,true),city:text(p.city,true),address:text(p.address??''),lng:p.lng,lat:p.lat,coordinateSystem:'GCJ-02',category:text(p.category??'Food'),articleUrl:safeUrl(p.articleUrl??''),amapUrl:safeUrl(p.amapUrl??'')};
   if(p.source&&p.source.jsonUrl!==feedUrl)throw new Error('Do not re-export imported venues');
   row.id=crypto.createHash('sha256').update(JSON.stringify([row.name.normalize('NFKC').toLowerCase(),row.city,row.lng,row.lat])).digest('hex').slice(0,24);
+  if(!row.articleUrl)row.articleUrl=`https://frostmoonrui.com/${foodNotePath(row.id)}/`;
   for(const [key,max] of [['price',1000000],['rating',5]])if(p[key]!==undefined){if(p[key]!==null&&(!Number.isFinite(p[key])||p[key]<0||p[key]>max))throw new Error('Invalid '+key);row[key]=p[key];}
   row.source={id:'local',name:'frostmoon-rui',homepage:'https://frostmoonrui.com/',jsonUrl:feedUrl,type:'local'};
   return row;

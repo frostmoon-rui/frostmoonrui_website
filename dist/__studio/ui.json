@@ -1,5 +1,6 @@
 {
   "en": {
+    "Food note": "Food note",
     "Visit website": "Visit website",
     "Send a little hello to {name}": "Send a little hello to {name}",
     "A little hello for {name}.": "A little hello for {name}.",
@@ -411,6 +412,7 @@
     "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "Diagnostics ready. Copy the report below; it contains no password, token or draft content."
   },
   "zh": {
+    "Food note": "美食文章正文",
     "Visit website": "去串个门",
     "Send a little hello to {name}": "和 {name} 贴贴",
     "A little hello for {name}.": "和 {name} 轻轻贴贴。",
@@ -822,6 +824,7 @@
     "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "诊断完成。请复制下方报告；其中不包含密码、令牌或草稿内容。"
   },
   "ru": {
+    "Food note": "Заметка о заведении",
     "Visit website": "Заглянуть в гости",
     "Send a little hello to {name}": "Поприветствовать {name}",
     "A little hello for {name}.": "Тёплый привет для {name}.",
@@ -1233,6 +1236,7 @@
     "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "Диагностика завершена. Скопируйте отчёт ниже: в нём нет пароля, токена или текста черновика."
   },
   "ja": {
+    "Food note": "グルメ記事の本文",
     "Visit website": "遊びに行く",
     "Send a little hello to {name}": "{name} にそっとごあいさつ",
     "A little hello for {name}.": "{name} に、そっと寄り添うごあいさつ。",

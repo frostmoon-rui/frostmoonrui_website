@@ -1,7 +1,8 @@
 export function safeHttps(value){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password?u.href:null;}catch{return null;}}
-export function articleLink(place){
+export function articleLink(place,locale){
  const safe=safeHttps(place.articleUrl);if(!safe)return null;
  const url=new URL(safe);
+ if(url.origin==='https://frostmoonrui.com'&&/^\/notes\/food\/[a-f0-9]{24}\/$/.test(url.pathname)&&['en','zh','ru','ja'].includes(locale))url.pathname='/'+locale+url.pathname;
  // CacheTide's current Valaxy client applies encodeURI to already encoded slugs.
  // Match its published canonical/client routes without changing exchanged data.
  if(url.origin==='https://cachetide.top'&&/^\/posts\/[^/]+\/?$/.test(url.pathname)&&/%[0-9a-f]{2}/i.test(url.pathname)&&!/%25[0-9a-f]{2}/i.test(url.pathname))url.pathname=encodeURI(url.pathname);

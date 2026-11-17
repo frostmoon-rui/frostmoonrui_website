@@ -35,6 +35,6 @@ test('visible attribution is consolidated in About while original venue links re
   assert.doesNotMatch(read(`dist/${code}/food-map/index.html`),/CacheTide/);
   assert.ok(fs.existsSync(new URL(`../dist/${code}/about/index.html`,import.meta.url)));
  }
- assert.match(read('dist/assets/food-map.js'),/articleLink\(p\)/);
+ assert.match(read('dist/assets/food-map.js'),/articleLink\(p,locale\)/);
  assert.equal(JSON.parse(read('dist/data/food.json')).sourceUrl,'https://cachetide.top/food-map/index.json');
 });
