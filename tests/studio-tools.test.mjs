@@ -41,3 +41,23 @@ test('strict connection verification retains unsaved JSON text and the original 
 test('verification cannot silently rebase a dirty draft onto a changed remote revision',async()=>{const value=JSON.parse(read('content/site.json'));const s=await fixture({value,sha:'b'.repeat(40),access:{mode:'authenticated',canPublish:true}});s.state.sha='a'.repeat(40);s.state.dirty=true;s.state.value.displayName='Keep my draft';await s.verifyRepository();assert.equal(s.state.value.displayName,'Keep my draft');assert.equal(s.state.sha,'a'.repeat(40));assert.equal(s.state.canPublish,false);assert.match(s.elements.get('studio-status').textContent,/changed elsewhere/);});
 test('uncertain client publication blocks repeated writes until explicitly reconciled',async()=>{let writes=0;const value=JSON.parse(read('content/site.json'));const s=await fixture((url,options)=>{if(options.method==='PUT'){writes++;throw Error('fixture reply lost');}return {value,sha:'b'.repeat(40),access:{mode:'authenticated',canPublish:true}};});s.state.sha='a'.repeat(40);s.state.dirty=true;await s.elements.get('studio-save').click();assert.equal(writes,1);assert.equal(s.state.writeUncertain,true);assert.equal(s.elements.get('studio-save').disabled,true);await s.elements.get('studio-save').click();assert.equal(writes,1);await s.verifyRepository();assert.equal(s.state.writeUncertain,false);assert.equal(s.state.sha,'b'.repeat(40));assert.equal(s.state.dirty,false);assert.equal(writes,1);assert.match(s.elements.get('studio-status').textContent,/No additional write/);});
 test('an unresolved write cannot be retried merely because an old revision can be read',async()=>{const value=JSON.parse(read('content/site.json'));const s=await fixture({value,sha:'a'.repeat(40),access:{mode:'authenticated',canPublish:true}});s.state.sha='a'.repeat(40);s.state.writeUncertain=true;s.state.saveIntent={key:'site',value:{...value,displayName:'Unknown outcome'}};s.state.dirty=true;await s.verifyRepository();assert.equal(s.state.writeUncertain,true);assert.equal(s.state.canPublish,false);assert.equal(s.state.dirty,true);});
+
+test('incomplete food drafts retain the collection preview and escape the article text',async()=>{
+ const s=await fixture();
+ const original=JSON.parse(read('content/food-spots.json'));
+ const value=structuredClone(original);
+ value.spots.push({name:'',city:'',lng:null,lat:null,note:'<img src=x onerror=alert(1)>'});
+ Object.assign(s.state,{key:'food',value,original});
+ s.preview();
+ const frame=s.elements.get('studio-preview');
+ assert.match(frame.srcdoc,/Review the draft fields before publishing/);
+ assert.match(frame.srcdoc,/My original food collection/);
+ assert.match(frame.srcdoc,/&lt;img src=x onerror=alert\(1\)&gt;/);
+ assert.doesNotMatch(frame.srcdoc,/<img src=x/);
+ await s.elements.get('studio-check').click();
+ assert.match(s.elements.get('studio-status').textContent,/Invalid venue coordinates/);
+ Object.assign(value.spots.at(-1),{name:'New cafe',city:'Shanghai',lng:121,lat:31});
+ s.preview();
+ assert.match(frame.srcdoc,/<h2>New cafe<\/h2>/);
+ assert.doesNotMatch(frame.srcdoc,/Review the draft fields before publishing/);
+});
