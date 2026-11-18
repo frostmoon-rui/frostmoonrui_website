@@ -14,7 +14,7 @@
     "url": "https://frostmoonrui.com/",
     "homepage": "https://frostmoonrui.com/"
   },
-  "generatedAt": "2026-11-18T11:23:20.292Z",
+  "generatedAt": "2026-11-18T11:29:25.110Z",
   "coordinateSystem": "GCJ-02",
   "spots": [
     {
@@ -133,6 +133,20 @@
       "articleUrl": "",
       "amapUrl": "https://surl.amap.com/2mIjT3wea3S0",
       "price": 20,
+      "rating": 4.8
+    },
+    {
+      "name": "张大叔成都市井火锅",
+      "city": "黑龙江省黑河市",
+      "address": "爱辉区微波局办公住宅楼(兴林街309号)",
+      "lng": 127.505729,
+      "lat": 50.245811,
+      "category": "火锅",
+      "date": "2025-10-04",
+      "note": "非常不错的火锅,算是半自助形式\n很多很多小吃可以吃,味道很好,性价比也很高",
+      "articleUrl": "",
+      "amapUrl": "https://surl.amap.com/2o11moca1beoO",
+      "price": 140,
       "rating": 4.8
     }
   ]

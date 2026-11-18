@@ -14,7 +14,7 @@
     "url": "https://frostmoonrui.com/",
     "homepage": "https://frostmoonrui.com/"
   },
-  "generatedAt": "2026-11-18T11:23:20.292Z",
+  "generatedAt": "2026-11-18T11:29:25.110Z",
   "coordinateSystem": "GCJ-02",
   "spots": [
     {
@@ -114,6 +114,27 @@
       "id": "40b20406852e2caf187c877b",
       "price": 150,
       "rating": 3.5,
+      "source": {
+        "id": "local",
+        "name": "frostmoon-rui",
+        "homepage": "https://frostmoonrui.com/",
+        "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
+        "type": "local"
+      }
+    },
+    {
+      "name": "张大叔成都市井火锅",
+      "city": "黑龙江省黑河市",
+      "address": "爱辉区微波局办公住宅楼(兴林街309号)",
+      "lng": 127.505729,
+      "lat": 50.245811,
+      "coordinateSystem": "GCJ-02",
+      "category": "火锅",
+      "articleUrl": "https://frostmoonrui.com/notes/food/49e716f754af44df971d8cbe/",
+      "amapUrl": "https://surl.amap.com/2o11moca1beoO",
+      "id": "49e716f754af44df971d8cbe",
+      "price": 140,
+      "rating": 4.8,
       "source": {
         "id": "local",
         "name": "frostmoon-rui",
