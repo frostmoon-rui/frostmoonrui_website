@@ -27,19 +27,34 @@
       "articleUrl": "",
       "amapUrl": "https://surl.amap.com/2RbDjCcSEdh9",
       "price": 30,
-      "rating": 4.6
+      "rating": 4.6,
+      "note": "看到附近还不错的包子店,里面其实有很多种类的食物\n点了一笼肉烧麦,一碗馄饨和一个咸鸭蛋(灌汤包卖光了呜呜呜没有灌汤包可以吃)\n咸鸭蛋中规中矩,馄饨也很香,烧麦很好吃,让我更想吃灌汤包了呜呜呜\n----2026/11/11"
     },
     {
       "name": "郭淑芬鲜切牛肉自助老火锅",
       "city": "苏州市",
-      "address": "苏州市吴中区郭新东路199号叠翠峰(尹山湖地铁站5号口步行60米)",
+      "address": "吴中区郭新东路199号叠翠峰(尹山湖地铁站5号口步行60米)",
       "lng": 120.697309,
       "lat": 31.248427,
       "category": "Food",
       "articleUrl": "",
       "amapUrl": "https://surl.amap.com/2VlcPSPQ1jdVK",
       "price": 75,
-      "rating": 4.5
+      "rating": 4.5,
+      "note": "和朋友黑猫酱一起去吃的,就是一般般的自助火锅\n----2026/08/02"
+    },
+    {
+      "name": "知味•金陵小笼包",
+      "city": "苏州市",
+      "address": "吴中区苏粤工业小区东门北60米",
+      "lng": 120.629375,
+      "lat": 31.251775,
+      "category": "Food",
+      "note": "和朋友点的外卖(貌似是只支持外卖服务店)\n它非常对得起它的评分,胡辣汤不好喝,包子也不好吃\n避雷",
+      "articleUrl": "",
+      "amapUrl": "https://surl.amap.com/2bLaY0tI1B6re",
+      "price": 26,
+      "rating": 3.5
     }
   ]
 }
