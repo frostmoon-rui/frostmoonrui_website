@@ -60,14 +60,17 @@ export async function handleStudio(request,env,fetcher=fetch){
  if(!input||typeof input.sha!=='string'||!/^[a-f0-9]{40}$/.test(input.sha))return reply({error:'A current document revision is required'},400);
  let previous;try{previous=await readDocument(name,env,fetcher);}catch(error){return readFailure(error);}
  if(previous.sha!==input.sha)return reply({error:'The document changed elsewhere. Export your draft, then reload before saving.'},409);
- try{validateDocument(name,input.value,previous.value);}catch(error){return reply({error:error.message},400);}
- const content=encoder.encode(JSON.stringify(input.value,null,2)+'\n');if(content.length>maxBody)return reply({error:'Document too large'},413);
+ const value=input.value;
+ const generatedAt=name==='food'?new Date().toISOString():null;
+ if(generatedAt&&value&&typeof value==='object'&&!Array.isArray(value))value.generatedAt=generatedAt;
+ try{validateDocument(name,value,previous.value);}catch(error){return reply({error:error.message},400);}
+ const content=encoder.encode(JSON.stringify(value,null,2)+'\n');if(content.length>maxBody)return reply({error:'Document too large'},413);
  try{
   const result=await fetcher(github+documents[name],{method:'PUT',headers:{...headers(env),'Content-Type':'application/json'},body:JSON.stringify({message:'Studio: update '+name,content:base64(content),sha:input.sha,branch:'main'}),redirect:'manual',signal:AbortSignal.timeout(15000)});
   if(result.status===409||result.status===422)return reply({error:'Repository conflict or branch rule prevented publication. Reload the document before retrying.'},409);
   if(result.status>=500||result.status===408)throw new Error('Uncertain upstream write outcome');
   if(!result.ok)return reply({error:'GitHub rejected publication. Check Contents read/write access; no confirmed save was returned.',code:'github-publish-rejected',operation:'write',upstreamStatus:result.status},502);
   const saved=await boundedJson(result,100000);if(!/^[a-f0-9]{40}$/.test(saved.commit?.sha||'')||!/^[a-f0-9]{40}$/.test(saved.content?.sha||''))throw new Error('Missing publication receipt');
-  return reply({saved:true,sha:saved.content.sha,commit:saved.commit.sha,url:'https://github.com/frostmoon-rui/frostmoonrui_website/commit/'+saved.commit.sha});
+  return reply({saved:true,sha:saved.content.sha,commit:saved.commit.sha,...(generatedAt?{generatedAt}:{}),url:'https://github.com/frostmoon-rui/frostmoonrui_website/commit/'+saved.commit.sha});
  }catch{return reply({error:'Publication status is uncertain. Check GitHub before retrying; your draft is retained.',code:'github-write-uncertain',operation:'write'},502);}
 }

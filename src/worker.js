@@ -61,7 +61,8 @@ export async function handle(request,env,fetcher=fetch){
  if(url.pathname==='/food-map/index.json'){
   response.headers.set('Content-Type','application/json; charset=utf-8');
   response.headers.set('Access-Control-Allow-Origin','*');
-  response.headers.set('Cache-Control','public, max-age=3600, stale-while-revalidate=86400');
+  response.headers.set('Cache-Control','no-store');
+  response.headers.set('Cloudflare-CDN-Cache-Control','no-store');
  }
  return response;
 }

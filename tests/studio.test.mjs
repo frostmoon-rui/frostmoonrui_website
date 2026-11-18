@@ -99,3 +99,21 @@ test('logout clears the secure cookie and studio pages receive non-indexable pri
  const env=environment(),auth=await signed(env),logout=await handleStudio(request('logout','POST',{},auth),env);assert.equal(logout.status,200);assert.match(logout.headers.get('Set-Cookie'),/Max-Age=0/);
  for(const route of ['/studio/','/zh/studio/']){const response=await handle(new Request(origin+route),{ASSETS:{fetch:async()=>new Response('<html></html>')}});assert.match(response.headers.get('Cache-Control'),/no-store/);assert.match(response.headers.get('X-Robots-Tag'),/noindex/);assert.match(response.headers.get('Content-Security-Policy'),/frame-ancestors 'none'/);assert.match(response.headers.get('Content-Security-Policy'),/script-src 'self'/);}
 });
+
+test('food publication stamps the saved source and returns the same timestamp',async()=>{
+ const env=environment(),auth=await signed(env),value=fixture('food');
+ value.generatedAt='untrusted';
+ const start=Date.now();
+ let stored;
+ const result=await handleStudio(request('document?key=food','PUT',{sha,value},auth),env,async(_,options)=>{
+  if(options.method==='GET')return documentResponse('food');
+  stored=JSON.parse(Buffer.from(JSON.parse(options.body).content,'base64').toString());
+  return Response.json({commit:{sha:commit},content:{sha:nextSha}});
+ });
+ assert.equal(result.status,200);
+ const receipt=await result.json();
+ assert.equal(stored.generatedAt,receipt.generatedAt);
+ assert.ok(Date.parse(stored.generatedAt)>=start);
+ assert.deepEqual(stored.spots,value.spots);
+ assert.equal(exportFood(stored).generatedAt,receipt.generatedAt);
+});
