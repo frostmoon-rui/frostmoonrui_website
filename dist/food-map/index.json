@@ -39,6 +39,27 @@
       }
     },
     {
+      "name": "和熟•巴斯克芝士蛋糕",
+      "city": "无锡市 · 江阴市",
+      "address": "九方广场35号",
+      "lng": 120.269807,
+      "lat": 31.896392,
+      "coordinateSystem": "GCJ-02",
+      "category": "Food",
+      "articleUrl": "https://frostmoonrui.com/notes/food/4438f3d96fa92641952be2ec/",
+      "amapUrl": "https://surl.amap.com/2dAMASS6wdrz",
+      "id": "4438f3d96fa92641952be2ec",
+      "price": 58,
+      "rating": 4.3,
+      "source": {
+        "id": "local",
+        "name": "frostmoon-rui",
+        "homepage": "https://frostmoonrui.com/",
+        "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
+        "type": "local"
+      }
+    },
+    {
       "name": "雯雯点心店",
       "city": "上海市",
       "address": "中山东路143号(方东小区北2门西150米)",

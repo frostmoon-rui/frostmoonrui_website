@@ -55,6 +55,19 @@
       "amapUrl": "https://surl.amap.com/2bLaY0tI1B6re",
       "price": 26,
       "rating": 3.5
+    },
+    {
+      "name": "和熟•巴斯克芝士蛋糕",
+      "city": "无锡市 · 江阴市",
+      "address": "九方广场35号",
+      "lng": 120.269807,
+      "lat": 31.896392,
+      "category": "Food",
+      "note": "第一次吃巴斯克的地方,点了两块1/4的开心果和伯爵红茶,很细腻绵密,好吃\n----2026/07/31",
+      "articleUrl": "",
+      "amapUrl": "https://surl.amap.com/2dAMASS6wdrz",
+      "price": 58,
+      "rating": 4.3
     }
   ]
 }
