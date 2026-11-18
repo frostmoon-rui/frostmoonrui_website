@@ -409,7 +409,9 @@
     "Diagnose GitHub connection": "Diagnose GitHub connection",
     "Read-only connection report": "Read-only connection report",
     "Running read-only connection diagnostics…": "Running read-only connection diagnostics…",
-    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "Diagnostics ready. Copy the report below; it contains no password, token or draft content."
+    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "Diagnostics ready. Copy the report below; it contains no password, token or draft content.",
+    "Article date": "Article date",
+    "Use a valid article date": "Use a valid article date"
   },
   "zh": {
     "Food note": "美食文章正文",
@@ -821,7 +823,9 @@
     "Diagnose GitHub connection": "诊断 GitHub 连接",
     "Read-only connection report": "只读连接诊断报告",
     "Running read-only connection diagnostics…": "正在进行只读连接诊断，不会发送写入…",
-    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "诊断完成。请复制下方报告；其中不包含密码、令牌或草稿内容。"
+    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "诊断完成。请复制下方报告；其中不包含密码、令牌或草稿内容。",
+    "Article date": "文章日期",
+    "Use a valid article date": "请选择有效的文章日期"
   },
   "ru": {
     "Food note": "Заметка о заведении",
@@ -1233,7 +1237,9 @@
     "Diagnose GitHub connection": "Диагностика связи с GitHub",
     "Read-only connection report": "Отчёт о проверке соединения",
     "Running read-only connection diagnostics…": "Проверяем соединение без записи данных…",
-    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "Диагностика завершена. Скопируйте отчёт ниже: в нём нет пароля, токена или текста черновика."
+    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "Диагностика завершена. Скопируйте отчёт ниже: в нём нет пароля, токена или текста черновика.",
+    "Article date": "Дата статьи",
+    "Use a valid article date": "Укажите действительную дату статьи"
   },
   "ja": {
     "Food note": "グルメ記事の本文",
@@ -1645,6 +1651,8 @@
     "Diagnose GitHub connection": "GitHub 接続を診断",
     "Read-only connection report": "読み取り専用の接続診断レポート",
     "Running read-only connection diagnostics…": "接続を診断中です。書き込みは行いません…",
-    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "診断が完了しました。下のレポートをコピーしてください。パスワード・トークン・下書きは含まれません。"
+    "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "診断が完了しました。下のレポートをコピーしてください。パスワード・トークン・下書きは含まれません。",
+    "Article date": "記事の日付",
+    "Use a valid article date": "有効な記事の日付を指定してください"
   }
 }

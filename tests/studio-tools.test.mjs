@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import {validateDocument,locales} from '../shared/site-schema.js';
+import {validateDocument,locales,articleDate,foodArticle} from '../shared/site-schema.js';
 const read=file=>fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
 async function fixture(documentResult){
  const elements=new Map(),events={},bodyClasses=new Set(),confirmations=[];
@@ -11,7 +11,7 @@ async function fixture(documentResult){
  const document={createElement:node,getElementById:id=>{if(!elements.has(id)){if(['studio-check','studio-restore','studio-connection','studio-repository-state'].includes(id))return null;const n=node();n.connected=true;n.id=id;}return elements.get(id);},body:{classList:{contains:key=>bodyClasses.has(key)}},querySelectorAll:()=>[],addEventListener:(key,callback)=>{events[key]=callback;}};
  class MutationObserver{constructor(callback){events.theme=callback;}observe(){}}
  const source=read('dist/assets/studio.js').replace(/^import[^\n]*\n/gm,'');
- const result=await vm.runInNewContext('(async()=>{'+source+';return {state,busy,preview,loadDocument,verifyRepository,friendly,renderFields,editorViews};})()',{document,window:{addEventListener(){}},MutationObserver,validateDocument,locales,t:key=>key,locale:'en',structuredClone,AbortSignal,requestAnimationFrame:callback=>callback(),confirm:message=>{confirmations.push(message);return result?.allowConfirm??true;},fetch:async (url,options)=>({ok:true,json:async()=>url.includes('/document?')?(typeof documentResult==='function'?documentResult(url,options):documentResult):{authenticated:false,configured:true}})});
+ const result=await vm.runInNewContext('(async()=>{'+source+';return {state,busy,preview,loadDocument,verifyRepository,friendly,renderFields,editorViews};})()',{document,window:{addEventListener(){}},MutationObserver,validateDocument,locales,articleDate,foodArticle,t:key=>key,locale:'en',structuredClone,AbortSignal,requestAnimationFrame:callback=>callback(),confirm:message=>{confirmations.push(message);return result?.allowConfirm??true;},fetch:async (url,options)=>({ok:true,json:async()=>url.includes('/document?')?(typeof documentResult==='function'?documentResult(url,options):documentResult):{authenticated:false,configured:true}})});
  const original=JSON.parse(read('content/site.json'));Object.assign(result.state,{value:structuredClone(original),original:structuredClone(original),canPublish:true});document.getElementById('studio-preview-page').value='home';document.getElementById('studio-editor').hidden=false;result.allowConfirm=true;result.busy(false);
  return {...result,elements,events,bodyClasses,confirmations,original,context:result};
 }
@@ -81,4 +81,24 @@ test('closed field groups mount their inputs once when expanded',async()=>{
  const restored=s.elements.get('studio-fields').querySelectorAll().find(item=>item._fieldPath===group._fieldPath);
  assert.equal(restored.open,true);
  assert.equal(restored.children.length,mounted);
+});
+
+test('home lists undated articles first and dated articles newest first',()=>{
+ for(const locale of locales){
+  const page=read(`dist/${locale}/index.html`);
+  const cards=[...page.matchAll(/<article class="note-card"[^>]*>[\s\S]*?<\/article>/g)];
+  const dates=cards.map(([card])=>card.match(/datetime="([^"]+)"/)?.[1]??'');
+  assert.deepEqual(dates,dates.toSorted((a,b)=>Number(Boolean(a))-Number(Boolean(b))||b.localeCompare(a)));
+ }
+});
+
+test('food article dates preserve legacy dates until explicitly cleared',()=>{
+ assert.deepEqual(foodArticle({note:'A meal\n----2026/8/2'}),{note:'A meal',date:'2026-08-02'});
+ assert.deepEqual(foodArticle({note:'A meal\n----2026/8/2',date:''}),{note:'A meal',date:''});
+ const original=JSON.parse(read('content/food-spots.json'));
+ const invalid=structuredClone(original);
+ if(invalid.spots.length){
+  invalid.spots[0].date='2026-02-30';
+  assert.throws(()=>validateDocument('food',invalid,original),/valid article date/);
+ }
 });
