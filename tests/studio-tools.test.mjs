@@ -90,10 +90,15 @@ test('closed field groups mount their inputs once when expanded',async()=>{
  assert.equal(restored.children.length,mounted);
 });
 
-test('home lists undated articles first and dated articles newest first',()=>{
+test('archive separates category navigation from sorted article titles',()=>{
+ const feed=JSON.parse(read('dist/food-map/index.json'));
  for(const locale of locales){
-  const page=read(`dist/${locale}/index.html`);
-  const cards=[...page.matchAll(/<article class="note-card"[^>]*>[\s\S]*?<\/article>/g)];
+  const archive=read(`dist/${locale}/notes/index.html`);
+  assert.ok(archive.includes(`/${locale}/notes/category/food/`));
+  assert.doesNotMatch(archive,/class="category-articles"/);
+  const page=read(`dist/${locale}/notes/category/food/index.html`);
+  const cards=[...page.matchAll(/<li><a href="[^"]*notes\/food\/[^"]+">[\s\S]*?<\/li>/g)];
+  assert.equal(cards.length,feed.spots.length);
   const dates=cards.map(([card])=>card.match(/datetime="([^"]+)"/)?.[1]??'');
   assert.deepEqual(dates,dates.toSorted((a,b)=>Number(Boolean(a))-Number(Boolean(b))||b.localeCompare(a)));
  }

@@ -24,15 +24,39 @@
     "ja": "初めてバスクチーズケーキを食べたお店。ピスタチオとアールグレイを4分の1カットずつ頼んだ。なめらかで口当たりがよく、おいしかった。"
   },
   "b7c1841d3eda9f6c433ad55f": {
-    "sourceHash": "9a6a6fa030947ef26c0a2fc08f8dcfd7cddb034f6f0a24c435c493cd992b722c",
-    "en": "This place is one of my go-tos for food from home. Whenever friends visit, it's a must. The cooking tastes authentic, and the owner is lovely.",
-    "ru": "Одно из моих любимых мест с кухней родного края. Когда приезжают друзья, обязательно веду их сюда. Еда по-настоящему аутентичная, а хозяин очень приятный.",
-    "ja": "地元の味を代表するお店の一つ。友だちが遊びに来たら必ず連れていく。本場の味で、店主さんもとても親切。"
+    "sourceHash": "4aa2b40183b5046b132c3bf398902402c27f3ffef64f229d93ff98954a86414c",
+    "en": "One of my go-to places for Shanxi cuisine. Whenever friends visit, this is a must. The food tastes authentic and the owner is lovely.",
+    "ru": "Одно из моих любимых мест с кухней Шаньси. Когда приезжают друзья, обязательно веду их сюда. Еда по-настоящему аутентичная, а хозяин очень приятный.",
+    "ja": "山西料理を代表するお店の一つ。友だちが遊びに来たら必ず連れていく。本場の味で、店主さんもとても親切。"
   },
   "40b20406852e2caf187c877b": {
     "sourceHash": "f46d200f6a628ab8e282e15407eede3dd8f7cf1cfb06743fb5a3b39652313628",
     "en": "I think the low rating comes down to poor value for money, especially given its location near campus.\nThe barbecue was average and the atmosphere felt a bit oppressive.\nIt had more of a pub feel, but I don't drink, so I didn't order anything alcoholic.",
     "ru": "Думаю, низкая оценка связана с тем, что цена не оправдывает качество, особенно для заведения рядом с учебным кампусом.\nГриль обычный, а атмосфера немного давящая.\nПо ощущениям это скорее бар. Я не пью, поэтому алкоголь не заказывала.",
     "ja": "評価が低いのは、学校の近くにあるわりにコスパが悪いからだと思う。\n串焼きは普通で、店内は少し息苦しい雰囲気だった。\nどちらかといえば居酒屋っぽいけど、私はお酒を飲まないので頼まなかった。"
+  },
+  "79d3d70ff8b58781536fd023": {
+    "sourceHash": "ea3f5b8c8e7e629c11a1076a8fdd7aabaee8cebadf32c158be412966d5df2072",
+    "en": "Qiqihar barbecue lives up to its reputation. It's hard to find barbecue like this elsewhere, and it's great value too.",
+    "ru": "Барбекю из Цицикара действительно оправдывает свою славу. Такое мясо трудно найти где-то ещё, да и цены очень приятные.",
+    "ja": "チチハルの焼肉は評判どおり。ほかの場所ではなかなか出会えない味で、値段も手ごろ。"
+  },
+  "22537ea6c1ed1615ccfb681b": {
+    "sourceHash": "38e6730f806b1222e35b7105809155bf8f2cf1713be989602b4dc69c411edc6c",
+    "en": "Nothing particularly special. I'm noting it because it's the northernmost Wallace in China.",
+    "ru": "Ничего особенного. Отмечу его, потому что это самый северный Wallace в Китае.",
+    "ja": "特に変わったところはないけど、中国最北の華莱士なので記録しておく。"
+  },
+  "13ee9e7f1d49cbae4389c5f4": {
+    "sourceHash": "6105d9b30a5aae5caea4f6fc5dd8492ebaed386af563399c10883fe8f622582f",
+    "en": "Very authentic northeastern Chinese cooking, with a student discount too. A good spot for a meal out.",
+    "ru": "Очень аутентичная кухня Северо-Восточного Китая, ещё и со студенческой скидкой. Хорошее место, чтобы поесть вне дома.",
+    "ja": "本格的な中国東北料理で、学割もある。外食にちょうどいいお店。"
+  },
+  "49e716f754af44df971d8cbe": {
+    "sourceHash": "7f0bfde701f682b5bdda4b0d69acd6047627955e6de6dafb8bfd5df8f085bc14",
+    "en": "A very good hot pot spot, with a sort of semi-buffet setup. There are lots and lots of snacks to try. Everything tasted good, and the value was excellent.",
+    "ru": "Очень хороший хот-пот в формате, похожем на частичный шведский стол. Закусок очень много, всё вкусно и по отличной цене.",
+    "ja": "かなりいい火鍋屋さん。半分ビュッフェのような形式で、軽食がとにかく豊富。味もよくて、コスパもかなりいい。"
   }
 }

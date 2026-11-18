@@ -31,6 +31,12 @@ function write(file,content){const destination=path.join(root,'dist',file);fs.mk
 const food=JSON.parse(read('content/food-spots.json'));
 const foodFeed=exportFood(food);
 write('food-map/index.json',JSON.stringify(foodFeed,null,2)+'\n');
+function notebookEntries(pages,paths){
+ return paths.map(path=>{
+  const page=pages.find(item=>item.path===path);
+  return {path,title:page.title,date:articleDate(page)};
+ });
+}
 const foodNotes=new Map();
 const foodTranslations=JSON.parse(read('content/food-translations.json'));
 for(const spot of food.spots){
@@ -61,27 +67,21 @@ for(const locale of locales){
  extra.push({path:'resources',title:text('Recommended links'),label:text('Resource collection'),description:text('A small shelf of useful places.'),body:resourcesBody(resources,locale,catalog)});
  const dateFormat=new Intl.DateTimeFormat(htmlLanguages[locale],{dateStyle:'medium',timeZone:'UTC'});
  const time=date=>date?`<time datetime="${date}">${escape(dateFormat.format(new Date(date)))}</time>`:'';
- const foodCards=[...foodNotes].map(([route,{venue,date}])=>`<article class="note-card" data-category="food"><div class="note-meta"><span>Food</span>${time(date)}</div><h3><a href="/${route}/">${escape(venue.name)} <span>↗</span></a></h3><p>${escape([venue.city,venue.address].filter(Boolean).join(" · "))}</p></article>`);
- const cardsPattern=/<article class="note-card"[^>]*>[\s\S]*?<\/article>/g;
- const cardDate=card=>card.match(/datetime="([^"]+)"/)?.[1]??'';
- const notebookCards=home.match(cardsPattern).map(card=>{
-  const route=card.match(/href="\/([^"]+)\/"/)?.[1];
-  const page=source[locale].find(item=>item.path===route);
-  return card.replace(/<time[^>]*>[^<]*<\/time>/,time(page?articleDate(page):''));
- });
- const cards=[...foodCards,...notebookCards].sort((a,b)=>{
-  const first=cardDate(a),second=cardDate(b);
-  return Number(Boolean(first))-Number(Boolean(second))||second.localeCompare(first);
- });
- const count=cards.length;
- let inserted=false;
- const foodHome=home.replace(cardsPattern,()=>{
-  if(inserted)return '';
-  inserted=true;
-  return cards.join('\n');
- }).replace('All notes <span>3</span>',`All notes <span>${count}</span>`)
-  .replace('03 field notes',escape(text('03 field notes').replace('03',String(count).padStart(2,'0'))))
-  .replace(/^[ \t]+$/gm,'');
+ const notebookCategories=[
+  {key:'food',label:'Food',icon:'◎',entries:[...foodNotes].map(([path,{venue,date}])=>({path,title:venue.name,date}))},
+  {key:'software',label:'Software',icon:'⌘',entries:notebookEntries(source[locale],['notes/a-quieter-bot','notes/a-map-with-boundaries'])},
+  {key:'hardware',label:'Hardware',icon:'◇',entries:notebookEntries(source[locale],['notes/recovering-a-prototype'])}
+ ];
+ const categoryLinks=notebookCategories.map(category=>`<a class="category-link" href="/notes/category/${category.key}/"><span aria-hidden="true">${category.icon}</span><strong>${escape(text(category.label))}</strong><span class="category-count">${category.entries.length}</span></a>`).join('');
+ const categoriesTitle=text('Categories');
+ const categoryPages=[['notes/',article({path:'notes',title:categoriesTitle,label:text('Blog articles'),description:categoriesTitle,body:`<nav class="category-grid" aria-label="${escape(categoriesTitle)}">${categoryLinks}</nav>`}).replace('class="article-layout"','class="article-layout note-directory"')]];
+ for(const category of notebookCategories){
+  const path='notes/category/'+category.key,title=text(category.label);
+  const entries=category.entries.sort((a,b)=>Number(Boolean(a.date))-Number(Boolean(b.date))||b.date.localeCompare(a.date));
+  const list=entries.map(entry=>`<li><a href="/${entry.path}/"><span>${escape(entry.title)}</span>${time(entry.date)}<span aria-hidden="true">↗</span></a></li>`).join('');
+  const body=`<p><a class="text-link" href="/notes/">${escape(categoriesTitle)} ↗</a></p><ul class="category-articles">${list}</ul>`;
+  categoryPages.push([path+'/',article({path,title,label:text('Blog articles'),description:title,body}).replace('class="article-layout"','class="article-layout note-directory"')]);
+ }
  const venuePages=[...foodNotes].map(([route,{venue,note,date,translated}])=>{
   const description=[venue.city,venue.address].filter(Boolean).join(' · ');
   const details=[['Price',venue.price],['Rating',venue.rating]].filter(([,value])=>value!=null)
@@ -94,7 +94,7 @@ for(const locale of locales){
    `<p><a class="text-link" href="/food-map/">${escape(text('Food atlas'))} ↗</a></p>`;
   return [route+'/',article({path:route,title:venue.name,label:text('Food atlas'),description,body})];
  });
- const pages=[['',foodHome],...venuePages,['food-map/',atlas],['404.html',notFound],['studio/',read('templates/studio.html')],...extra.map(p=>[p.path+'/',p.path==='about'?article(p).replace('class="article-layout"','class="article-layout about-layout"'):article(p)]),...source[locale].filter(p=>p.path!=='about').map(p=>[p.path+'/',article({...p,body:time(articleDate(p))+p.body}).replace('</main>',(['privacy','notes/a-map-with-boundaries'].includes(p.path)?'<p>Loading Amap contacts Amap servers; the security code stays on the server. OpenStreetMap remains an optional alternative.</p>':'')+'</main>')])];
+ const pages=[['',home],...categoryPages,...venuePages,['food-map/',atlas],['404.html',notFound],['studio/',read('templates/studio.html')],...extra.map(p=>[p.path+'/',p.path==='about'?article(p).replace('class="article-layout"','class="article-layout about-layout"'):article(p)]),...source[locale].filter(p=>p.path!=='about').map(p=>[p.path+'/',article({...p,body:time(articleDate(p))+p.body}).replace('</main>',(['privacy','notes/a-map-with-boundaries'].includes(p.path)?'<p>Loading Amap contacts Amap servers; the security code stays on the server. OpenStreetMap remains an optional alternative.</p>':'')+'</main>')])];
  for(const [route,html] of pages){
   if(route.includes('..')||!/^([a-z/-]+|404\.html)$/.test(route||'/')&&!foodNotes.has(route.slice(0,-1)))throw new Error('Invalid route');
   const leaf=route.endsWith('.html')?route:route+'index.html';
@@ -118,7 +118,7 @@ write('assets/appearance.css',`:root{--accent:${site.appearance.accent};--gold:$
 for(const [key,file] of Object.entries(documents)){const content=read(file);const value=JSON.parse(content);validateDocument(key,value,value);write('__studio/'+key+'.json',content);}
 write('data/site.json',JSON.stringify(site,null,2)+'\n');
 write('data/bot-site.json',JSON.stringify({schemaVersion:1,origin:'https://frostmoonrui.com',pages:{home:'',about:'about/',friends:'links/',resources:'resources/',food:'food-map/',projects:'projects/'},locales,resources:resources.links},null,2)+'\n');
-const routes=[...new Set(['','food-map/','about/','links/','resources/',...english.map(p=>p.path+'/'),...[...foodNotes.keys()].map(route=>route+'/')])];
+const routes=[...new Set(['','notes/','notes/category/food/','notes/category/software/','notes/category/hardware/','food-map/','about/','links/','resources/',...english.map(p=>p.path+'/'),...[...foodNotes.keys()].map(route=>route+'/')])];
 const urls=[...routes.map(route=>'https://frostmoonrui.com/'+route),...locales.flatMap(code=>routes.map(route=>'https://frostmoonrui.com'+languagePath(code,route)))];
 write('sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(url=>`<url><loc>${url}</loc></url>`).join('')}</urlset>\n`);
 console.log(`Built ${locales.length} complete site languages, ${urls.length} public routes and localized 404 pages.`);

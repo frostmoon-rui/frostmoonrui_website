@@ -420,7 +420,9 @@
     "Another device saved a draft. This copy is kept on this device.": "Another device saved a draft. This copy is kept on this device.",
     "Draft sync unavailable. Check your local copy or export it.": "Draft sync unavailable. Check your local copy or export it.",
     "Draft restored": "Draft restored",
-    "Draft restored. The published version changed. Export before merging.": "Draft restored. The published version changed. Export before merging."
+    "Draft restored. The published version changed. Export before merging.": "Draft restored. The published version changed. Export before merging.",
+    "Blog articles": "Blog articles",
+    "Categories": "Categories"
   },
   "zh": {
     "Food note": "美食文章正文",
@@ -843,7 +845,9 @@
     "Another device saved a draft. This copy is kept on this device.": "另一设备已保存草稿，这份内容仍留在本机。",
     "Draft sync unavailable. Check your local copy or export it.": "草稿暂时无法同步，请确认本机副本或导出。",
     "Draft restored": "草稿已恢复",
-    "Draft restored. The published version changed. Export before merging.": "草稿已恢复。已发布版本有变化，请先导出草稿再合并。"
+    "Draft restored. The published version changed. Export before merging.": "草稿已恢复。已发布版本有变化，请先导出草稿再合并。",
+    "Blog articles": "博客文章",
+    "Categories": "分类"
   },
   "ru": {
     "Food note": "Заметка о заведении",
@@ -1266,7 +1270,9 @@
     "Another device saved a draft. This copy is kept on this device.": "На другом устройстве сохранён черновик. Эта копия осталась на текущем устройстве.",
     "Draft sync unavailable. Check your local copy or export it.": "Синхронизация недоступна. Проверьте локальную копию или экспортируйте черновик.",
     "Draft restored": "Черновик восстановлен",
-    "Draft restored. The published version changed. Export before merging.": "Черновик восстановлен. Опубликованная версия изменилась. Экспортируйте черновик перед объединением."
+    "Draft restored. The published version changed. Export before merging.": "Черновик восстановлен. Опубликованная версия изменилась. Экспортируйте черновик перед объединением.",
+    "Blog articles": "Статьи блога",
+    "Categories": "Категории"
   },
   "ja": {
     "Food note": "グルメ記事の本文",
@@ -1689,6 +1695,8 @@
     "Another device saved a draft. This copy is kept on this device.": "別の端末で下書きが保存されました。このコピーはこの端末に残ります。",
     "Draft sync unavailable. Check your local copy or export it.": "同期できません。端末のコピーを確認するか、書き出してください。",
     "Draft restored": "下書きを復元しました",
-    "Draft restored. The published version changed. Export before merging.": "下書きを復元しました。公開版が変更されています。統合前に書き出してください。"
+    "Draft restored. The published version changed. Export before merging.": "下書きを復元しました。公開版が変更されています。統合前に書き出してください。",
+    "Blog articles": "ブログ記事",
+    "Categories": "カテゴリー"
   }
 }
