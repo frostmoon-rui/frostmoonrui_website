@@ -16,7 +16,7 @@ export function localizedAsset(request){
  if(!['GET','HEAD'].includes(request.method))return null;
  const route=url.pathname.replace(/^\//,'').replace(/(?:\/index\.html|\/$)/,'');
  const page=route==='index.html'?'':route;
- if(!pages.has(page))return null;
+ if(!pages.has(page)&&!/^notes\/food\/[a-f0-9]{24}$/.test(page))return null;
  url.pathname='/'+languagePreference(request)+'/'+(page?page+'/':'');
  return url;
 }
