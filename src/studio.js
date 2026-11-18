@@ -1,3 +1,4 @@
+import {studioDraft} from './studio-drafts.js';
 import {documents,validateDocument} from '../shared/site-schema.js';
 import {readRepository,readDeployedDocument,diagnoseRepository,repositoryMessages as readMessages,repositoryError as readError,repositoryHeaders as headers,repositoryToken as tokenFor} from './studio-repository.js';
 const encoder=new TextEncoder(),decoder=new TextDecoder('utf-8',{fatal:true});
@@ -51,6 +52,11 @@ export async function handleStudio(request,env,fetcher=fetch){
   return reply(await diagnoseRepository(env,fetcher,name));
  }
  if(path==='/api/studio/logout'&&request.method==='POST')return reply({authenticated:false},200,{'Set-Cookie':cookie('',0)});
+ if(path==='/api/studio/draft'){
+  const key=url.searchParams.get('key');
+  if(!Object.hasOwn(documents,key||''))return reply({error:'Unknown editable document'},400);
+  return studioDraft(request,env.WEBSITE_DB,key,boundedJson,reply);
+ }
  if(path!=='/api/studio/document')return reply({error:'Unknown studio operation'},404);
  const name=url.searchParams.get('key');if(!Object.hasOwn(documents,name||''))return reply({error:'Unknown editable document'},400);
  if(request.method==='GET'){try{return reply(url.searchParams.get('source')==='deployed'&&url.searchParams.get('strict')!=='1'?await readDeployedDocument(name,env):await readDocument(name,env,fetcher,url.searchParams.get('strict')!=='1'));}catch(error){return readFailure(error);}}

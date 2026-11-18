@@ -34,6 +34,6 @@ test('every locale has accessible contact icons, localized avatar links, About a
 test('studio is excluded from the public sitemap and previews are isolated',()=>{
  assert.doesNotMatch(read('dist/sitemap.xml'),/studio/);
  for(const code of ['en','zh','ru','ja']){const page=read(`dist/${code}/studio/index.html`);assert.match(page,/name="robots" content="noindex,nofollow"/);assert.match(page,/sandbox=""/);assert.match(page,/id="login-form" method="post" action="\/api\/studio\/login"/);assert.doesNotMatch(page,/name="password"/);}
- assert.match(read('dist/assets/studio.js'),/state\.dirty/);assert.match(read('dist/assets/studio.js'),/beforeunload/);assert.doesNotMatch(read('dist/assets/studio.js'),/localStorage|sessionStorage/);
+ assert.match(read('dist/assets/studio.js'),/state\.dirty/);assert.match(read('dist/assets/studio.js'),/beforeunload/);assert.match(read('dist/assets/studio.js'),/frostmoon-studio-draft-v1:/);assert.doesNotMatch(read('dist/assets/studio.js'),/localStorage[^\n]*(?:csrf|password|token)/i);
 });
 test('studio source commits receive checked generated-file synchronization, never a force push',()=>{const workflow=read('.github/workflows/publish-content.yml');assert.match(workflow,/node --test tests\/\*\.test\.mjs/);assert.match(workflow,/git add -- dist\//);assert.match(workflow,/git push origin HEAD:main/);assert.doesNotMatch(workflow,/--force|force-with-lease/);});

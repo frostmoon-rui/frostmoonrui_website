@@ -117,3 +117,37 @@ test('food publication stamps the saved source and returns the same timestamp',a
  assert.deepEqual(stored.spots,value.spots);
  assert.equal(exportFood(stored).generatedAt,receipt.generatedAt);
 });
+
+test('private draft accepts unfinished JSON and rejects stale writes without calling GitHub',async()=>{
+ let row=null;
+ const db={prepare(sql){
+  if(sql.startsWith('CREATE'))return {run:async()=>({})};
+  return {bind(...values){return {
+   first:async()=>row,
+   run:async()=>{
+    if(sql.startsWith('DELETE')){
+     if(row?.revision===values[1])row=null;
+     return {meta:{changes:1}};
+    }
+    if(sql.startsWith('UPDATE')?row?.revision!==values[5]:row!==null)return {meta:{changes:0}};
+    const [revision,baseSha,raw,updatedAt]=values;
+    row={revision,baseSha,raw,updatedAt};
+    return {meta:{changes:1}};
+   }
+  };}};
+ }};
+ const env={...environment(),WEBSITE_DB:db},auth=await signed(env);
+ const never=()=>{throw Error('Drafts must not reach GitHub');};
+ const url='draft?key=food',raw='{"still editing":';
+ assert.equal((await handleStudio(request(url),env,never)).status,401);
+ assert.equal((await handleStudio(request(url,'PUT',{raw,baseSha:sha,revision:null},{Cookie:auth.Cookie}),env,never)).status,403);
+ const write=payload=>handleStudio(request(url,'PUT',payload,auth),env,never);
+ const read=()=>handleStudio(request(url,'GET',undefined,auth),env,never);
+ const saved=await write({raw,baseSha:sha,revision:null});
+ assert.equal(saved.status,200);
+ const {revision}=await saved.json();
+ assert.equal((await write({raw:'other',baseSha:sha,revision:null})).status,409);
+ assert.equal((await (await read()).json()).draft.raw,raw);
+ assert.equal((await write({raw:null,revision})).status,200);
+ assert.equal((await (await read()).json()).draft,null);
+});

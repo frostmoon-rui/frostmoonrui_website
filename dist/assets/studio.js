@@ -10,17 +10,116 @@ function busy(value){state.busy=value;$('studio-editor').setAttribute('aria-busy
 const repositoryMessages={"github-token-format":"The configured GitHub token contains an invalid header value. Check the runtime secret format.","github-timeout":"GitHub did not respond within the read time budget. No write was attempted.","github-token-invalid":"GitHub rejected the configured token. Update the production WEBSITE_GITHUB_TOKEN secret.","github-permission":"GitHub denied repository access. Check the selected repository and Contents permission.","github-rate-limit":"GitHub rate limit reached. Wait before reloading; no write was attempted.","github-network":"Could not reach GitHub. Reload the document; no write was attempted.","github-response-invalid":"GitHub returned an unexpected document response. No write was attempted.","github-document-invalid":"The repository document failed validation. Review its source JSON before publishing.","github-unavailable":"GitHub could not serve this document. Reload later; no write was attempted.","github-publish-rejected":"GitHub rejected publication. Check Contents read/write access; no confirmed save was returned."};
 function repositoryMessage(code,http){return t(repositoryMessages[code]||'Could not complete this request.')+(Number.isInteger(http)?' (GitHub HTTP '+http+')':'');}
 function friendly(error){if(error.code==='github-write-uncertain')return t('Publication status is uncertain. Check GitHub before retrying; your draft is retained.');if(Object.hasOwn(repositoryMessages,error.code||''))return repositoryMessage(error.code,error.upstreamStatus);const messages={401:'Authentication failed or the session expired. Your draft is still here.',403:'The request was refused. Reload the studio and sign in again.',409:'This document changed elsewhere. Export your draft before reloading.',429:'Too many attempts. Please wait one minute.',503:'Studio setup is incomplete. Check the runtime secrets in Cloudflare.',502:'The remote service did not confirm the operation. Check GitHub before retrying.'};return t(messages[error.status]||'Could not complete this request.')+(error.message?'\n'+error.message:'');}
-async function api(path,options={}){
- let response;try{response=await fetch('/api/studio/'+path,{...options,credentials:'same-origin',cache:'no-store',headers:{...(options.method?{'Content-Type':'application/json','X-Studio-CSRF':state.csrf||''}:{}),...options.headers},signal:AbortSignal.timeout(45000)});}catch{throw Object.assign(new Error(t(options.method==='PUT'?'Publication status is uncertain. Check GitHub before retrying; your draft is retained.':'The studio connection was interrupted. Your current draft is unchanged.')),{code:options.method==='PUT'?'github-write-uncertain':'studio-network'});}
+async function api(path,{timeoutMs=45000,...options}={}){
+ let response;try{response=await fetch('/api/studio/'+path,{...options,credentials:'same-origin',cache:'no-store',headers:{...(options.method?{'Content-Type':'application/json','X-Studio-CSRF':state.csrf||''}:{}),...options.headers},signal:AbortSignal.timeout(timeoutMs)});}catch{throw Object.assign(new Error(t(options.method==='PUT'?'Publication status is uncertain. Check GitHub before retrying; your draft is retained.':'The studio connection was interrupted. Your current draft is unchanged.')),{code:options.method==='PUT'?'github-write-uncertain':'studio-network'});}
  let data;try{data=await response.json();}catch{throw Object.assign(new Error(t('Unexpected server response')),{status:response.status,code:options.method==='PUT'?'github-write-uncertain':'studio-network'});}
  if(!response.ok)throw Object.assign(new Error(data.error||'Request failed'),{status:response.status,code:data.code,operation:data.operation,upstreamStatus:data.upstreamStatus});return data;
 }
+const localDraftPrefix='frostmoon-studio-draft-v1:';
+const draftJobs=new Map();
+function localDraft(key){
+ try{return JSON.parse(localStorage.getItem(localDraftPrefix+key));}catch{return null;}
+}
+function writeLocalDraft(key,draft){
+ try{
+  if(draft)localStorage.setItem(localDraftPrefix+key,JSON.stringify(draft));
+  else localStorage.removeItem(localDraftPrefix+key);
+  return true;
+ }catch{return false;}
+}
+function draftJob(key){
+ if(!draftJobs.has(key))draftJobs.set(key,{revision:null,timer:null,tail:Promise.resolve()});
+ return draftJobs.get(key);
+}
+function draftStatus(key,label){
+ if(state.key===key&&state.dirty)$('studio-dirty').textContent=t(label);
+}
+function flushDraft(key,job){
+ job.tail=job.tail.then(async()=>{
+  const draft=job.pending;
+  if(!draft||!state.csrf)return;
+  job.pending=null;
+  try{
+   const result=await api('draft?key='+encodeURIComponent(key),{method:'PUT',timeoutMs:6500,body:JSON.stringify({...draft,revision:job.revision})});
+   job.revision=result.revision;
+   if(job.pending||localDraft(key)?.raw===draft.raw){
+    const current=job.pending??draft;
+    writeLocalDraft(key,{...current,revision:job.revision});
+   }
+   if(!job.pending)draftStatus(key,'Draft saved to the workbench');
+  }catch(error){
+   if(!job.pending)job.pending=draft;
+   draftStatus(key,error.status===409?'Another device saved a draft. This copy is kept on this device.':'Draft sync unavailable. Check your local copy or export it.');
+  }
+ });
+ return job.tail;
+}
+function saveDraft(immediate=false){
+ if(!state.dirty||!/^[a-f0-9]{40}$/.test(state.sha??''))return;
+ const key=state.key,job=draftJob(key);
+ const raw=state.json?$('studio-json').value:JSON.stringify(state.value,null,2);
+ job.pending={baseSha:state.sha,raw};
+ const saved=writeLocalDraft(key,{...job.pending,revision:job.revision});
+ draftStatus(key,saved?'Draft saved on this device':'Draft only in this tab. Export it before closing.');
+ clearTimeout(job.timer);
+ if(immediate)return flushDraft(key,job);
+ if(state.csrf)job.timer=setTimeout(()=>flushDraft(key,job),800);
+}
+async function restoreDraft(key){
+ if(!state.csrf)return;
+ const local=localDraft(key),job=draftJob(key);
+ let cloud;
+ try{({draft:cloud}=await api('draft?key='+encodeURIComponent(key),{timeoutMs:3500}));}catch{}
+ const draft=local??cloud;
+ if(!draft||typeof draft.raw!=='string'||!draft.baseSha)return;
+ job.revision=draft.revision??null;
+ let parsed;
+ try{parsed=JSON.parse(draft.raw);}catch{}
+ if(parsed!==undefined){
+  const compare=key==='food'?{...parsed,generatedAt:state.original?.generatedAt}:parsed;
+  if(JSON.stringify(compare)===JSON.stringify(state.original))return;
+ }
+ state.dirty=true;
+ if(draft.baseSha!==state.sha){
+  state.draftBaseline={sha:state.sha,canPublish:state.canPublish};
+  state.sha=draft.baseSha;
+  state.canPublish=false;
+  draftStatus(key,'Draft restored. The published version changed. Export before merging.');
+ }else draftStatus(key,'Draft restored');
+ if(local&&cloud?.raw!==local.raw&&(cloud?.revision??null)===job.revision){
+  job.pending={baseSha:local.baseSha,raw:local.raw};
+  flushDraft(key,job);
+ }
+ if(parsed!==undefined){
+  try{
+   validateDocument(key,parsed,state.original);
+   state.value=parsed;renderFields();previewOptions();preview();return;
+  }catch{}
+ }
+ state.json=true;
+ $('studio-fields').hidden=true;$('studio-json-label').hidden=false;
+ $('visual-tab').setAttribute('aria-pressed','false');$('json-tab').setAttribute('aria-pressed','true');
+ $('studio-json').value=draft.raw;preview();
+}
+function clearDraft(key){
+ const job=draftJob(key);
+ clearTimeout(job.timer);
+ job.pending=null;
+ writeLocalDraft(key,null);
+ job.tail=job.tail.then(async()=>{
+  if(!job.revision||!state.csrf)return;
+  try{
+   await api('draft?key='+encodeURIComponent(key),{method:'PUT',body:JSON.stringify({raw:null,revision:job.revision})});
+   job.revision=null;
+  }catch{}
+ });
+}
 function at(path){return path.reduce((value,key)=>value[key],state.value);}
-function set(path,value){const parent=at(path.slice(0,-1));parent[path.at(-1)]=value;state.dirty=true;$('studio-dirty').textContent=t('Unsaved draft');requestAnimationFrame(preview);}
-function changed(){state.dirty=true;$('studio-dirty').textContent=t('Unsaved draft');requestAnimationFrame(preview);}
+function set(path,value){const parent=at(path.slice(0,-1));parent[path.at(-1)]=value;changed();}
+function changed(){state.dirty=true;$('studio-dirty').textContent=t('Unsaved draft');saveDraft();requestAnimationFrame(preview);}
 function readJson(){if(state.json){const value=JSON.parse($('studio-json').value);validateDocument(state.key,value,state.original);state.value=value;}validateDocument(state.key,state.value,state.original);return state.value;}
 function arrayTemplate(path){const key=path.at(-1);if(key==='spots')return {name:'',city:'',address:'',lng:0,lat:0,category:'Food',date:'',note:'',articleUrl:'',amapUrl:'',price:null,rating:null};if(key==='sections')return {title:'',text:''};const languages=()=>Object.fromEntries(locales.map(code=>[code,'']));if(key==='contacts')return {id:'contact-'+Date.now().toString(36),url:'',label:languages(),note:languages()};if(key==='links')return {id:'resource-'+Date.now().toString(36),name:'',url:'',category:'Reference / tools',description:languages()};if(key==='friends')return {id:'friend-'+Date.now().toString(36),name:'',url:'',linksUrl:'',description:languages()};return '' ;}
-// UI layout only: draft values and credentials never enter persistent storage.
+// Disclosure layout remains independent of saved drafts.
 const editorViews=new Map();
 function editorView(key=state.key){if(!editorViews.has(key))editorViews.set(key,{groups:new Map(),top:0,left:0});return editorViews.get(key);}
 function disclosure(path,label,populate){
@@ -93,16 +192,17 @@ function connectionState(access){
  $('studio-repository-state').textContent=access?t('Source: {source}. Read attempts: {count}.',{source:t(names[access.mode]||'Unknown source'),count:access.attempts??1}):'';
 }
 function adoptDocument(data){
+ state.draftBaseline=null;
  state.value=data.value;state.original=structuredClone(data.value);state.sha=data.sha;state.canPublish=data.access?.canPublish===true;state.dirty=false;state.json=false;state.writeUncertain=false;state.saveIntent=null;
  $('studio-fields').hidden=false;$('studio-json-label').hidden=true;$('visual-tab').setAttribute('aria-pressed','true');$('json-tab').setAttribute('aria-pressed','false');$('studio-dirty').textContent=t('No unsaved changes');
  connectionState(data.access);renderFields();previewOptions();preview();
 }
 async function loadDocument(key){
  if(state.busy)return;
- if(state.dirty&&!confirm(t('Discard unsaved changes? Export first if you need a copy.'))){$('studio-document').value=state.key;return;}
+ if(state.dirty&&!localDraft(state.key)&&!confirm(t('Discard unsaved changes? Export first if you need a copy.'))){$('studio-document').value=state.key;return;}
  $('studio-document').value=key;busy(true);status(t('Reading the current repository document…'));
  try{
-  const data=await api('document?key='+encodeURIComponent(key)+(state.access?.mode==='deployed'?'&source=deployed':''));state.key=key;adoptDocument(data);
+  const data=await api('document?key='+encodeURIComponent(key)+(state.access?.mode==='deployed'?'&source=deployed':''));state.key=key;adoptDocument(data);await restoreDraft(key);
   status(data.access?.mode==='deployed'?t('Loaded the current deployed snapshot. It may lag GitHub. Editing and export work; verify GitHub before publishing.'):data.access?.warningCode?t('Loaded current public repository content. Publishing is disabled until authenticated access is restored.')+'\n'+repositoryMessage(data.access.warningCode,data.access.upstreamStatus):state.canPublish?t('Ready to edit. Nothing is published until you save.'):t('Publishing is not configured. You can preview and export a draft.'),!!data.access?.warningCode);
  }catch(error){status(friendly(error),true);$('studio-document').value=state.key;}finally{busy(false);}
 }
@@ -114,7 +214,7 @@ async function verifyRepository(){
   if(state.writeUncertain){
    const intent=state.saveIntent;
    const savedValue=intent?.key==='food'?{...intent.value,generatedAt:data.value.generatedAt}:intent?.value;
-   if(intent?.key===state.key&&data.sha!==intent.sha&&JSON.stringify(data.value)===JSON.stringify(savedValue)){adoptDocument(data);status(t('GitHub now matches the submitted draft. No additional write was sent.'));}
+   if(intent?.key===state.key&&data.sha!==intent.sha&&JSON.stringify(data.value)===JSON.stringify(savedValue)){clearDraft(state.key);adoptDocument(data);status(t('GitHub now matches the submitted draft. No additional write was sent.'));}
    else{state.canPublish=false;status(t('The write outcome is still unresolved. Export your draft and inspect GitHub before reloading.'),true);}return;
   }
   if(state.value&&data.sha!==state.sha&&state.dirty){state.canPublish=false;status(t('This document changed elsewhere. Export your draft before reloading.'),true);return;}
@@ -142,9 +242,9 @@ const diagnosticPanel=node('details',undefined,'studio-diagnostics');diagnosticP
 $('studio-fields').before(utility);
 $('studio-connection').addEventListener('click',verifyRepository);
 $('studio-check').addEventListener('click',()=>{if(state.busy||!state.value)return;try{readJson();preview();status(t('Draft is valid. Nothing has been published.'));}catch(error){status(t('Review the draft fields before publishing.')+'\n'+t(error.message),true);}});
-$('studio-restore').addEventListener('click',()=>{if(state.busy||!state.original)return;if(state.dirty&&!confirm(t('Discard unsaved changes? Export first if you need a copy.')))return;state.value=structuredClone(state.original);state.dirty=false;renderFields();previewOptions();preview();$('studio-dirty').textContent=t('No unsaved changes');status(t('Loaded version restored. Nothing has been published.'));});
+$('studio-restore').addEventListener('click',()=>{if(state.busy||!state.original)return;if(state.dirty&&!confirm(t('Discard unsaved changes? Export first if you need a copy.')))return;clearDraft(state.key);if(state.draftBaseline){Object.assign(state,state.draftBaseline);state.draftBaseline=null;}state.value=structuredClone(state.original);state.dirty=false;renderFields();previewOptions();preview();$('studio-dirty').textContent=t('No unsaved changes');busy(false);status(t('Loaded version restored. Nothing has been published.'));});
 new MutationObserver(()=>{if(state.value)requestAnimationFrame(preview);}).observe(document.body,{attributes:true,attributeFilter:['class']});
-document.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='s'&&!$('studio-editor').hidden){event.preventDefault();if(!state.busy&&state.canPublish&&!$('studio-save').disabled)$('studio-save').click();}});
+document.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='s'&&!$('studio-editor').hidden){event.preventDefault();if(!state.busy)saveDraft(true);}});
 $('studio-document').addEventListener('change',()=>loadDocument($('studio-document').value));$('studio-locale').value=state.editLocale;$('studio-locale').addEventListener('change',()=>{try{readJson();state.editLocale=$('studio-locale').value;renderFields();preview();}catch(error){$('studio-locale').value=state.editLocale;status(t('Review the draft fields before publishing.')+'\n'+t(error.message),true);}});$('studio-preview-page').addEventListener('change',preview);$('studio-reload').addEventListener('click',()=>loadDocument(state.key));
 for(const [id,json] of [['visual-tab',false],['json-tab',true]])$(id).addEventListener('click',()=>{try{readJson();state.json=json;$('studio-fields').hidden=json;$('studio-json-label').hidden=!json;$('studio-json').value=JSON.stringify(state.value,null,2);$('visual-tab').setAttribute('aria-pressed',String(!json));$('json-tab').setAttribute('aria-pressed',String(json));if(!json)renderFields();preview();}catch(error){status(t('Review the draft fields before publishing.')+'\n'+t(error.message),true);}});
 $('studio-json').addEventListener('input',changed);
@@ -153,9 +253,9 @@ $('studio-save').addEventListener('click',async()=>{if(state.busy||!state.value|
   state.value.generatedAt=receipt.generatedAt;
   renderFields();
  }
- state.sha=receipt.sha;state.original=structuredClone(value);state.dirty=false;state.saveIntent=null;state.writeUncertain=false;$('studio-dirty').textContent=t('No unsaved changes');status(t('Saved to GitHub. Deployment is a separate step; check the repository build.')+'\n'+receipt.url);}catch(error){if(error.code==='github-write-uncertain'||(!error.operation&&(!error.status||error.status>=500))){state.writeUncertain=true;state.canPublish=false;}status(friendly(error),true);}finally{busy(false);}});
-$('studio-export').addEventListener('click',()=>{try{const value=readJson(),url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)+'\n'],{type:'application/json'}));const anchor=node('a');anchor.href=url;anchor.download='frostmoon-'+state.key+'-draft.json';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(error){status(t('Review the draft fields before publishing.')+'\n'+t(error.message),true);}});
+ clearDraft(state.key);state.sha=receipt.sha;state.original=structuredClone(value);state.dirty=false;state.saveIntent=null;state.writeUncertain=false;$('studio-dirty').textContent=t('No unsaved changes');status(t('Saved to GitHub. Deployment is a separate step; check the repository build.')+'\n'+receipt.url);}catch(error){if(error.code==='github-write-uncertain'||(!error.operation&&(!error.status||error.status>=500))){state.writeUncertain=true;state.canPublish=false;}status(friendly(error),true);}finally{busy(false);}});
+$('studio-export').addEventListener('click',()=>{try{const raw=state.json?$('studio-json').value:JSON.stringify(state.value,null,2)+'\n';const url=URL.createObjectURL(new Blob([raw],{type:'application/json'}));const anchor=node('a');anchor.href=url;anchor.download='frostmoon-'+state.key+'-draft.json';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(error){status(t('Review the draft fields before publishing.')+'\n'+t(error.message),true);}});
 $('studio-import').addEventListener('change',async event=>{const file=event.target.files[0];if(!file)return;try{if(file.size>300000)throw new Error('Draft is too large');const value=JSON.parse(await file.text());validateDocument(state.key,value,state.original);state.value=value;changed();renderFields();previewOptions();preview();}catch(error){status(t('Could not import this draft.')+'\n'+error.message,true);}finally{event.target.value='';}});
-$('studio-logout').addEventListener('click',async()=>{if(state.dirty&&!confirm(t('Discard unsaved changes? Export first if you need a copy.')))return;try{await api('logout',{method:'POST',body:'{}'});state.value=null;state.original=null;state.csrf=null;state.dirty=false;state.access=null;state.saveIntent=null;state.writeUncertain=false;connectionState(null);window.dispatchEvent?.(new Event('studio-locked'));$('studio-fields').replaceChildren();$('studio-json').value='';$('studio-preview').srcdoc='';$('studio-editor').hidden=true;$('studio-login').hidden=false;status(t('Studio locked.'));}catch(error){status(friendly(error),true);}});
-window.addEventListener('beforeunload',event=>{if(state.dirty||state.writeUncertain){event.preventDefault();event.returnValue='';}});
+$('studio-logout').addEventListener('click',async()=>{if(state.dirty&&!localDraft(state.key)&&!confirm(t('Discard unsaved changes? Export first if you need a copy.')))return;try{await saveDraft(true);await api('logout',{method:'POST',body:'{}'});state.value=null;state.original=null;state.csrf=null;state.dirty=false;state.access=null;state.saveIntent=null;state.writeUncertain=false;connectionState(null);window.dispatchEvent?.(new Event('studio-locked'));$('studio-fields').replaceChildren();$('studio-json').value='';$('studio-preview').srcdoc='';$('studio-editor').hidden=true;$('studio-login').hidden=false;status(t('Studio locked.'));}catch(error){status(friendly(error),true);}});
+window.addEventListener('beforeunload',event=>{if((state.dirty&&!localDraft(state.key))||state.writeUncertain){event.preventDefault();event.returnValue='';}});
 try{const data=await api('session');if(data.authenticated)await enter(data);else status(t(data.configured?'Enter your owner password to continue.':'Studio setup is incomplete. Check the runtime secrets in Cloudflare.'),!data.configured);}catch(error){status(t('The studio backend is unavailable in this preview. Use the deployed HTTPS site.'),true);}

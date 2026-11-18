@@ -411,7 +411,16 @@
     "Running read-only connection diagnostics…": "Running read-only connection diagnostics…",
     "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "Diagnostics ready. Copy the report below; it contains no password, token or draft content.",
     "Article date": "Article date",
-    "Use a valid article date": "Use a valid article date"
+    "Use a valid article date": "Use a valid article date",
+    "Upload to GitHub": "Upload to GitHub",
+    "Drafts are saved automatically. Uploading publishes your edits to the public website repository.": "Drafts are saved automatically. Uploading publishes your edits to the public website repository.",
+    "Draft saved to the workbench": "Draft saved to the workbench",
+    "Draft saved on this device": "Draft saved on this device",
+    "Draft only in this tab. Export it before closing.": "Draft only in this tab. Export it before closing.",
+    "Another device saved a draft. This copy is kept on this device.": "Another device saved a draft. This copy is kept on this device.",
+    "Draft sync unavailable. Check your local copy or export it.": "Draft sync unavailable. Check your local copy or export it.",
+    "Draft restored": "Draft restored",
+    "Draft restored. The published version changed. Export before merging.": "Draft restored. The published version changed. Export before merging."
   },
   "zh": {
     "Food note": "美食文章正文",
@@ -825,7 +834,16 @@
     "Running read-only connection diagnostics…": "正在进行只读连接诊断，不会发送写入…",
     "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "诊断完成。请复制下方报告；其中不包含密码、令牌或草稿内容。",
     "Article date": "文章日期",
-    "Use a valid article date": "请选择有效的文章日期"
+    "Use a valid article date": "请选择有效的文章日期",
+    "Upload to GitHub": "上传到 GitHub",
+    "Drafts are saved automatically. Uploading publishes your edits to the public website repository.": "草稿会自动保存。点击上传后，改动才会发布到网站的公开仓库。",
+    "Draft saved to the workbench": "草稿已保存到工作台",
+    "Draft saved on this device": "草稿已保存到本机",
+    "Draft only in this tab. Export it before closing.": "草稿仅在此标签页中，关闭前请导出。",
+    "Another device saved a draft. This copy is kept on this device.": "另一设备已保存草稿，这份内容仍留在本机。",
+    "Draft sync unavailable. Check your local copy or export it.": "草稿暂时无法同步，请确认本机副本或导出。",
+    "Draft restored": "草稿已恢复",
+    "Draft restored. The published version changed. Export before merging.": "草稿已恢复。已发布版本有变化，请先导出草稿再合并。"
   },
   "ru": {
     "Food note": "Заметка о заведении",
@@ -1239,7 +1257,16 @@
     "Running read-only connection diagnostics…": "Проверяем соединение без записи данных…",
     "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "Диагностика завершена. Скопируйте отчёт ниже: в нём нет пароля, токена или текста черновика.",
     "Article date": "Дата статьи",
-    "Use a valid article date": "Укажите действительную дату статьи"
+    "Use a valid article date": "Укажите действительную дату статьи",
+    "Upload to GitHub": "Загрузить на GitHub",
+    "Drafts are saved automatically. Uploading publishes your edits to the public website repository.": "Черновики сохраняются автоматически. Загрузка публикует правки в открытом репозитории сайта.",
+    "Draft saved to the workbench": "Черновик сохранён в редакторе",
+    "Draft saved on this device": "Черновик сохранён на этом устройстве",
+    "Draft only in this tab. Export it before closing.": "Черновик только в этой вкладке. Экспортируйте его перед закрытием.",
+    "Another device saved a draft. This copy is kept on this device.": "На другом устройстве сохранён черновик. Эта копия осталась на текущем устройстве.",
+    "Draft sync unavailable. Check your local copy or export it.": "Синхронизация недоступна. Проверьте локальную копию или экспортируйте черновик.",
+    "Draft restored": "Черновик восстановлен",
+    "Draft restored. The published version changed. Export before merging.": "Черновик восстановлен. Опубликованная версия изменилась. Экспортируйте черновик перед объединением."
   },
   "ja": {
     "Food note": "グルメ記事の本文",
@@ -1653,6 +1680,15 @@
     "Running read-only connection diagnostics…": "接続を診断中です。書き込みは行いません…",
     "Diagnostics ready. Copy the report below; it contains no password, token or draft content.": "診断が完了しました。下のレポートをコピーしてください。パスワード・トークン・下書きは含まれません。",
     "Article date": "記事の日付",
-    "Use a valid article date": "有効な記事の日付を指定してください"
+    "Use a valid article date": "有効な記事の日付を指定してください",
+    "Upload to GitHub": "GitHub にアップロード",
+    "Drafts are saved automatically. Uploading publishes your edits to the public website repository.": "下書きは自動保存されます。アップロードすると公開リポジトリに反映されます。",
+    "Draft saved to the workbench": "下書きをワークベンチに保存しました",
+    "Draft saved on this device": "下書きをこの端末に保存しました",
+    "Draft only in this tab. Export it before closing.": "下書きはこのタブにのみあります。閉じる前に書き出してください。",
+    "Another device saved a draft. This copy is kept on this device.": "別の端末で下書きが保存されました。このコピーはこの端末に残ります。",
+    "Draft sync unavailable. Check your local copy or export it.": "同期できません。端末のコピーを確認するか、書き出してください。",
+    "Draft restored": "下書きを復元しました",
+    "Draft restored. The published version changed. Export before merging.": "下書きを復元しました。公開版が変更されています。統合前に書き出してください。"
   }
 }
