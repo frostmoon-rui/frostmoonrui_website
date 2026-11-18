@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import {foodCountryCode} from '../shared/site-schema.js';
 export const foodNotePath=id=>`notes/food/${id}`;
 export const feedUrl='https://frostmoonrui.com/food-map/index.json';
 const safeUrl=value=>{if(value==='')return '';const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password)throw new Error('Expected public HTTPS URL');return u.href;};
@@ -8,6 +9,8 @@ export function exportFood(data){
  const spots=data.spots.map(p=>{
   if(!p||!Number.isFinite(p.lng)||!Number.isFinite(p.lat)||Math.abs(p.lng)>180||Math.abs(p.lat)>90||(p.coordinateSystem??'GCJ-02')!=='GCJ-02')throw new Error('Invalid GCJ-02 venue');
   const row={name:text(p.name,true),city:text(p.city,true),address:text(p.address??''),lng:p.lng,lat:p.lat,coordinateSystem:'GCJ-02',category:text(p.category??'Food'),articleUrl:safeUrl(p.articleUrl??''),amapUrl:safeUrl(p.amapUrl??'')};
+  const country=foodCountryCode(p.countryCode);
+  if(country)row.countryCode=country;
   if(p.source&&p.source.jsonUrl!==feedUrl)throw new Error('Do not re-export imported venues');
   row.id=crypto.createHash('sha256').update(JSON.stringify([row.name.normalize('NFKC').toLowerCase(),row.city,row.lng,row.lat])).digest('hex').slice(0,24);
   if(!row.articleUrl)row.articleUrl=`https://frostmoonrui.com/${foodNotePath(row.id)}/`;

@@ -442,7 +442,13 @@
     "Teppanyaki": "Teppanyaki",
     "Tsampa": "Tsampa",
     "Fried skewers": "Fried skewers",
-    "Fried food": "Fried food"
+    "Fried food": "Fried food",
+    "Country or region code (e.g. IT)": "Country or region code (e.g. IT)",
+    "Local language code (e.g. it)": "Local language code (e.g. it)",
+    "Local-language translation": "Local-language translation",
+    "Use a two-letter country or region code": "Use a two-letter country or region code",
+    "Use a valid local language code": "Use a valid local language code",
+    "Enter a language code for the local translation": "Enter a language code for the local translation"
   },
   "zh": {
     "Food note": "美食文章正文",
@@ -887,7 +893,13 @@
     "Teppanyaki": "铁板烧",
     "Tsampa": "糌粑",
     "Fried skewers": "炸串",
-    "Fried food": "炸物"
+    "Fried food": "炸物",
+    "Country or region code (e.g. IT)": "国家或地区代码（如 IT）",
+    "Local language code (e.g. it)": "当地语言代码（如 it）",
+    "Local-language translation": "当地语言译文",
+    "Use a two-letter country or region code": "请使用两位字母的国家或地区代码",
+    "Use a valid local language code": "请填写有效的当地语言代码",
+    "Enter a language code for the local translation": "请为当地语言译文填写语言代码"
   },
   "ru": {
     "Food note": "Заметка о заведении",
@@ -1332,7 +1344,13 @@
     "Teppanyaki": "Тэппанъяки",
     "Tsampa": "Цампа",
     "Fried skewers": "Жареные шпажки",
-    "Fried food": "Жареные блюда"
+    "Fried food": "Жареные блюда",
+    "Country or region code (e.g. IT)": "Код страны или региона (например, IT)",
+    "Local language code (e.g. it)": "Код местного языка (например, it)",
+    "Local-language translation": "Перевод на местный язык",
+    "Use a two-letter country or region code": "Укажите двухбуквенный код страны или региона",
+    "Use a valid local language code": "Укажите допустимый код местного языка",
+    "Enter a language code for the local translation": "Укажите код языка для перевода"
   },
   "ja": {
     "Food note": "グルメ記事の本文",
@@ -1777,6 +1795,12 @@
     "Teppanyaki": "鉄板焼き",
     "Tsampa": "ツァンパ",
     "Fried skewers": "揚げ串",
-    "Fried food": "揚げ物"
+    "Fried food": "揚げ物",
+    "Country or region code (e.g. IT)": "国・地域コード（例 IT）",
+    "Local language code (e.g. it)": "現地の言語コード（例 it）",
+    "Local-language translation": "現地語訳",
+    "Use a two-letter country or region code": "2 文字の国・地域コードを入力してください",
+    "Use a valid local language code": "有効な現地言語コードを入力してください",
+    "Enter a language code for the local translation": "現地語訳の言語コードを入力してください"
   }
 }
