@@ -27,3 +27,20 @@ test('the browser persists language without late navigation or a second page loa
  const source=fs.readFileSync(new URL('../dist/assets/site.js',import.meta.url),'utf8');
  assert.doesNotMatch(source,/location\.(?:replace|assign|reload)\(/);assert.match(source,/frostmoon_language=/);assert.match(source,/Max-Age=31536000/);
 });
+
+test('published resources and site feeds bypass stale client validators and CDN caching',async()=>{
+ const paths=['/resources/','/zh/resources/','/ru/resources/index.html','/data/bot-site.json','/data/site.json','/food-map/index.json'];
+ for(const pathname of paths){
+  const req=request(pathname,{'If-None-Match':'"old-release"','If-Modified-Since':'Wed, 18 Nov 2026 00:00:00 GMT'});
+  const env={ASSETS:{fetch:async upstream=>{
+   assert.equal(upstream.headers.get('If-None-Match'),null);
+   assert.equal(upstream.headers.get('If-Modified-Since'),null);
+   return new Response('latest',{headers:{'Cache-Control':'public, max-age=3600, stale-while-revalidate=86400'}});
+  }}};
+  const response=await handle(req,env);
+  assert.equal(response.status,200);
+  assert.match(response.headers.get('Cache-Control'),/no-store/);
+  assert.equal(response.headers.get('Cloudflare-CDN-Cache-Control'),'no-store');
+  assert.equal(await response.text(),'latest');
+ }
+});

@@ -3,6 +3,8 @@ import {handleCommunity} from './community.js';
 import {themePreference,stampTheme} from './theme-hint.js';
 import {localizedAsset} from './language-hint.js';
 const paths=new Set(['/v4/map/styles','/v3/config/district','/v3/place/text','/v3/place/around','/v3/geocode/geo','/v3/geocode/regeo']);
+const publishedData=new Set(['/food-map/index.json','/data/bot-site.json','/data/site.json']);
+const resourcesPage=/^\/(?:zh\/|en\/|ru\/|ja\/)?resources(?:\/(?:index\.html)?)?$/;
 const mapCsp="default-src 'self'; script-src 'self' 'unsafe-eval' https://webapi.amap.com https://*.amap.com https://*.autonavi.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.amap.com https://*.autonavi.com https://tile.openstreetmap.org; connect-src 'self' https://*.amap.com https://*.autonavi.com https://*.amap.com.cn https://*.amapcdn.com; worker-src 'self' blob:; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests";
 function json(data,status=200){return Response.json(data,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'strict-origin-when-cross-origin'}});}
 export function proxyTarget(url,env){
@@ -43,11 +45,18 @@ export async function handle(request,env,fetcher=fetch){
  }
  if(!['GET','HEAD'].includes(request.method))return json({error:'Read-only website'},405);
  const localized=localizedAsset(request);
- const asset=await env.ASSETS.fetch(localized?new Request(localized,request):request);
+ const fresh=publishedData.has(url.pathname)||resourcesPage.test(url.pathname);
+ let assetRequest=localized?new Request(localized,request):request;
+ if(fresh){
+  const headers=new Headers(assetRequest.headers);
+  headers.delete('If-None-Match');headers.delete('If-Modified-Since');
+  assetRequest=new Request(assetRequest,{headers});
+ }
+ const asset=await env.ASSETS.fetch(assetRequest);
  let response=new Response(asset.body,asset);
  if(localized){response.headers.set('Cache-Control','private, no-store');response.headers.append('Vary','Cookie, Accept-Language');}
  const preferred=themePreference(request);
- if(preferred&&(asset.headers.get('Content-Type')||'').includes('text/html')){
+ if(preferred&&asset.ok&&(asset.headers.get('Content-Type')||'').includes('text/html')){
   const headers=new Headers(response.headers);headers.set('Cache-Control','private, no-store');if(!localized)headers.append('Vary','Cookie');headers.delete('Content-Length');headers.delete('Content-Encoding');headers.delete('ETag');
   response=new Response(request.method==='HEAD'?null:stampTheme(await asset.text(),preferred),{status:asset.status,headers});
  }
@@ -61,7 +70,9 @@ export async function handle(request,env,fetcher=fetch){
  if(url.pathname==='/food-map/index.json'){
   response.headers.set('Content-Type','application/json; charset=utf-8');
   response.headers.set('Access-Control-Allow-Origin','*');
-  response.headers.set('Cache-Control','no-store');
+ }
+ if(fresh){
+  response.headers.set('Cache-Control',resourcesPage.test(url.pathname)?'private, no-store':'no-store');
   response.headers.set('Cloudflare-CDN-Cache-Control','no-store');
  }
  return response;
