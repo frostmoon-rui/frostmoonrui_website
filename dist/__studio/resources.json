@@ -72,6 +72,18 @@
         "ru": "Справочники веб-платформы и практические руководства.",
         "ja": "Web標準のリファレンスと実践的な開発ガイド。"
       }
+    },
+    {
+      "id": "com",
+      "name": "HRT Tracker 2",
+      "url": "https://hrt.transmtf.com/",
+      "category": "Reference / tools",
+      "description": {
+        "zh": "hrt记录网站2",
+        "en": "",
+        "ru": "",
+        "ja": ""
+      }
     }
   ]
 }
