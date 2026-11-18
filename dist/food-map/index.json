@@ -18,6 +18,27 @@
   "coordinateSystem": "GCJ-02",
   "spots": [
     {
+      "name": "知味•金陵小笼包",
+      "city": "苏州市",
+      "address": "吴中区苏粤工业小区东门北60米",
+      "lng": 120.629375,
+      "lat": 31.251775,
+      "coordinateSystem": "GCJ-02",
+      "category": "Food",
+      "articleUrl": "https://frostmoonrui.com/notes/food/400bf939f7c136b909de1be3/",
+      "amapUrl": "https://surl.amap.com/2bLaY0tI1B6re",
+      "id": "400bf939f7c136b909de1be3",
+      "price": 26,
+      "rating": 3.5,
+      "source": {
+        "id": "local",
+        "name": "frostmoon-rui",
+        "homepage": "https://frostmoonrui.com/",
+        "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
+        "type": "local"
+      }
+    },
+    {
       "name": "雯雯点心店",
       "city": "上海市",
       "address": "中山东路143号(方东小区北2门西150米)",
@@ -41,7 +62,7 @@
     {
       "name": "郭淑芬鲜切牛肉自助老火锅",
       "city": "苏州市",
-      "address": "苏州市吴中区郭新东路199号叠翠峰(尹山湖地铁站5号口步行60米)",
+      "address": "吴中区郭新东路199号叠翠峰(尹山湖地铁站5号口步行60米)",
       "lng": 120.697309,
       "lat": 31.248427,
       "coordinateSystem": "GCJ-02",
