@@ -4,3 +4,25 @@
 .schema-array-item>button{margin-right:8px;min-height:34px}.schema-array-item>button:disabled{opacity:.4;cursor:default}
 .studio-controls select{min-height:44px}.studio-utility button{min-height:38px}
 @media(max-width:680px){.studio-utility button{flex:1 1 140px;min-height:44px}.schema-array-item>button{min-height:40px}.studio-utility #studio-repository-state{font-size:11px!important}.studio-grid{gap:18px}}
+
+/* Avoid compositing a blurred layer for every field and button on touch screens. */
+@media (max-width:1000px), (hover:none) and (pointer:coarse) {
+  :is(.studio-main,.studio-header,.studio-footer) :is(button,summary,a,.import-button),
+  .studio-main :is(.login-card,.studio-form-panel,.studio-preview-panel,.studio-actions,.studio-controls) {
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+    background-color:var(--paper);
+    background-image:none;
+    box-shadow:none;
+    transform:none;
+    transition:none;
+  }
+  .studio-main .studio-primary { background:var(--ink); color:var(--paper); }
+  .studio-main .studio-grid { grid-template-columns:minmax(0,1fr); }
+  .studio-main .studio-actions { position:static; }
+  .studio-main #studio-fields { max-height:none; overflow:visible; }
+  .studio-main :is(button,summary,.import-button) { min-height:44px; }
+  .studio-main :is(input:not([type=checkbox]),textarea,select,.rich-body) { font-size:16px; }
+  .studio-main .schema-group { padding-inline:8px; }
+  .studio-main .schema-array-item { padding-inline:8px; }
+}

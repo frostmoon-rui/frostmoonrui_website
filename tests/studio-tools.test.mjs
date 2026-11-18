@@ -61,3 +61,24 @@ test('incomplete food drafts retain the collection preview and escape the articl
  assert.match(frame.srcdoc,/<h2>New cafe<\/h2>/);
  assert.doesNotMatch(frame.srcdoc,/Review the draft fields before publishing/);
 });
+
+test('closed field groups mount their inputs once when expanded',async()=>{
+ const s=await fixture();
+ s.renderFields();
+ const group=s.elements.get('studio-fields').querySelectorAll().find(item=>item._fieldPath==='["home","en"]');
+ assert.equal(group.open,false);
+ assert.equal(group.children.length,1);
+ group.open=true;
+ group.events.toggle();
+ assert.ok(group.children.length>1);
+ const mounted=group.children.length;
+ group.open=false;
+ group.events.toggle();
+ group.open=true;
+ group.events.toggle();
+ assert.equal(group.children.length,mounted);
+ s.renderFields();
+ const restored=s.elements.get('studio-fields').querySelectorAll().find(item=>item._fieldPath===group._fieldPath);
+ assert.equal(restored.open,true);
+ assert.equal(restored.children.length,mounted);
+});
