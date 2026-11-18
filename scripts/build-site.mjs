@@ -61,7 +61,7 @@ for(const locale of locales){
  extra.push({path:'resources',title:text('Recommended links'),label:text('Resource collection'),description:text('A small shelf of useful places.'),body:resourcesBody(resources,locale,catalog)});
  const dateFormat=new Intl.DateTimeFormat(htmlLanguages[locale],{dateStyle:'medium',timeZone:'UTC'});
  const time=date=>date?`<time datetime="${date}">${escape(dateFormat.format(new Date(date)))}</time>`:'';
- const foodCards=[...foodNotes].map(([route,{venue,date}])=>`<article class="note-card" data-category="food"><div class="note-meta"><span>Food</span>${time(date)}</div><h3><a href="/${route}/">${escape(venue.name)} <span>↗</span></a></h3></article>`);
+ const foodCards=[...foodNotes].map(([route,{venue,date}])=>`<article class="note-card" data-category="food"><div class="note-meta"><span>Food</span>${time(date)}</div><h3><a href="/${route}/">${escape(venue.name)} <span>↗</span></a></h3><p>${escape([venue.city,venue.address].filter(Boolean).join(" · "))}</p></article>`);
  const cardsPattern=/<article class="note-card"[^>]*>[\s\S]*?<\/article>/g;
  const cardDate=card=>card.match(/datetime="([^"]+)"/)?.[1]??'';
  const notebookCards=home.match(cardsPattern).map(card=>{

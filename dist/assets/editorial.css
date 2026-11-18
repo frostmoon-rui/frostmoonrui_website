@@ -32,14 +32,3 @@ html[lang=zh-CN] .about-layout>h1,html[lang=ja] .about-layout>h1{letter-spacing:
 @media(prefers-reduced-motion:reduce){.about-prologue .about-portrait:hover img{transform:none}}
 body[data-motion=false] .about-prologue .about-portrait:hover img{transform:none}
 @media(forced-colors:active){.room-orbit{display:none}.about-section,.room-entry,.room-header{border-color:CanvasText}.hero .text-link,.about-directions .text-link{background:ButtonFace;color:ButtonText;border:1px solid ButtonText}}
-
-.home-compact .hero{display:block;min-height:0;padding:clamp(22px,4vw,48px);background:var(--paper)}
-.home-compact .hero h1{font-size:clamp(32px,5vw,56px)}
-.home-compact .hero-copy{max-width:100%}
-.home-compact .content-grid{grid-template-columns:minmax(0,1fr);padding-top:28px}
-.home-compact .notes{gap:10px}
-.home-compact .note-card{padding:12px 16px;background:var(--paper);box-shadow:none;min-width:0}
-.home-compact .note-card::before{display:none}
-.home-compact .note-card .note-meta{margin:0 0 2px}
-.home-compact .note-card h3{margin:0}
-.home-compact .note-card h3 a{font-size:clamp(17px,3vw,23px);padding:5px 0!important;overflow-wrap:anywhere}
