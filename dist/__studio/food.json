@@ -14,7 +14,7 @@
     "url": "https://frostmoonrui.com/",
     "homepage": "https://frostmoonrui.com/"
   },
-  "generatedAt": "2026-11-18T11:22:30.161Z",
+  "generatedAt": "2026-11-18T11:23:20.292Z",
   "coordinateSystem": "GCJ-02",
   "spots": [
     {
@@ -119,7 +119,8 @@
       "articleUrl": "",
       "amapUrl": "https://surl.amap.com/2m3Dl9nQYeFv",
       "price": 30,
-      "rating": 4.4
+      "rating": 4.4,
+      "date": "2025-10-04"
     },
     {
       "name": "德生小吃部",
