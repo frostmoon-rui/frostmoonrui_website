@@ -14,7 +14,7 @@
     "url": "https://frostmoonrui.com/",
     "homepage": "https://frostmoonrui.com/"
   },
-  "generatedAt": "2026-11-20T11:30:10.017Z",
+  "generatedAt": "2026-11-20T11:34:26.427Z",
   "coordinateSystem": "GCJ-02",
   "spots": [
     {
@@ -240,6 +240,27 @@
       "id": "bbc0ba4cf7c68b62843ee054",
       "price": 30,
       "rating": 4.6,
+      "source": {
+        "id": "local",
+        "name": "frostmoon-rui",
+        "homepage": "https://frostmoonrui.com/",
+        "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
+        "type": "local"
+      }
+    },
+    {
+      "name": "品香居饭店",
+      "city": "黑龙江省绥化市",
+      "address": "北林区绥兰路五中西",
+      "lng": 126.9604,
+      "lat": 46.628768,
+      "coordinateSystem": "GCJ-02",
+      "category": "东北菜",
+      "articleUrl": "https://frostmoonrui.com/notes/food/dba7208eb5e5e1d411ab4095/",
+      "amapUrl": "https://surl.amap.com/2Nyz6ZUm1m4Lz",
+      "id": "dba7208eb5e5e1d411ab4095",
+      "price": 50,
+      "rating": 4.3,
       "source": {
         "id": "local",
         "name": "frostmoon-rui",
