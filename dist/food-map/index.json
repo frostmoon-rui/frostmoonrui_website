@@ -14,7 +14,7 @@
     "url": "https://frostmoonrui.com/",
     "homepage": "https://frostmoonrui.com/"
   },
-  "generatedAt": "2026-11-18T11:29:25.110Z",
+  "generatedAt": "2026-11-20T11:17:55.365Z",
   "coordinateSystem": "GCJ-02",
   "spots": [
     {
@@ -51,27 +51,6 @@
       "id": "14d5e3172fb92c32d4b4cf18",
       "price": 26,
       "rating": 3.5,
-      "source": {
-        "id": "local",
-        "name": "frostmoon-rui",
-        "homepage": "https://frostmoonrui.com/",
-        "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
-        "type": "local"
-      }
-    },
-    {
-      "name": "华莱士",
-      "city": "黑龙江省大兴安岭地区漠河市",
-      "address": "市西林吉镇39区雪缘1号楼0120号",
-      "lng": 122.535062,
-      "lat": 52.968924,
-      "coordinateSystem": "GCJ-02",
-      "category": "快餐",
-      "articleUrl": "https://frostmoonrui.com/notes/food/22537ea6c1ed1615ccfb681b/",
-      "amapUrl": "https://surl.amap.com/2m3Dl9nQYeFv",
-      "id": "22537ea6c1ed1615ccfb681b",
-      "price": 30,
-      "rating": 4.4,
       "source": {
         "id": "local",
         "name": "frostmoon-rui",
@@ -135,6 +114,27 @@
       "id": "49e716f754af44df971d8cbe",
       "price": 140,
       "rating": 4.8,
+      "source": {
+        "id": "local",
+        "name": "frostmoon-rui",
+        "homepage": "https://frostmoonrui.com/",
+        "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
+        "type": "local"
+      }
+    },
+    {
+      "name": "文化街早市",
+      "city": "黑龙江省黑河市",
+      "address": "爱辉区文化街与公园路交叉口东南20米",
+      "lng": 127.509001,
+      "lat": 50.24764,
+      "coordinateSystem": "GCJ-02",
+      "category": "早市",
+      "articleUrl": "https://frostmoonrui.com/notes/food/62d027289867a7dd3f9ba6c6/",
+      "amapUrl": "https://surl.amap.com/2JQxfPgm1g3kD",
+      "id": "62d027289867a7dd3f9ba6c6",
+      "price": 20,
+      "rating": 4.6,
       "source": {
         "id": "local",
         "name": "frostmoon-rui",
@@ -219,6 +219,27 @@
       "id": "bbc0ba4cf7c68b62843ee054",
       "price": 30,
       "rating": 4.6,
+      "source": {
+        "id": "local",
+        "name": "frostmoon-rui",
+        "homepage": "https://frostmoonrui.com/",
+        "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
+        "type": "local"
+      }
+    },
+    {
+      "name": "122.511855",
+      "city": "黑龙江省大兴安岭地区漠河市",
+      "address": "市西林吉镇39区雪缘1号楼0120号",
+      "lng": 122.511855,
+      "lat": 52.987499,
+      "coordinateSystem": "GCJ-02",
+      "category": "营地",
+      "articleUrl": "https://frostmoonrui.com/notes/food/dfcc77d1351fe216255412d3/",
+      "amapUrl": "https://surl.amap.com/2CSHeeqmucpO",
+      "id": "dfcc77d1351fe216255412d3",
+      "price": 0,
+      "rating": 4.5,
       "source": {
         "id": "local",
         "name": "frostmoon-rui",
