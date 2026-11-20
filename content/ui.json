@@ -448,7 +448,9 @@
     "Local-language translation": "Local-language translation",
     "Use a two-letter country or region code": "Use a two-letter country or region code",
     "Use a valid local language code": "Use a valid local language code",
-    "Enter a language code for the local translation": "Enter a language code for the local translation"
+    "Enter a language code for the local translation": "Enter a language code for the local translation",
+    "Morning market": "Morning market",
+    "Campsite": "Campsite"
   },
   "zh": {
     "Food note": "美食文章正文",
@@ -899,7 +901,9 @@
     "Local-language translation": "当地语言译文",
     "Use a two-letter country or region code": "请使用两位字母的国家或地区代码",
     "Use a valid local language code": "请填写有效的当地语言代码",
-    "Enter a language code for the local translation": "请为当地语言译文填写语言代码"
+    "Enter a language code for the local translation": "请为当地语言译文填写语言代码",
+    "Morning market": "早市",
+    "Campsite": "营地"
   },
   "ru": {
     "Food note": "Заметка о заведении",
@@ -1350,7 +1354,9 @@
     "Local-language translation": "Перевод на местный язык",
     "Use a two-letter country or region code": "Укажите двухбуквенный код страны или региона",
     "Use a valid local language code": "Укажите допустимый код местного языка",
-    "Enter a language code for the local translation": "Укажите код языка для перевода"
+    "Enter a language code for the local translation": "Укажите код языка для перевода",
+    "Morning market": "Утренний рынок",
+    "Campsite": "Кемпинг"
   },
   "ja": {
     "Food note": "グルメ記事の本文",
@@ -1801,6 +1807,8 @@
     "Local-language translation": "現地語訳",
     "Use a two-letter country or region code": "2 文字の国・地域コードを入力してください",
     "Use a valid local language code": "有効な現地言語コードを入力してください",
-    "Enter a language code for the local translation": "現地語訳の言語コードを入力してください"
+    "Enter a language code for the local translation": "現地語訳の言語コードを入力してください",
+    "Morning market": "朝市",
+    "Campsite": "キャンプ場"
   }
 }
