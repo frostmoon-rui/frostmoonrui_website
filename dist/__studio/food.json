@@ -14,7 +14,7 @@
     "url": "https://frostmoonrui.com/",
     "homepage": "https://frostmoonrui.com/"
   },
-  "generatedAt": "2026-11-20T11:17:55.365Z",
+  "generatedAt": "2026-11-20T11:30:10.017Z",
   "coordinateSystem": "GCJ-02",
   "spots": [
     {
@@ -162,6 +162,20 @@
       "amapUrl": "https://surl.amap.com/2JQxfPgm1g3kD",
       "price": 20,
       "rating": 4.6
+    },
+    {
+      "name": "东辉一品酱骨牛肉面",
+      "city": "黑龙江省黑河市",
+      "address": "孙吴县红旗大街307号",
+      "lng": 127.329057,
+      "lat": 49.422341,
+      "category": "面食",
+      "date": "2025-10-05",
+      "note": "很好吃实惠的馆子",
+      "articleUrl": "",
+      "amapUrl": "https://surl.amap.com/2N9LbdiiAckw",
+      "price": 50,
+      "rating": 4.4
     }
   ]
 }
