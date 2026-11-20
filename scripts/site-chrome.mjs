@@ -21,6 +21,6 @@ export function applyChrome(html,site,locale,route,catalog){
  result=result.replace('</head>','<link rel="stylesheet" href="/assets/community.css"><link rel="stylesheet" href="/assets/entry.css"><link rel="stylesheet" href="/assets/companions.css"><link rel="stylesheet" href="/assets/frost.css"><link rel="stylesheet" href="/assets/editorial.css"></head>').replace(/(<body data-motion="(?:true|false)">)/,'$1<div class="page-intro" aria-hidden="true"><div class="intro-emblem"><img src="/assets/avatar-cute.jpg" width="50" height="50" alt=""><span>FROSTMOON</span></div></div>');
  result=result.replaceAll('src="/assets/moon.svg"','src="/assets/avatar-cute.jpg"').replaceAll('href="/assets/moon.svg" type="image/svg+xml"','href="/favicon.jpg" type="image/jpeg"');
  result=result.replace(/<meta property="og:image"[^>]*>/g,'').replace('</head>','<link rel="apple-touch-icon" href="/favicon.jpg"><meta property="og:image" content="https://frostmoonrui.com/assets/avatar-cute.jpg"><meta name="twitter:image" content="https://frostmoonrui.com/assets/avatar-cute.jpg"></head>');
- result=result.replace('<head>','<head><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="/assets/theme-base.css"><script data-cfasync="false" src="/assets/theme-init.js"></script>');
+ result=result.replace('<head>','<head><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="/assets/theme-base.css"><script data-cfasync="false" src="/assets/theme-init.js"></script><link rel="modulepreload" href="/assets/i18n.js">');
  return result;
 }

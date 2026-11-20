@@ -59,12 +59,6 @@
     "ru": "Очень хороший хот-пот в формате, похожем на частичный шведский стол. Закусок очень много, всё вкусно и по отличной цене.",
     "ja": "かなりいい火鍋屋さん。半分ビュッフェのような形式で、軽食がとにかく豊富。味もよくて、コスパもかなりいい。"
   },
-  "dfcc77d1351fe216255412d3": {
-    "sourceHash": "36c0cab6513c5a53c1c3ee6452d090d2e785477741b17ba327edc58603cd2ff1",
-    "en": "I stayed at this campsite on that trip. A lot of livestreamers taking on the extreme cold were there too. Their gear was seriously impressive. If you’re worried about the cold, there’s even an indoor space to pitch a tent. The facilities were pretty good.",
-    "ru": "В той поездке я останавливалась в этом кемпинге. Там было много стримеров, решивших испытать себя в экстремальный мороз. Снаряжение у них было потрясающее. Для тех, кто боится холода, есть даже помещение, где можно поставить палатку. Условия вполне хорошие.",
-    "ja": "そのとき泊まったキャンプ場。極寒に挑戦する配信者もたくさんいて、みんなの装備がすごかった。寒さが苦手な人は屋内でもテントを張れるし、設備もなかなかよかった。"
-  },
   "62d027289867a7dd3f9ba6c6": {
     "sourceHash": "8ac181fb639da1af6ded936ec1b7f912d2f367ec441b185f7c14f73d5ad2ed14",
     "en": "This is a great morning market in Heihe. They sell a bit of everything.\nI bought a pair of gloves, two cute fuzzy hats, and two jars of beef sauce, and had breakfast there.",
@@ -82,5 +76,11 @@
     "en": "I’d call this one of the best places to try Northeastern Chinese cooking around here. A must if you’re passing through.\nThe portions are generous and the prices low. The food and service are both excellent.",
     "ru": "Я бы назвала это заведение отличным примером местной северо-восточной китайской кухни. Если будете проезжать мимо, обязательно загляните.\nПорции большие, цены низкие, а еда и обслуживание очень хорошие.",
     "ja": "このあたりの中国東北料理を代表するお店だと思う。近くを通るならぜひ寄ってほしい。\n量が多くて安いし、味も接客もとてもいい。"
+  },
+  "c7332cb740e63a64b6650628": {
+    "sourceHash": "36c0cab6513c5a53c1c3ee6452d090d2e785477741b17ba327edc58603cd2ff1",
+    "en": "I stayed at this campsite on that trip. A lot of livestreamers taking on the extreme cold were there too. Their gear was seriously impressive. If you’re worried about the cold, there’s even an indoor space to pitch a tent. The facilities were pretty good.",
+    "ru": "В той поездке я останавливалась в этом кемпинге. Там было много стримеров, решивших испытать себя в экстремальный мороз. Снаряжение у них было потрясающее. Для тех, кто боится холода, есть даже помещение, где можно поставить палатку. Условия вполне хорошие.",
+    "ja": "そのとき泊まったキャンプ場。極寒に挑戦する配信者もたくさんいて、みんなの装備がすごかった。寒さが苦手な人は屋内でもテントを張れるし、設備もなかなかよかった。"
   }
 }

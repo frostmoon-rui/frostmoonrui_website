@@ -44,6 +44,10 @@ export async function handle(request,env,fetcher=fetch){
   }catch{return json({error:'Map provider unavailable'},502);}
  }
  if(!['GET','HEAD'].includes(request.method))return json({error:'Read-only website'},405);
+ if(/^\/(?:zh\/|en\/|ru\/|ja\/)?notes\/food\/dfcc77d1351fe216255412d3(?:\/(?:index\.html)?)?$/.test(url.pathname)){
+  url.pathname=url.pathname.replace('dfcc77d1351fe216255412d3','c7332cb740e63a64b6650628');
+  return Response.redirect(url,308);
+ }
  const localized=localizedAsset(request);
  const fresh=publishedData.has(url.pathname)||resourcesPage.test(url.pathname);
  let assetRequest=localized?new Request(localized,request):request;

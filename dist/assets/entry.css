@@ -13,3 +13,14 @@ body[data-motion=false] .page-intro{display:none}
 html[lang=ru] .hero h1{font-size:clamp(36px,4vw,58px);letter-spacing:-.035em}html[lang=ja] .hero h1,html[lang=zh-CN] .hero h1{line-height:1.35}
 @media(max-width:900px){.hero{grid-template-columns:minmax(0,1fr) minmax(0,.85fr)}.hero h1{font-size:clamp(34px,4.7vw,48px)}.hero-caption{white-space:normal;max-width:70%;text-align:right}.studio-controls label{min-width:0;flex:1 1 180px}}
 @media(max-width:680px){.hero{display:flex}.hero h1,html[lang=ru] .hero h1{font-size:clamp(32px,9.5vw,44px)}.margin-notes{grid-template-columns:1fr}.hero-description{max-width:100%}.topline{padding-block:14px;min-height:70px}.studio-entry a{max-width:100%}.studio-actions{align-items:stretch}.studio-actions button{flex:1 1 140px}.preview-heading>span{flex-basis:100%}.preview-heading select{max-width:100%}.contact-strip .contact-links{flex-wrap:wrap}.note-bottom{gap:12px;flex-wrap:wrap}}
+
+/* Paint static surfaces on touch screens while retaining the opening transition. */
+@media (max-width: 700px) and (pointer: coarse){
+ .nav-enhanced .mobile-topbar{backdrop-filter:none;background:var(--bg)}
+ .venue-card,.atlas-intro,.map-panel,.map-tools,.atlas-toolbar,.atlas-footer,.hero,.hero-link{
+  backdrop-filter:none!important;
+ }
+ .is-loaded .hero-art{animation:none}
+ .is-loaded #results>.venue-card{animation:none}
+ #results>.venue-card{content-visibility:auto;contain-intrinsic-block-size:auto 140px}
+}

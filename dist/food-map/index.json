@@ -14,7 +14,7 @@
     "url": "https://frostmoonrui.com/",
     "homepage": "https://frostmoonrui.com/"
   },
-  "generatedAt": "2026-11-20T11:34:26.427Z",
+  "generatedAt": "2026-11-20T11:42:46.272Z",
   "coordinateSystem": "GCJ-02",
   "spots": [
     {
@@ -249,6 +249,27 @@
       }
     },
     {
+      "name": "漠河市桥北自驾营地",
+      "city": "黑龙江省大兴安岭地区漠河市",
+      "address": "市西林吉镇39区雪缘1号楼0120号",
+      "lng": 122.511855,
+      "lat": 52.987499,
+      "coordinateSystem": "GCJ-02",
+      "category": "营地",
+      "articleUrl": "https://frostmoonrui.com/notes/food/c7332cb740e63a64b6650628/",
+      "amapUrl": "https://surl.amap.com/2CSHeeqmucpO",
+      "id": "c7332cb740e63a64b6650628",
+      "price": 0,
+      "rating": 4.5,
+      "source": {
+        "id": "local",
+        "name": "frostmoon-rui",
+        "homepage": "https://frostmoonrui.com/",
+        "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
+        "type": "local"
+      }
+    },
+    {
       "name": "品香居饭店",
       "city": "黑龙江省绥化市",
       "address": "北林区绥兰路五中西",
@@ -261,27 +282,6 @@
       "id": "dba7208eb5e5e1d411ab4095",
       "price": 50,
       "rating": 4.3,
-      "source": {
-        "id": "local",
-        "name": "frostmoon-rui",
-        "homepage": "https://frostmoonrui.com/",
-        "jsonUrl": "https://frostmoonrui.com/food-map/index.json",
-        "type": "local"
-      }
-    },
-    {
-      "name": "122.511855",
-      "city": "黑龙江省大兴安岭地区漠河市",
-      "address": "市西林吉镇39区雪缘1号楼0120号",
-      "lng": 122.511855,
-      "lat": 52.987499,
-      "coordinateSystem": "GCJ-02",
-      "category": "营地",
-      "articleUrl": "https://frostmoonrui.com/notes/food/dfcc77d1351fe216255412d3/",
-      "amapUrl": "https://surl.amap.com/2CSHeeqmucpO",
-      "id": "dfcc77d1351fe216255412d3",
-      "price": 0,
-      "rating": 4.5,
       "source": {
         "id": "local",
         "name": "frostmoon-rui",
