@@ -14,7 +14,7 @@
     "url": "https://frostmoonrui.com/",
     "homepage": "https://frostmoonrui.com/"
   },
-  "generatedAt": "2026-11-18T11:29:25.110Z",
+  "generatedAt": "2026-11-20T11:17:55.365Z",
   "coordinateSystem": "GCJ-02",
   "spots": [
     {
@@ -109,17 +109,17 @@
       "rating": 4.4
     },
     {
-      "name": "华莱士",
+      "name": " 122.511855",
       "city": "黑龙江省大兴安岭地区漠河市",
       "address": "市西林吉镇39区雪缘1号楼0120号",
-      "lng": 122.535062,
-      "lat": 52.968924,
-      "category": "快餐",
-      "note": "没什么特别的,因为是中国最北的华莱士所以记一下)\n",
+      "lng": 122.511855,
+      "lat": 52.987499,
+      "category": "营地",
+      "note": "当时住过的营地,很多挑战极寒的主播也在那里,他们的装备好先进,怕冷的也有室内可以搭帐篷,环境条件不错",
       "articleUrl": "",
-      "amapUrl": "https://surl.amap.com/2m3Dl9nQYeFv",
-      "price": 30,
-      "rating": 4.4,
+      "amapUrl": "https://surl.amap.com/2CSHeeqmucpO",
+      "price": 0,
+      "rating": 4.5,
       "date": "2025-10-04"
     },
     {
@@ -148,6 +148,20 @@
       "amapUrl": "https://surl.amap.com/2o11moca1beoO",
       "price": 140,
       "rating": 4.8
+    },
+    {
+      "name": "文化街早市",
+      "city": "黑龙江省黑河市",
+      "address": "爱辉区文化街与公园路交叉口东南20米",
+      "lng": 127.509001,
+      "lat": 50.24764,
+      "category": "早市",
+      "date": "2025-10-05",
+      "note": "是黑河非常棒的早市,什么都有的卖\n在那里买了一双手套,两个可爱毛帽子,两瓶牛肉酱,吃了一顿早点",
+      "articleUrl": "",
+      "amapUrl": "https://surl.amap.com/2JQxfPgm1g3kD",
+      "price": 20,
+      "rating": 4.6
     }
   ]
 }
