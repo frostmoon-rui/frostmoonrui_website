@@ -71,6 +71,13 @@ export async function handle(request,env,fetcher=fetch){
   response.headers.set('Cache-Control','private, no-store');response.headers.set('X-Robots-Tag','noindex, nofollow, noarchive, nosnippet, noimageindex');response.headers.set('Referrer-Policy','no-referrer');
  }
  if(/^\/(?:zh\/|en\/|ru\/|ja\/)?food-map\/(?:index\.html)?$/.test(url.pathname))response.headers.set('Content-Security-Policy',mapCsp);
+ if(/^\/(?:zh\/|en\/|ru\/|ja\/)?legacy(?:\/|$)/.test(url.pathname)&&asset.ok){
+  response.headers.set('X-Robots-Tag','noindex, nofollow');
+  const csp="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'";
+  if(/\/legacy\/(?:recording|talks\/\d{4}-\d{2}-\d{2})(?:\/index\.html|\/)?$/.test(url.pathname)){
+   response.headers.set('Content-Security-Policy',csp+'; frame-src https://player.bilibili.com');
+  }
+ }
  if(url.pathname==='/food-map/index.json'){
   response.headers.set('Content-Type','application/json; charset=utf-8');
   response.headers.set('Access-Control-Allow-Origin','*');

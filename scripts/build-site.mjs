@@ -7,11 +7,13 @@ import {exportFood,foodNotePath} from './food-export.mjs';
 import {documents,validateSite,validateDocument,surfaceCornerRadius,articleDate,foodArticle,foodLanguage} from '../shared/site-schema.js';
 import {resourcesBody,applicationBody,deskBody} from './community-pages.mjs';
 import {secretPage} from './secret-page.mjs';
+import {archivePages,archiveTitle} from './legacy-archive.mjs';
 import {applyChrome,aboutBody,friendsBody} from './site-chrome.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const catalog=loadCatalog(path.join(root,'content/ui.json'));
 const site=validateSite(JSON.parse(read('content/site.json')));
+const legacy=JSON.parse(read('content/legacy-archive.json'));
 const room=validateDocument('room',JSON.parse(read('content/about-secret.json')));
 const resources=validateDocument('resources',JSON.parse(read('content/resources.json')));
 const english=JSON.parse(read('content/pages.json'));
@@ -59,9 +61,20 @@ for(const locale of locales){
  const roomHtml=secretPage(room,site,locale,catalog);
  write(`${locale}/about-secret/index.html`,roomHtml);
  if(locale==='en')write('about-secret/index.html',roomHtml);
+ for(const page of archivePages(legacy,locale)){
+  const html=article({...page,path:page.route.slice(0,-1)})
+   .replace('<head>','<head><meta name="robots" content="noindex, nofollow"><link rel="stylesheet" href="/assets/legacy.css">')
+   .replace('class="article-layout"','class="article-layout legacy-layout"')
+   .replace('<h1>',page.lang?`<h1 lang="${page.lang}">`:'<h1>');
+  const navigationHtml=html.replace('<body>',`<body>${mobileNav}`)
+   .replace('<script src="/assets/site.js" defer>','<script type="module" src="/assets/site.js">');
+  const render=(options)=>applyChrome(localizeHtml(navigationHtml,locale,page.route,catalog,options),site,locale,page.route,catalog);
+  write(`${locale}/${page.route}index.html`,render());
+  if(locale==='en')write(`${page.route}index.html`,render({defaultEntry:true}));
+ }
  const text=key=>catalog[locale][key]||key;
  const credits=source[locale].find(p=>p.path==='about').body.replace(/^<p class="lead">[\s\S]*?<\/p>/,'');
- const about=aboutBody(site,locale,catalog).replace('<section class="studio-entry">',`<section class="about-credits">${credits}</section><section class="studio-entry">`);
+ const about=aboutBody(site,locale,catalog).replace('<section class="studio-entry">',`<section class="about-credits">${credits}</section><p><a class="text-link" href="${languagePath(locale,'legacy/')}">${escape(archiveTitle[locale])} <span aria-hidden="true">›</span></a></p><section class="studio-entry">`);
  const extra=[{path:'about',title:site.about[locale].title,label:text('A LITTLE INTRODUCTION'),description:site.about[locale].intro,body:about},{path:'links',title:text('Good company, on the open web.'),label:text('MY COMPANIONS'),description:text('Independent corners of the web, and the people who keep them growing.'),body:friendsBody(site,locale,catalog)}];
  extra[1].body+=applicationBody(locale,catalog);
  extra.push({path:'resources',title:text('Recommended links'),label:text('Resource collection'),description:text('A small shelf of useful places.'),body:resourcesBody(resources,locale,catalog)});
