@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-locale="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.jpg" type="image/jpeg">
+<title>星坠天文台</title>
+<link rel="stylesheet" href="/assets/astrofall.css">
+</head>
+<body>
+<div id="app">
+  <!-- Loading Screen -->
+  <div id="loader-screen">
+    <div class="orbital-spinner">
+      <div class="orbit-ring"></div>
+      <div class="orbit-ring-inner"></div>
+      <div class="moon-core"></div>
+    </div>
+    <div class="loader-title" id="loader-title">星坠天文台</div>
+    <div class="loader-bar-wrap" id="loader-progress" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="loader-bar-fill" id="loader-bar"></div></div>
+    <div class="loader-status" id="loader-status">正在初始化星图… 0%</div>
+  </div>
+
+  <!-- Title Screen -->
+  <div id="title-screen" class="hidden">
+    <div class="title-badge" id="t-badge">KNOWLEDGE-GATED PLATFORMER</div>
+    <h1 class="title-main" id="t-main">星坠天文台</h1>
+    <p class="title-sub" id="t-sub">在安全的前厅领悟一条关于「坠落与共振」的法则，然后用它改写光影、借势飞跃，揭开 16 间互通星室中早已摆在眼前的秘密路线。</p>
+    <div class="title-actions">
+      <button class="btn-primary" id="btn-start">开始探索</button>
+      <button class="btn-glass" id="btn-continue" style="display:none;">继续存档</button>
+      <button class="btn-glass" id="btn-title-settings">设置与存档</button>
+    </div>
+    <div class="lang-row" id="title-langs">
+      <button class="lang-pill active" data-lang="zh">中文</button>
+      <button class="lang-pill" data-lang="en">English</button>
+      <button class="lang-pill" data-lang="ru">Русский</button>
+      <button class="lang-pill" data-lang="ja">日本語</button>
+    </div>
+    <a class="test-notes-link" href="/zh/notes/astrofall-playtest/">返回公测文章</a>
+  </div>
+
+  <!-- Game Stage -->
+  <div id="stage-wrap">
+    <canvas id="game-canvas" width="960" height="540"></canvas>
+    <div id="room-spinner"><div class="mini-orbit"></div></div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" style="display:none;">
+    <div class="hud-group">
+      <div class="hud-pill"><span class="dot-gold"></span><span id="hud-room">星门前厅</span></div>
+      <div class="hud-pill" id="hud-cores"><span class="dot-gold"></span><span id="hud-cores-txt">星核 0/4</span></div>
+      <div class="hud-pill hide-sm" id="hud-shards"><span class="dot-lunar"></span><span id="hud-shards-txt">碎片 0/4</span></div>
+      <div class="hud-pill" id="hud-impact" data-grade="0"><span id="hud-impact-txt"></span><span class="impact-segments" aria-hidden="true"><i></i><i></i><i></i></span></div>
+      <div class="hud-pill hide-sm" id="hud-phase"><span class="dot-lunar" id="hud-phase-dot"></span><span id="hud-phase-txt">月光相位</span></div>
+    </div>
+    <div class="hud-group">
+      <button class="hud-btn" id="btn-hint" title="提示 (H)">💡 <span id="lbl-hint">提示</span></button>
+      <button class="hud-btn" id="btn-map" title="星图 (M)">🗺 <span id="lbl-map">星图</span></button>
+      <button class="hud-btn" id="btn-reset" title="重置房间 (R)">↺</button>
+      <button class="hud-btn" id="btn-audio" title="声音">🔊</button>
+      <button class="hud-btn" id="btn-fullscreen" type="button" aria-pressed="false">⛶</button>
+      <button class="hud-btn" id="btn-settings" title="设置">⚙</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="rotate-hint" hidden></div>
+
+  <!-- Keyboard Legend -->
+  <div id="key-bar" style="display:none;">
+    <span id="kb-move">A/D 移动</span>
+    <span>·</span>
+    <span id="kb-jump">Space 跳跃</span>
+    <span>·</span>
+    <span id="kb-act">E 互动</span>
+    <span>·</span>
+    <span id="kb-reset">R 重置房间</span>
+    <span>·</span>
+    <span id="kb-map">M 星图</span>
+  </div>
+
+  <!-- Touch Controls -->
+  <div id="touch-controls">
+    <div class="touch-cluster">
+      <button class="t-btn" id="tc-left">◀</button>
+      <button class="t-btn" id="tc-right">▶</button>
+    </div>
+    <div class="touch-cluster">
+      <button class="t-btn" id="tc-act">✦</button>
+      <button class="t-btn jump" id="tc-jump">▲</button>
+    </div>
+  </div>
+
+  <!-- Map Modal -->
+  <div class="modal-backdrop" id="modal-map">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title" id="m-map-title">天文台星图 (16 房间)</div>
+        <button class="modal-close" data-close="modal-map">×</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);" id="m-map-sub">金色边框为当前位置 · ★ 星核 · ✦ 隐藏星尘碎片</div>
+      <div class="map-grid" id="map-grid"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+        <button class="btn-glass" id="btn-warp-hub">返回大厅 (Hub)</button>
+        <button class="btn-glass" data-close="modal-map" id="btn-close-map">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hint Modal -->
+  <div class="modal-backdrop" id="modal-hint">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title" id="m-hint-title">分层观察提示</div>
+        <button class="modal-close" data-close="modal-hint">×</button>
+      </div>
+      <div id="hint-content"></div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-backdrop" id="modal-settings">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title" id="m-set-title">设置与存档管理</div>
+        <button class="modal-close" data-close="modal-settings">×</button>
+      </div>
+      <div class="setting-row">
+        <span id="s-lang-lbl">界面语言</span>
+        <div class="seg-group" id="set-langs">
+          <button class="seg-btn" data-lang="zh">中</button>
+          <button class="seg-btn" data-lang="en">EN</button>
+          <button class="seg-btn" data-lang="ru">RU</button>
+          <button class="seg-btn" data-lang="ja">日</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span id="s-sfx-lbl">机关与环境音效</span>
+        <div class="seg-group">
+          <button class="seg-btn" id="set-sfx-on">开启</button>
+          <button class="seg-btn" id="set-sfx-off">静音</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span id="s-bgm-lbl">深空环境背景音</span>
+        <div class="seg-group">
+          <button class="seg-btn" id="set-bgm-on">开启</button>
+          <button class="seg-btn" id="set-bgm-off">关闭</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span id="s-touch-lbl">屏幕触控按键</span>
+        <div class="seg-group">
+          <button class="seg-btn" id="set-touch-auto">自动</button>
+          <button class="seg-btn" id="set-touch-on">显示</button>
+          <button class="seg-btn" id="set-touch-off">隐藏</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span id="s-hand-lbl">左右手布局</span>
+        <div class="seg-group">
+          <button class="seg-btn" id="set-hand-std">左手方向</button>
+          <button class="seg-btn" id="set-hand-swap">右手方向</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span id="s-size-lbl">触控按键尺寸</span>
+        <div class="seg-group">
+          <button class="seg-btn" data-size="0.85">小</button>
+          <button class="seg-btn" data-size="1">中</button>
+          <button class="seg-btn" data-size="1.18">大</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-size:12px;color:var(--muted);" id="s-save-lbl">跨设备存档码（自动保存在本浏览器）</div>
+        <textarea class="save-box" id="save-code-box" placeholder="点击「导出存档」生成存档码，或粘贴存档码后点击「导入」"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+          <button class="btn-glass" id="btn-export-save">导出并复制</button>
+          <button class="btn-glass" id="btn-import-save">导入存档</button>
+          <button class="btn-glass" id="btn-new-game" style="border-color:rgba(248,113,113,0.45);color:#fca5a5;">重置全部进度</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ending Modal -->
+  <div class="modal-backdrop" id="modal-ending">
+    <div class="modal-card" style="text-align:center;">
+      <div class="title-badge" id="end-badge" style="display:inline-block;">OBSERVATORY REKINDLED</div>
+      <h2 class="title-main" id="end-title" style="font-size:28px;">星象重启</h2>
+      <p id="end-desc" style="font-size:14px;line-height:1.7;color:#cbd5e1;margin:12px 0 18px;"></p>
+      <div id="end-stats" style="font-size:13px;color:var(--gold);margin-bottom:18px;"></div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primary" id="btn-keep-exploring">继续自由探索</button>
+        <button class="btn-glass" id="btn-back-title">返回标题</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/astrofall.js" defer></script>
+</body>
+</html>

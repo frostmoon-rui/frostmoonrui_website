@@ -21,3 +21,16 @@ test('normal entry relies on CSS and cached return replays the same fixed openin
 test('cached return skips motion for either accessibility or owner preference',()=>{for(const options of [{reduced:true},{owner:true}]){const s=fixture(options);s.events.pageshow({persisted:true});assert.equal(s.animations.length,0);}});
 test('cached animation can be canceled when preferences or visibility change',()=>{for(const kind of ['reduced','owner','visibilitychange']){const s=fixture();s.events.pageshow({persisted:true});if(kind==='reduced'){s.media.matches=true;s.events.reduced();}else if(kind==='owner'){s.document.body.dataset.motion='false';s.events.owner();}else{s.document.visibilityState='hidden';s.events.visibilitychange();}assert.equal(s.canceled(),1);}});
 test('entry does not intercept navigation, forms or create simulated progress',()=>{const source=read('dist/assets/entry.js');assert.doesNotMatch(source,/preventDefault|fetch\(|localStorage|sessionStorage|addEventListener\('click'|addEventListener\('submit'/);assert.doesNotMatch(read('dist/assets/entry.css'),/width:100vw|white-space:nowrap/);});
+
+test('the public playtest article opens the standalone game without inline scripts',()=>{
+ for(const locale of ['en','zh','ru','ja']){
+  const sitePath=path=>fs.readFileSync(new URL(`../dist/${locale}/${path}/index.html`,import.meta.url),'utf8');
+  const article=sitePath('notes/astrofall-playtest');
+  const game=sitePath('play/astrofall');
+  assert.equal((article.match(new RegExp(`href="/${locale}/play/astrofall/"`,'g'))||[]).length,1);
+  assert.ok(game.includes(`data-locale="${locale}"`));
+  assert.ok(game.includes(`href="/${locale}/notes/astrofall-playtest/"`));
+  assert.match(game,/<script src="\/assets\/astrofall\.js" defer><\/script>/);
+  assert.doesNotMatch(game,/<script>|<style>/);
+ }
+});

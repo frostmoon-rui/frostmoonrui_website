@@ -24,6 +24,13 @@ for(const locale of locales.filter(code=>code!=='en')){
  source[locale]=JSON.parse(read(`content/pages.${locale}.json`));
  if(JSON.stringify(source[locale].map(p=>p.path))!==JSON.stringify(english.map(p=>p.path)))throw new Error(`Incomplete ${locale} article catalog`);
 }
+const astrofall=read('templates/astrofall.html');
+const astrofallShell={
+ zh:['星坠天文台','正在初始化星图…','返回公测文章'],
+ en:['Astrofall Observatory','Preparing the star map…','Back to the playtest article'],
+ ru:['Обсерватория «Звездопад»','Подготовка звёздной карты…','Назад к статье о тестировании'],
+ ja:['星墜の天文台','星図を準備しています…','プレイテスト記事に戻る']
+};
 const home=read('templates/home.html');
 const atlas=read('templates/food-map.html').replace('</head>','<link rel="stylesheet" href="/assets/map-tools.css"></head>');
 const notFound=read('templates/404.html');
@@ -54,6 +61,15 @@ for(const prefix of ['',...locales.map(locale=>`${locale}/`)]){
  }
 }
 for(const locale of locales){
+ const [gameTitle,loading,returnToNotes]=astrofallShell[locale];
+ const game=astrofall
+  .replace('<html lang="zh-CN" data-locale="zh">',`<html lang="${htmlLanguages[locale]}" data-locale="${locale}">`)
+  .replace(/<title>[^<]*<\/title>/,`<title>${escape(gameTitle)}</title>`)
+  .replace(/(id="loader-title">)[^<]*/,`$1${escape(gameTitle)}`)
+  .replace(/(id="loader-status">)[^<]*/,`$1${escape(loading)} 0%`)
+  .replace('<!--PUBLIC_TEST_NOTES-->',`<a class="test-notes-link" href="${languagePath(locale,'notes/astrofall-playtest/')}">${escape(returnToNotes)}</a>`);
+ write(`${locale}/play/astrofall/index.html`,game);
+ if(locale==='en')write('play/astrofall/index.html',game);
  const roomHtml=secretPage(room,site,locale,catalog);
  write(`${locale}/about-secret/index.html`,roomHtml);
  if(locale==='en')write('about-secret/index.html',roomHtml);
@@ -102,8 +118,12 @@ for(const locale of locales){
   const navigationHtml=html.includes('class="mobile-topbar"')?html:html.replace('<body>',`<body>${mobileNav}${html.includes('id="site-sidebar"')?'':`<div class="mobile-only-drawer">${aside}</div>`}`);
   let moduleHtml=navigationHtml.replace('<script src="/assets/site.js" defer>','<script type="module" src="/assets/site.js">');
   if(route==='studio/')moduleHtml=moduleHtml.replace('</section></main>',deskBody(locale,catalog)+'</section></main>');
-  write(`${locale}/${leaf}`,applyChrome(localizeHtml(moduleHtml,locale,route,catalog),site,locale,route,catalog));
-  if(locale==='en')write(leaf,applyChrome(localizeHtml(moduleHtml,locale,route,catalog,{defaultEntry:true}),site,locale,route,catalog));
+  const render=(options)=>{
+   const page=applyChrome(localizeHtml(moduleHtml,locale,route,catalog,options),site,locale,route,catalog);
+   return route==='notes/astrofall-playtest/'?page.replace('</head>','<style>@view-transition{navigation:none}</style></head>'):page;
+  };
+  write(`${locale}/${leaf}`,render());
+  if(locale==='en')write(leaf,render({defaultEntry:true}));
  }
 }
 const runtime=[

@@ -1,7 +1,7 @@
 // Resolve public page language before requesting HTML, never after first paint.
 import {notebookTopics} from '../shared/site-schema.js';
 const languages=new Set(['zh','en','ru','ja']);
-const pages=new Set(['','about','links','resources','studio','food-map','projects','privacy','about-secret','notes','notes/a-quieter-bot','notes/recovering-a-prototype','notes/a-map-with-boundaries']);
+const pages=new Set(['','about','links','resources','studio','food-map','projects','privacy','about-secret','notes','notes/a-quieter-bot','notes/recovering-a-prototype','notes/a-map-with-boundaries','notes/astrofall-playtest','play/astrofall']);
 export function languagePreference(request){
  const cookie=(request.headers.get('Cookie')||'').match(/(?:^|;\s*)frostmoon_language=(zh|en|ru|ja)(?:;|$)/)?.[1];
  if(cookie)return cookie;

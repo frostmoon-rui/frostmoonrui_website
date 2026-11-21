@@ -146,6 +146,7 @@ const membershipNames={
  'notes/a-quieter-bot':'Bot technical notes',
  'notes/recovering-a-prototype':'Hardware archive notes',
  'notes/a-map-with-boundaries':'Map privacy notes',
+ 'notes/astrofall-playtest':'Astrofall public playtest',
  'projects#gmn-bot':'Lucky Cat bot project',
  'projects#fire-rescue-vehicle':'Fire-rescue vehicle project',
  'projects#electrostatic-detection':'Electrostatic detection project',

@@ -469,7 +469,8 @@
     "Lucky Cat bot project": "Lucky Cat bot project",
     "Fire-rescue vehicle project": "Fire-rescue vehicle project",
     "Electrostatic detection project": "Electrostatic detection project",
-    "Food atlas project": "Food atlas project"
+    "Food atlas project": "Food atlas project",
+    "Astrofall public playtest": "Astrofall public playtest"
   },
   "zh": {
     "Food note": "美食文章正文",
@@ -941,7 +942,8 @@
     "Lucky Cat bot project": "招财猫项目",
     "Fire-rescue vehicle project": "消防救援车项目",
     "Electrostatic detection project": "静电检测项目",
-    "Food atlas project": "美食图集项目"
+    "Food atlas project": "美食图集项目",
+    "Astrofall public playtest": "星坠天文台公测文章"
   },
   "ru": {
     "Food note": "Заметка о заведении",
@@ -1413,7 +1415,8 @@
     "Lucky Cat bot project": "Проект бота Lucky Cat",
     "Fire-rescue vehicle project": "Проект пожарно-спасательной машины",
     "Electrostatic detection project": "Проект обнаружения статического электричества",
-    "Food atlas project": "Проект гастрономического атласа"
+    "Food atlas project": "Проект гастрономического атласа",
+    "Astrofall public playtest": "Открытое тестирование «Звездопада»"
   },
   "ja": {
     "Food note": "グルメ記事の本文",
@@ -1885,6 +1888,7 @@
     "Lucky Cat bot project": "招き猫ボットのプロジェクト",
     "Fire-rescue vehicle project": "消防救助車プロジェクト",
     "Electrostatic detection project": "静電気検出プロジェクト",
-    "Food atlas project": "グルメアトラスのプロジェクト"
+    "Food atlas project": "グルメアトラスのプロジェクト",
+    "Astrofall public playtest": "星墜の天文台の公開テスト"
   }
 }
