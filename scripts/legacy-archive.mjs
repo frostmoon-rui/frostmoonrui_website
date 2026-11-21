@@ -16,10 +16,10 @@ const statusCopy={
 };
 
 const platformCopy={
- zh:{help:'跳过缺口，抵达右侧旗帜。沿途有三枚星屑可以收集。用方向键、空格或屏幕按钮操作。',left:'向左',right:'向右',jump:'跳跃',shards:'星屑',cleared:'通关！',fell:'掉下去了',retry:'重新开始'},
- en:{help:'Jump across the gaps and reach the flag. Collect up to three stardust pieces along the way. Use the arrow keys, Space or the on-screen controls.',left:'Move left',right:'Move right',jump:'Jump',shards:'Stardust',cleared:'Level cleared!',fell:'You fell',retry:'Restart'},
- ru:{help:'Перепрыгните разрывы и доберитесь до флага. По пути можно собрать три частицы звёздной пыли. Используйте стрелки, пробел или экранные кнопки.',left:'Влево',right:'Вправо',jump:'Прыжок',shards:'Звёздная пыль',cleared:'Уровень пройден!',fell:'Вы упали',retry:'Начать заново'},
- ja:{help:'足場の間を跳び越えて旗を目指します。途中で星のかけらを3つ集められます。矢印キー、スペースキー、画面のボタンで操作できます。',left:'左へ移動',right:'右へ移動',jump:'ジャンプ',shards:'星のかけら',cleared:'クリア！',fell:'落ちてしまいました',retry:'最初から'}
+ zh:{help:'一路向右跳到旗帜，四关逐步加难。踩上带短旗的存档平台即可保存进度。方向键或屏幕按钮移动，空格或 ↑ 跳跃。',left:'向左',right:'向右',jump:'跳跃',shards:'星屑',level:'关卡',cleared:'本关通过！',completed:'四关全部通关！',fell:'掉下去了',retry:'重试本关',resume:'从存档点继续',saved:'已保存进度',next:'下一关',replay:'从第一关重玩'},
+ en:{help:'Jump right to the flag across four increasingly difficult levels. Land on a ledge with a small flag to save. Move with the arrow keys or on-screen buttons, and jump with Space or ↑.',left:'Move left',right:'Move right',jump:'Jump',shards:'Stardust',level:'Level',cleared:'Level cleared!',completed:'All four levels cleared!',fell:'You fell',retry:'Retry level',resume:'Resume from checkpoint',saved:'Checkpoint saved',next:'Next level',replay:'Replay from level one'},
+ ru:{help:'Прыгайте вправо к флагу. Каждый из четырёх уровней сложнее предыдущего. Приземление на платформу с маленьким флагом сохраняет игру. Стрелки и кнопки на экране отвечают за движение, пробел и ↑ за прыжок.',left:'Влево',right:'Вправо',jump:'Прыжок',shards:'Звёздная пыль',level:'Уровень',cleared:'Уровень пройден!',completed:'Все четыре уровня пройдены!',fell:'Вы упали',retry:'Повторить уровень',resume:'Продолжить с сохранения',saved:'Игра сохранена',next:'Следующий уровень',replay:'Сыграть с первого уровня'},
+ ja:{help:'右へ進み、旗を目指す全4ステージです。小さな旗のある足場に着地すると進行状況を保存できます。矢印キーか画面のボタンで移動し、スペースキーか ↑ でジャンプします。',left:'左へ移動',right:'右へ移動',jump:'ジャンプ',shards:'星のかけら',level:'ステージ',cleared:'ステージクリア！',completed:'全4ステージクリア！',fell:'落ちてしまいました',retry:'ステージをやり直す',resume:'チェックポイントから再開',saved:'進行状況を保存しました',next:'次のステージ',replay:'第1ステージから遊ぶ'}
 };
 
 export function archivePages(data,locale){
@@ -42,7 +42,7 @@ export function archivePages(data,locale){
   const labels=platformCopy[locale];
   const control=(name,symbol)=>`<button type="button" data-control="${name}" aria-label="${escape(labels[name])}">${symbol}</button>`;
   const controls=mode==='platform'?`<div class="legacy-move">${control('left','←')}${control('right','→')}</div>${control('jump','↑')}`:'';
-  const messages=mode==='platform'?` data-shard-label="${escape(labels.shards)}" data-cleared="${escape(labels.cleared)}" data-fell="${escape(labels.fell)}" data-retry="${escape(labels.retry)}"`:'';
+  const messages=mode==='platform'?` data-shard-label="${escape(labels.shards)}" data-cleared="${escape(labels.cleared)}" data-fell="${escape(labels.fell)}" data-retry="${escape(labels.retry)}" data-level-label="${escape(labels.level)}" data-completed="${escape(labels.completed)}" data-resume="${escape(labels.resume)}" data-saved="${escape(labels.saved)}" data-next="${escape(labels.next)}" data-replay="${escape(labels.replay)}"`:'';
   return `<p id="legacy-game-help">${escape(help)}</p><div class="legacy-game" data-legacy-game="${mode}" data-score="${escape(score)}" data-game-over="${escape(gameOver)}"${messages}><canvas width="720" height="360" tabindex="0" aria-label="${escape(label)}" aria-describedby="legacy-game-help"></canvas><div class="legacy-controls"><button type="button" data-start>${escape(start)}</button>${controls}<output aria-live="polite"></output></div></div><script type="module" src="/assets/legacy-game.js"></script>`;
  };
  const home=`<p class="lead">${escape(intro)}</p><ul class="legacy-grid">${[
