@@ -65,7 +65,8 @@ for(const locale of locales){
   const html=article({...page,path:page.route.slice(0,-1)})
    .replace('<head>','<head><meta name="robots" content="noindex, nofollow"><link rel="stylesheet" href="/assets/legacy.css">')
    .replace('class="article-layout"','class="article-layout legacy-layout"')
-   .replace('<h1>',page.lang?`<h1 lang="${page.lang}">`:'<h1>');
+   .replace('<h1>',page.lang?`<h1 lang="${page.lang}">`:'<h1>')
+   .replace('width=device-width,initial-scale=1',page.route==='legacy/platform/'?'width=device-width,initial-scale=1,viewport-fit=cover':'width=device-width,initial-scale=1');
   const navigationHtml=html.replace('<body>',`<body>${mobileNav}`)
    .replace('<script src="/assets/site.js" defer>','<script type="module" src="/assets/site.js">');
   const render=(options)=>applyChrome(localizeHtml(navigationHtml,locale,page.route,catalog,options),site,locale,page.route,catalog);
