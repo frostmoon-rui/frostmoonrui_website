@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import {validateDocument,locales,articleDate,foodArticle} from '../shared/site-schema.js';
+import {validateDocument,locales,articleDate,foodArticle,notebookTopics} from '../shared/site-schema.js';
 const read=file=>fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
 async function fixture(documentResult){
  const storage=new Map(),elements=new Map(),events={},bodyClasses=new Set(),confirmations=[];
@@ -11,7 +11,7 @@ async function fixture(documentResult){
  const document={createElement:node,getElementById:id=>{if(!elements.has(id)){if(['studio-check','studio-restore','studio-connection','studio-repository-state'].includes(id))return null;const n=node();n.connected=true;n.id=id;}return elements.get(id);},body:{classList:{contains:key=>bodyClasses.has(key)}},querySelectorAll:()=>[],addEventListener:(key,callback)=>{events[key]=callback;}};
  class MutationObserver{constructor(callback){events.theme=callback;}observe(){}}
  const source=read('dist/assets/studio.js').replace(/^import[^\n]*\n/gm,'');
- const result=await vm.runInNewContext('(async()=>{'+source+';return {state,busy,preview,loadDocument,verifyRepository,friendly,renderFields,editorViews,localDraft};})()',{document,window:{addEventListener(){}},MutationObserver,setTimeout,clearTimeout,localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)},validateDocument,locales,articleDate,foodArticle,t:key=>key,locale:'en',structuredClone,AbortSignal,requestAnimationFrame:callback=>callback(),confirm:message=>{confirmations.push(message);return result?.allowConfirm??true;},fetch:async (url,options)=>({ok:true,json:async()=>url.includes('/document?')?(typeof documentResult==='function'?documentResult(url,options):documentResult):{authenticated:false,configured:true}})});
+ const result=await vm.runInNewContext('(async()=>{'+source+';return {state,busy,preview,loadDocument,verifyRepository,friendly,renderFields,editorViews,localDraft};})()',{document,window:{addEventListener(){}},MutationObserver,setTimeout,clearTimeout,localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)},validateDocument,locales,articleDate,foodArticle,notebookTopics,t:key=>key,locale:'en',structuredClone,AbortSignal,requestAnimationFrame:callback=>callback(),confirm:message=>{confirmations.push(message);return result?.allowConfirm??true;},fetch:async (url,options)=>({ok:true,json:async()=>url.includes('/document?')?(typeof documentResult==='function'?documentResult(url,options):documentResult):{authenticated:false,configured:true}})});
  const original=JSON.parse(read('content/site.json'));Object.assign(result.state,{value:structuredClone(original),original:structuredClone(original),canPublish:true});document.getElementById('studio-preview-page').value='home';document.getElementById('studio-editor').hidden=false;result.allowConfirm=true;result.busy(false);
  return {...result,elements,events,bodyClasses,confirmations,original,context:result};
 }
@@ -113,4 +113,38 @@ test('food article dates preserve legacy dates until explicitly cleared',()=>{
   invalid.spots[0].date='2026-02-30';
   assert.throws(()=>validateDocument('food',invalid,original),/valid article date/);
  }
+});
+
+test('a shared membership appears once per category and links back to all its topics',()=>{
+ for(const locale of locales){
+  const prefix=`dist/${locale}`;
+  const mapPath=`/${locale}/notes/a-map-with-boundaries/`;
+  const projectPath=`/${locale}/projects/#food-atlas`;
+  for(const key of ['software','maps']){
+   const index=read(`${prefix}/notes/category/${key}/index.html`);
+   assert.ok(index.includes(`<li><a href="${mapPath}">`));
+   assert.ok(index.includes(`<li><a href="${projectPath}">`));
+  }
+  const article=read(`${prefix}/notes/a-map-with-boundaries/index.html`);
+  for(const key of ['software','maps'])assert.ok(article.includes(`/${locale}/notes/category/${key}/`));
+  assert.ok(article.includes('class="notebook-related"'));
+  assert.ok(read(`${prefix}/projects/index.html`).includes('id="food-atlas"'));
+ }
+});
+
+test('the shared category editor sets several topics without rewriting article content',async()=>{
+ const s=await fixture();
+ const value=JSON.parse(read('content/taxonomy.json'));
+ Object.assign(s.state,{key:'taxonomy',value,original:structuredClone(value)});
+ s.renderFields();
+ const find=(node,predicate)=>predicate(node)?node:(node.children||[]).map(child=>find(child,predicate)).find(Boolean);
+ const group=find(s.elements.get('studio-fields'),node=>node.tagName==='FIELDSET'&&node.children[0]?.textContent==='Bot technical notes');
+ const option=group.children.find(node=>node.children[1]?.textContent==='Hardware').children[0];
+ option.checked=true;
+ option.events.change();
+ assert.deepEqual(Array.from(s.state.value.members['notes/a-quieter-bot']),['software','automation','hardware']);
+ option.checked=false;
+ option.events.change();
+ assert.deepEqual(Array.from(s.state.value.members['notes/a-quieter-bot']),['software','automation']);
+ assert.throws(()=>validateDocument('taxonomy',{schemaVersion:1,members:{'notes/example':['maps','maps']}}),/distinct categories/);
 });

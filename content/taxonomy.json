@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "members": {
+    "notes/a-quieter-bot": [
+      "software",
+      "automation"
+    ],
+    "notes/recovering-a-prototype": [
+      "hardware"
+    ],
+    "notes/a-map-with-boundaries": [
+      "software",
+      "maps"
+    ],
+    "projects#gmn-bot": [
+      "software",
+      "automation"
+    ],
+    "projects#fire-rescue-vehicle": [
+      "hardware",
+      "software"
+    ],
+    "projects#electrostatic-detection": [
+      "hardware"
+    ],
+    "projects#food-atlas": [
+      "food",
+      "maps",
+      "software"
+    ]
+  }
+}

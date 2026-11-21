@@ -1,6 +1,7 @@
 // Resolve public page language before requesting HTML, never after first paint.
+import {notebookTopics} from '../shared/site-schema.js';
 const languages=new Set(['zh','en','ru','ja']);
-const pages=new Set(['','about','links','resources','studio','food-map','projects','privacy','about-secret','notes','notes/category/food','notes/category/software','notes/category/hardware','notes/a-quieter-bot','notes/recovering-a-prototype','notes/a-map-with-boundaries']);
+const pages=new Set(['','about','links','resources','studio','food-map','projects','privacy','about-secret','notes','notes/a-quieter-bot','notes/recovering-a-prototype','notes/a-map-with-boundaries']);
 export function languagePreference(request){
  const cookie=(request.headers.get('Cookie')||'').match(/(?:^|;\s*)frostmoon_language=(zh|en|ru|ja)(?:;|$)/)?.[1];
  if(cookie)return cookie;
@@ -16,7 +17,8 @@ export function localizedAsset(request){
  if(!['GET','HEAD'].includes(request.method))return null;
  const route=url.pathname.replace(/^\//,'').replace(/(?:\/index\.html|\/$)/,'');
  const page=route==='index.html'?'':route;
- if(!pages.has(page)&&!/^notes\/food\/[a-f0-9]{24}$/.test(page))return null;
+ const topic=page.match(/^notes\/category\/([a-z-]+)$/)?.[1];
+ if(!pages.has(page)&&!Object.hasOwn(notebookTopics,topic)&&!/^notes\/food\/[a-f0-9]{24}$/.test(page))return null;
  url.pathname='/'+languagePreference(request)+'/'+(page?page+'/':'');
  return url;
 }

@@ -1,5 +1,5 @@
 import {translate as t,locale} from './i18n.js';
-import {validateDocument,locales,surfaceCornerRadius,articleDate,foodArticle} from './site-schema.js';
+import {validateDocument,locales,surfaceCornerRadius,articleDate,foodArticle,notebookTopics} from './site-schema.js';
 const $=id=>document.getElementById(id),state={key:'site',value:null,original:null,sha:null,csrf:null,dirty:false,busy:false,canPublish:false,editLocale:locale,json:false,access:null,writeUncertain:false,saveIntent:null};
 const fieldNames={schemaVersion:'Schema version',displayName:'Display name',appearance:'Appearance',accent:'Accent color',highlight:'Highlight color',radius:'Corner radius',motion:'Enable motion',home:'Home',eyebrow:'Eyebrow',title:'Title',description:'Description',about:'About',intro:'Introduction',sections:'Sections',text:'Text',contacts:'Contacts',id:'Item ID',url:'URL',label:'Label',note:'Hover note',friends:'Companions',name:'Name',linksUrl:'Companion page URL',body:'Article body',date:'Article date',countryCode:'Country or region code (e.g. IT)',localLanguage:'Local language code (e.g. it)',localNote:'Local-language translation',path:'Page path',category:'Category',city:'City',address:'Address',lng:'Longitude',lat:'Latitude',generatedAt:'Updated timestamp',spots:'Original venues',price:'Price',rating:'Rating',avatar:'Avatar image',articleUrl:'Article URL',amapUrl:'Amap URL'};
 fieldNames.links='Recommended links';fieldNames.entries='Entries';
@@ -141,16 +141,48 @@ function rememberFields(host){
  const view=editorView(host._studioViewKey);view.top=host.scrollTop||0;view.left=host.scrollLeft||0;
  for(const group of host.querySelectorAll?.('details.schema-group')||[])view.groups.set(group._fieldPath,group.open);
 }
+const topicChoices=Object.entries(notebookTopics).filter(([key])=>key!=='uncategorized');
+const membershipNames={
+ 'notes/a-quieter-bot':'Bot technical notes',
+ 'notes/recovering-a-prototype':'Hardware archive notes',
+ 'notes/a-map-with-boundaries':'Map privacy notes',
+ 'projects#gmn-bot':'Lucky Cat bot project',
+ 'projects#fire-rescue-vehicle':'Fire-rescue vehicle project',
+ 'projects#electrostatic-detection':'Electrostatic detection project',
+ 'projects#food-atlas':'Food atlas project'
+};
+function categoryField(value,path,label){
+ const box=node('fieldset',undefined,'studio-category-field');
+ box.append(node('legend',label));
+ const checked=new Set(value);
+ for(const [key,name] of topicChoices){
+  if(state.key==='food'&&key==='food')continue;
+  const option=node('label');
+  const input=node('input');
+  input.type='checkbox';
+  input.checked=checked.has(key);
+  input.addEventListener('change',()=>{
+   if(input.checked)checked.add(key);else checked.delete(key);
+   set(path,[...checked]);
+  });
+  option.append(input,node('span',t(name)));
+  box.append(option);
+ }
+ return box;
+}
 function field(value,path,label){
+ if((state.key==='taxonomy'&&path[0]==='members'&&path.length===2)||path.at(-1)==='notebookCategories'){
+  return categoryField(value,path,t(membershipNames[path.at(-1)]||label));
+ }
  if(Array.isArray(value))return disclosure(path,label+' · '+value.length,group=>{value.forEach((item,index)=>{const wrap=node('div',undefined,'schema-array-item');wrap.append(field(item,[...path,index],String(index+1)));if(!state.key.startsWith('pages-')){for(const [offset,label] of [[-1,'Move up'],[1,'Move down']]){const move=node('button',t(label));move.type='button';move.disabled=index+offset<0||index+offset>=value.length;move.addEventListener('click',()=>{if(state.busy)return;value.splice(index+offset,0,value.splice(index,1)[0]);changed();renderFields();});wrap.append(move);}const remove=node('button',t('Remove item'));remove.type='button';remove.addEventListener('click',()=>{value.splice(index,1);changed();renderFields();});wrap.append(remove);}group.append(wrap);});if(!state.key.startsWith('pages-')){const add=node('button',t('Add item'),'array-add');add.type='button';add.addEventListener('click',()=>{value.push(arrayTemplate(path));changed();renderFields();});group.append(add);}});
  if(value&&typeof value==='object')return disclosure(path,label,group=>{let entries=Object.entries(value);if(locales.every(code=>Object.hasOwn(value,code)))entries=entries.filter(([key])=>key===state.editLocale);if(state.key==='food'&&path[0]==='spots'&&path.length===2){
-  entries=entries.filter(([key])=>!['date','note','countryCode','localLanguage','localNote'].includes(key));
-  entries.push(['countryCode',value.countryCode??''],['date',foodArticle(value).date],['note',value.note??''],['localLanguage',value.localLanguage??''],['localNote',value.localNote??'']);
+  entries=entries.filter(([key])=>!['date','note','countryCode','localLanguage','localNote','notebookCategories'].includes(key));
+  entries.push(['countryCode',value.countryCode??''],['notebookCategories',value.notebookCategories??[]],['date',foodArticle(value).date],['note',value.note??''],['localLanguage',value.localLanguage??''],['localNote',value.localNote??'']);
  }
  if(state.key.startsWith('pages-')&&path.length===1){
   entries=entries.filter(([key])=>key!=='date');
   entries.splice(entries.findIndex(([key])=>key==='body'),0,['date',articleDate(value)]);
- }if(state.key==='food'&&path.length===0)entries=entries.filter(([key])=>['generatedAt','spots'].includes(key));for(const [key,item] of entries)group.append(field(item,[...path,key],locales.includes(key)?key.toUpperCase():t(state.key==='food'&&key==='note'?'Food note':fieldNames[key]||key)));});
+ }if(state.key==='food'&&path.length===0)entries=entries.filter(([key])=>['generatedAt','spots'].includes(key));for(const [key,item] of entries)group.append(field(item,[...path,key],locales.includes(key)?key.toUpperCase():t(state.key==='food'&&key==='note'?'Food note':fieldNames[key]||({members:'Category assignments',notebookCategories:'Additional categories'}[key])||key)));});
  const wrap=node('label',undefined,'schema-field');wrap.append(node('span',label));const last=path.at(-1);
  if(last==='body'&&state.key.startsWith('pages-')){const container=node('div');const toolbar=node('div',undefined,'rich-toolbar');const body=node('div',undefined,'rich-body');body.contentEditable='true';body.setAttribute('role','textbox');body.setAttribute('aria-label',label);body.setAttribute('aria-multiline','true');body.innerHTML=value;for(const [caption,command,argument] of [['B','bold'],['I','italic'],['H2','formatBlock','h2'],['¶','formatBlock','p'],['•','insertUnorderedList']]){const button=node('button',caption);button.type='button';button.addEventListener('mousedown',event=>event.preventDefault());button.addEventListener('click',()=>{body.focus();document.execCommand(command,false,argument);set(path,body.innerHTML);});toolbar.append(button);}body.addEventListener('input',()=>set(path,body.innerHTML));body.addEventListener('paste',event=>{event.preventDefault();document.execCommand('insertText',false,event.clipboardData.getData('text/plain'));set(path,body.innerHTML);});container.append(toolbar,body);wrap.append(container);return wrap;}
  const numeric=typeof value==='number'||(value===null&&['price','rating'].includes(last));const input=node(typeof value==='string'&&(value.length>90||['text','description','intro','title','note','localNote'].includes(last))?'textarea':'input');if(input.tagName==='TEXTAREA')input.rows=value.length>250?5:3;else input.type=typeof value==='boolean'?'checkbox':numeric?'number':last==='date'?'date':['accent','highlight'].includes(last)?'color':'text';if(numeric)input.step='any';if(typeof value==='boolean')input.checked=value;else input.value=value??'';if(['path','schemaVersion','coordinateSystem','generatedAt'].includes(last))input.readOnly=true;input.addEventListener('input',()=>set(path,typeof value==='boolean'?input.checked:numeric?(input.value===''?null:Number(input.value)):input.value));wrap.append(input);return wrap;
@@ -179,6 +211,7 @@ function preview(){
   else if(state.key==='site'){accent=value.appearance.accent;radius=surfaceCornerRadius(value.appearance.radius);const section=$('studio-preview-page').value;if(section==='home'){const home=value.home[code];markup=`<p class="eyebrow">${esc(home.eyebrow)}</p><h1>${esc(home.title).replace(/\n/g,'<br>')}</h1><p class="lead">${esc(home.description).replace(/\n/g,'<br>')}</p><img class="landscape" src="/assets/moon-landscape.svg" alt="">`;}else if(section==='about'){const about=value.about[code];markup=`<img class="portrait" src="/assets/avatar-portrait.jpg" alt=""><h1>${esc(about.title)}</h1><p class="lead">${esc(about.intro)}</p>`+about.sections.map(s=>`<section><h2>${esc(s.title)}</h2><p>${esc(s.text).replace(/\n/g,'<br>')}</p></section>`).join('');}else markup=`<h1>${esc(t('My companions ↗'))}</h1>`+value.friends.map(friend=>`<section><h2>${esc(friend.name)}</h2><p>${esc(friend.description[code])}</p><small>${esc(friend.url)}</small></section>`).join('');markup+=`<section class="contacts">${value.contacts.map(contact=>`<span title="${esc(contact.note[code])}">${esc(contact.label[code])}</span>`).join('')}</section>`;}
   else if(state.key.startsWith('pages-')){const index=Math.min(Number($('studio-preview-page').value)||0,value.length-1);const page=value[index];markup=`<small>${esc(page.label)}</small><h1>${esc(page.title)}</h1>${articleDate(page)?`<time>${esc(articleDate(page))}</time>`:''}${page.body}`;}
   else if(state.key==='room'){const entry=value.entries[code];markup=`<h1>${esc(entry.title)}</h1><p class="lead">${esc(entry.intro)}</p>`+entry.sections.map(section=>`<section><h2>${esc(section.title)}</h2><p>${esc(section.text).replace(/\n/g,'<br>')}</p></section>`).join('');}
+  else if(state.key==='taxonomy')markup=`<h1>${esc(t('Article and project categories'))}</h1>`+Object.entries(value.members).map(([key,topics])=>`<section><h2>${esc(t(membershipNames[key]||key))}</h2><p>${esc((topics.length?topics:['uncategorized']).map(topic=>t(notebookTopics[topic])).join(' · '))}</p></section>`).join('');
   else if(state.key==='resources')markup=`<h1>${esc(t('Recommended links'))}</h1>`+value.links.map(item=>`<section><h2>${esc(item.name)}</h2><p>${esc(item.description[code])}</p><small>${esc(item.url)}</small></section>`).join('');
   else markup=`<h1>${esc(t('Interface translations'))}</h1>`+Object.entries(value[code]).slice(0,40).map(([key,text])=>`<section><small>${esc(key)}</small><p>${esc(text)}</p></section>`).join('');
  }catch(error){markup=`<h2>${esc(t('Review the draft fields before publishing.'))}</h2><p>${esc(error.message)}</p>`;}

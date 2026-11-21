@@ -26,3 +26,8 @@
   .studio-main .schema-group { padding-inline:8px; }
   .studio-main .schema-array-item { padding-inline:8px; }
 }
+
+.studio-category-field{display:flex;flex-wrap:wrap;gap:8px 14px;border:1px solid var(--line);border-radius:var(--corner-sm,18px);margin:0 0 14px;padding:8px 12px;min-width:0}
+.studio-category-field legend{font-weight:600;font-size:12px;overflow-wrap:anywhere}
+.studio-category-field label{display:flex;align-items:center;gap:6px;min-height:36px;font-size:12px}
+.studio-category-field input[type=checkbox]{padding:0;accent-color:var(--accent)}
