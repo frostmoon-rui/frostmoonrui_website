@@ -81,3 +81,5 @@ body[data-motion=false] .about-prologue .about-portrait:hover img{transform:none
 .notebook-related{margin-top:36px}
 .notebook-related ul{display:flex;flex-wrap:wrap;gap:9px;padding:0;list-style:none}
 .project-row[id]{scroll-margin-top:90px}
+
+.project-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}

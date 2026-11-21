@@ -470,7 +470,8 @@
     "Fire-rescue vehicle project": "Fire-rescue vehicle project",
     "Electrostatic detection project": "Electrostatic detection project",
     "Food atlas project": "Food atlas project",
-    "Astrofall public playtest": "Astrofall public playtest"
+    "Astrofall public playtest": "Astrofall public playtest",
+    "Astrofall Observatory project": "Astrofall Observatory project"
   },
   "zh": {
     "Food note": "美食文章正文",
@@ -943,7 +944,8 @@
     "Fire-rescue vehicle project": "消防救援车项目",
     "Electrostatic detection project": "静电检测项目",
     "Food atlas project": "美食图集项目",
-    "Astrofall public playtest": "星坠天文台公测文章"
+    "Astrofall public playtest": "星坠天文台公测文章",
+    "Astrofall Observatory project": "星坠天文台项目"
   },
   "ru": {
     "Food note": "Заметка о заведении",
@@ -1416,7 +1418,8 @@
     "Fire-rescue vehicle project": "Проект пожарно-спасательной машины",
     "Electrostatic detection project": "Проект обнаружения статического электричества",
     "Food atlas project": "Проект гастрономического атласа",
-    "Astrofall public playtest": "Открытое тестирование «Звездопада»"
+    "Astrofall public playtest": "Открытое тестирование «Звездопада»",
+    "Astrofall Observatory project": "Проект «Обсерватория Звездопад»"
   },
   "ja": {
     "Food note": "グルメ記事の本文",
@@ -1889,6 +1892,7 @@
     "Fire-rescue vehicle project": "消防救助車プロジェクト",
     "Electrostatic detection project": "静電気検出プロジェクト",
     "Food atlas project": "グルメアトラスのプロジェクト",
-    "Astrofall public playtest": "星墜の天文台の公開テスト"
+    "Astrofall public playtest": "星墜の天文台の公開テスト",
+    "Astrofall Observatory project": "星墜の天文台プロジェクト"
   }
 }
