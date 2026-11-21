@@ -206,83 +206,67 @@
   ],
   "tools": [
     {
-      "label": "精品软件合集",
-      "url": "https://mp.weixin.qq.com/s/EWt4534yRdZhS6ASF2CLFw"
+      "label": "空投快传 · AirPortal",
+      "url": "https://www.airportal.cn/"
     },
     {
-      "label": "😎空投快传（手机应用“AirPortal”）",
-      "url": "https://airportal.cn/"
+      "label": "广告软件清理 · AdwCleaner",
+      "url": "https://www.malwarebytes.com/adwcleaner"
     },
     {
-      "label": "🅰️流氓软件清理【提取码ERIC】SoftCnKiller_V2",
-      "url": "https://pan.baidu.com/s/1M3XeJPWW1B8OQYhhx29ZvQ"
+      "label": "老毛桃 WinPE",
+      "url": "https://www.laomaotao.net/"
     },
     {
-      "label": "🍑老毛桃",
-      "url": "http://lmt.ycrsjy.top/"
-    },
-    {
-      "label": "🦅展翅高飞",
-      "url": "http://www.4399.com/flash/102429_4.htm"
-    },
-    {
-      "label": "💫热铁盒官方网站",
+      "label": "热铁盒官方网站",
       "url": "https://www.retiehe.com/"
     },
     {
-      "label": "✴️打印机L801 EPSON",
-      "url": "https://www.epson.com.cn/apps/tech_support/faq/QA-content.aspx?ColumnId=30583&ArticleId=37394&pg=&view=&columnid2=30583"
+      "label": "爱普生 Epson L801 驱动与支持",
+      "url": "https://www.epson.com.cn/services/supportproduct.html?p=bc36acbd87bb4b3fa5edfcb78c291065"
     },
     {
-      "label": "🅰️APPinventor(请用外网打开)",
+      "label": "MIT App Inventor",
       "url": "https://ai2.appinventor.mit.edu/"
     },
     {
-      "label": "😜单词表",
-      "url": "https://tool.retiehe.com/wordlist"
+      "label": "单词卡 · Anki",
+      "url": "https://apps.ankiweb.net/"
     },
     {
-      "label": "😜计时",
-      "url": "https://tool.retiehe.com/timer"
+      "label": "在线计时器 · timeanddate",
+      "url": "https://www.timeanddate.com/timer/"
     },
     {
-      "label": "😜工具箱",
-      "url": "https://tool.retiehe.com/"
+      "label": "在线工具箱 · tool.lu",
+      "url": "https://tool.lu/"
     },
     {
-      "label": "😜青柠",
-      "url": "https://limestart.cn/"
+      "label": "青柠起始页",
+      "url": "https://www.limestart.cn/"
     },
     {
-      "label": "📔百度文库",
-      "url": "https://wenku.baidu.com/"
+      "label": "Microsoft Learn · C/C++ 文档",
+      "url": "https://learn.microsoft.com/zh-cn/cpp/"
     },
     {
-      "label": "🔍天眼查",
-      "url": "https://www.tianyancha.com/"
+      "label": "二维码生成 · 草料二维码",
+      "url": "https://cli.im/"
     },
     {
-      "label": "📔C++微软",
-      "url": "https://docs.microsoft.com/zh-cn/learn/paths/csharp-first-steps/"
+      "label": "LED 跑马灯 · LEDSCROLL",
+      "url": "https://aledscroller.com/zh-CN/"
     },
     {
-      "label": "🔳微微",
-      "url": "https://www.wwei.cn/"
-    },
-    {
-      "label": "📈跑马灯（字符飘荡）",
-      "url": "https://tool.retiehe.com/marquee"
-    },
-    {
-      "label": "📇随机抽号",
+      "label": "随机抽号",
       "url": "https://random.shangzhenyang.com/"
     },
     {
-      "label": "📋文本编辑器",
-      "url": "https://tool.retiehe.com/texteditor"
+      "label": "在线文本编辑器 · Text Editor",
+      "url": "https://texteditor.co/"
     },
     {
-      "label": "📆文本编码器",
+      "label": "文本编码器",
       "url": "https://encoder.shangzhenyang.com/"
     }
   ],
@@ -295,33 +279,16 @@
     "因此，我们真诚希望您在条件允许的情况下捐助我们一块钱。如果大部分用户都这样做，我们就能顺利地继续提供更加优质的服务。",
     "谢谢您！"
   ],
-  "projectVideo": "http://video.mbm01.cn/nyg22w/a666G_elqfl",
   "recording": {
     "bvid": "BV1Ut42147YK",
     "aid": 1801200793,
     "cid": 1451023889
   },
-  "recording2024": "https://h5.fenliu.cn/showonly/M666G_uQ6dhaJ",
   "audit": {
     "date": "2026-11-21",
     "unavailableVideos": [
       "BV1GP4y1K7Ef",
       "BV16U4y197oG"
-    ],
-    "links": {
-      "https://mp.weixin.qq.com/s/EWt4534yRdZhS6ASF2CLFw": "unavailable",
-      "http://lmt.ycrsjy.top/": "connection",
-      "https://www.epson.com.cn/apps/tech_support/faq/QA-content.aspx?ColumnId=30583&ArticleId=37394&pg=&view=&columnid2=30583": "redirected",
-      "https://tool.retiehe.com/wordlist": "connection",
-      "https://tool.retiehe.com/timer": "connection",
-      "https://tool.retiehe.com/": "connection",
-      "https://wenku.baidu.com/": "verification",
-      "https://www.tianyancha.com/": "region",
-      "https://docs.microsoft.com/zh-cn/learn/paths/csharp-first-steps/": "redirected",
-      "https://www.wwei.cn/": "connection",
-      "https://tool.retiehe.com/marquee": "connection",
-      "https://tool.retiehe.com/texteditor": "connection",
-      "https://space.bilibili.com/551858934/channel/seriesdetail?sid=2290897&ctype=0": "verification"
-    }
+    ]
   }
 }

@@ -16,10 +16,10 @@ test('each localized About has one archive entry and the main navigation omits i
  assert.doesNotMatch(read('data/bot-site.json'),/legacy/);
 });
 
-test('all archived talks and six other pages build in each locale with unlisted metadata',()=>{
+test('all archived talks and remaining archive pages build in each locale with unlisted metadata',()=>{
  for(const locale of locales){
   const prefix=locale+'/legacy/';
-  for(const route of ['','talks/','project/','controller/','recording/','recording-2024/','jump/','platform/']){
+  for(const route of ['','talks/','recording/','jump/','platform/']){
    assert.match(read(prefix+route+'index.html'),/name="robots" content="noindex, nofollow"/);
   }
   const directory=read(prefix+'talks/index.html');
@@ -53,10 +53,14 @@ test('archive permits Bilibili frames only on recording and talk detail pages',a
  assert.doesNotMatch(result.headers.get('content-security-policy'),/bilibili/);
 });
 
-test('archive keeps confirmed unavailable links as text and preserves uncertain links',()=>{
- const page=read('zh/legacy/index.html');
- assert.match(page,/精品软件合集[^<]*<\/span><small[^>]+data-legacy-status="unavailable"/);
- assert.doesNotMatch(page,/mp\.weixin\.qq\.com/);
- assert.match(page,/href="https:\/\/tool\.retiehe\.com\/wordlist"/);
- assert.match(page,/data-legacy-status="connection"/);
+test('archive toolbox only contains verified replacements and retained links',()=>{
+ for(const locale of locales){
+  const page=read(locale+'/legacy/index.html');
+  for(const {url} of data.tools){
+   assert.ok(url.startsWith('https://'));
+   assert.ok(page.includes(`href="${url.replaceAll('&','&amp;')}"`));
+  }
+  assert.doesNotMatch(page,/tool\.retiehe\.com|mp\.weixin\.qq\.com|pan\.baidu\.com|wwei\.cn|102429\.htm|legacy-disabled|legacy\/(?:controller|project|recording-2024)\//);
+  assert.doesNotMatch(read(locale+'/legacy/talks/index.html'),/seriesdetail/);
+ }
 });
