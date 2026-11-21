@@ -4,8 +4,17 @@ const ctx=canvas.getContext('2d');
 const output=game.querySelector('output');
 const platformMode=game.dataset.legacyGame==='platform';
 const width=canvas.width,height=canvas.height,ground=height-45,size=24;
-const platforms=[{x:0,y:ground,w:width,h:16}];
-if(platformMode)platforms.push({x:165,y:255,w:165,h:13},{x:390,y:190,w:160,h:13});
+const course=[
+ {x:0,y:ground,w:154,h:19},
+ {x:215,y:268,w:104,h:16},
+ {x:382,y:221,w:111,h:16},
+ {x:551,y:176,w:169,h:19}
+];
+const platforms=platformMode?course:[{x:0,y:ground,w:width,h:16}];
+const goalX=677,goalY=course.at(-1).y;
+const startButton=game.querySelector('[data-start]');
+const shardPositions=course.slice(1).map(p=>({x:p.x+p.w*.42,y:p.y-size*.55}));
+let shards=[];
 const controls=new Set();
 let player,obstacles,score,spawn,nextFrame,lastFrame,running;
 
@@ -18,7 +27,39 @@ function paint(){
   ctx.fillStyle=theme.getPropertyValue(color).trim();
   ctx.fill();
  }
- for(const p of platforms)shape(p.x,p.y,p.w,p.h,'--muted',5);
+ if(platformMode){
+  const sky=ctx.createLinearGradient(0,0,0,height);
+  sky.addColorStop(0,theme.getPropertyValue('--soft').trim());
+  sky.addColorStop(1,theme.getPropertyValue('--bg').trim());
+  ctx.fillStyle=sky;
+  ctx.fillRect(0,0,width,height);
+  ctx.fillStyle=theme.getPropertyValue('--accent').trim();
+  ctx.globalAlpha=.2;
+  ctx.beginPath();
+  ctx.arc(586,81,43,0,Math.PI*2);
+  ctx.fill();
+  ctx.globalAlpha=.45;
+  for(const [x,y] of [[91,78],[140,131],[248,55],[342,155],[436,96],[541,58],[668,119]]){
+   ctx.fillRect(x,y,4,4);
+  }
+  ctx.globalAlpha=1;
+  for(const p of platforms){
+   shape(p.x,p.y+5,p.w,p.h+3,'--soft',7);
+   shape(p.x,p.y,p.w,p.h,'--muted',7);
+  }
+  for(const {x,y,collected} of shards){
+   if(collected)continue;
+   ctx.save();
+   ctx.translate(x,y);
+   ctx.rotate(Math.PI/4);
+   shape(-6,-6,12,12,'--gold',2);
+   ctx.restore();
+  }
+  shape(goalX-3,goalY-66,6,66,'--muted',2);
+  shape(goalX-3,goalY-66,34,21,'--accent',5);
+ }else{
+  for(const p of platforms)shape(p.x,p.y,p.w,p.h,'--muted',5);
+ }
  for(const obstacle of obstacles)shape(obstacle.x,ground-obstacle.h,obstacle.w,obstacle.h,'--accent',6);
  shape(player.x,player.y,size,size,'--ink',7);
 }
@@ -27,6 +68,19 @@ function jump(){
  if(!running||player.jumps>=(platformMode?1:2))return;
  player.velocity=player.jumps===0?-10.8:-9.2;
  player.jumps++;
+}
+
+function platformStatus(label=''){
+ const {shardLabel}=game.dataset;
+ const collected=shards.filter(shard=>shard.collected).length;
+ output.value=[label,`${shardLabel} ${collected}/${shards.length}`].filter(Boolean).join(' · ');
+}
+
+function finishPlatform(label){
+ running=false;
+ controls.clear();
+ startButton.textContent=game.dataset.retry;
+ platformStatus(label);
 }
 
 function frame(now){
@@ -61,6 +115,24 @@ function frame(now){
   }
  }
  if(!landed&&platformMode&&player.jumps===0)player.jumps=1;
+ if(platformMode){
+  if(shards.some(shard=>{
+   if(shard.collected||Math.abs(player.x+size/2-shard.x)>size/2+7||Math.abs(player.y+size/2-shard.y)>size/2+7)return false;
+   shard.collected=true;
+   return true;
+  }))platformStatus();
+  paint();
+  if(player.y>height+size){
+   finishPlatform(game.dataset.fell);
+   return;
+  }
+  if(player.x+size>=goalX-4&&player.y+size>=goalY-48&&player.y+size<=goalY){
+   finishPlatform(game.dataset.cleared);
+   return;
+  }
+  nextFrame=requestAnimationFrame(frame);
+  return;
+ }
  paint();
  const collision=obstacles.some(o=>player.x<o.x+o.w&&player.x+size>o.x&&player.y+size>ground-o.h);
  if(collision){
@@ -78,19 +150,23 @@ function reset(){
  obstacles=[];
  score=0;
  spawn=55;
- output.value=platformMode?'':game.dataset.score+' 0';
+ if(platformMode){
+  shards=shardPositions.map(shard=>({...shard,collected:false}));
+  platformStatus();
+ }else output.value=game.dataset.score+' 0';
  paint();
 }
 
 function start(){
  reset();
  running=true;
+ if(platformMode)startButton.textContent=game.dataset.retry;
  lastFrame=performance.now();
  nextFrame=requestAnimationFrame(frame);
 }
 
 const keys={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'jump',Space:'jump'};
-game.querySelector('[data-start]').addEventListener('click',()=>{start();canvas.focus();});
+startButton.addEventListener('click',()=>{start();canvas.focus({preventScroll:true});});
 canvas.addEventListener('pointerdown',()=>{if(!platformMode)jump();});
 canvas.addEventListener('keydown',event=>{
  const control=keys[event.code];

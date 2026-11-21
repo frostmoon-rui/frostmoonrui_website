@@ -2,10 +2,10 @@ import {escape,languagePath} from './i18n.mjs';
 
 export const archiveTitle={zh:'旧站归档',en:'Old site archive',ru:'Архив старого сайта',ja:'旧サイトのアーカイブ'};
 const copy={
- zh:['返回归档','旧站的工具、课前演讲、项目记录和小游戏。','课前演讲','旧站工具箱','FG2002 录像','跳跃游戏','平台游戏','旧站公告','在哔哩哔哩观看','开始','得分','点击画布或按空格跳跃，可二段跳。','使用方向键或屏幕按钮移动和跳跃。','返回关于页','游戏结束'],
- en:['Back to archive','Tools, classroom talks, project records and small games from the old site.','Classroom talks','Old toolbox','FG2002 recording','Jump game','Platform game','Original notice','Watch on Bilibili','Start','Score','Tap the board or press Space. Double jumps are allowed.','Use the arrow keys or on-screen controls to move and jump.','Back to About','Game over'],
- ru:['Назад в архив','Инструменты, школьные выступления, проекты и игры со старого сайта.','Школьные выступления','Старые инструменты','Запись FG2002','Игра с прыжками','Платформер','Исходное объявление','Смотреть на Bilibili','Начать','Счёт','Коснитесь поля или нажмите пробел. Двойной прыжок доступен.','Используйте стрелки или экранные кнопки для движения и прыжка.','На страницу «Обо мне»','Игра окончена'],
- ja:['アーカイブに戻る','旧サイトのツール、授業前の発表、プロジェクト記録、ミニゲーム。','授業前の発表','旧ツール集','FG2002 の録画','ジャンプゲーム','アクションゲーム','旧サイトからのお知らせ','Bilibili で見る','開始','スコア','画面をタップするかスペースキーを押します。二段ジャンプができます。','矢印キーまたは画面上のボタンで移動とジャンプができます。','プロフィールに戻る','ゲーム終了']
+ zh:['返回归档','旧站的工具、课前演讲、项目记录和小游戏。','课前演讲','旧站工具箱','FG2002 录像','跳跃游戏','平台游戏','旧站公告','在哔哩哔哩观看','开始','得分','点击画布或按空格跳跃，可二段跳。','返回关于页','游戏结束'],
+ en:['Back to archive','Tools, classroom talks, project records and small games from the old site.','Classroom talks','Old toolbox','FG2002 recording','Jump game','Platform game','Original notice','Watch on Bilibili','Start','Score','Tap the board or press Space. Double jumps are allowed.','Back to About','Game over'],
+ ru:['Назад в архив','Инструменты, школьные выступления, проекты и игры со старого сайта.','Школьные выступления','Старые инструменты','Запись FG2002','Игра с прыжками','Платформер','Исходное объявление','Смотреть на Bilibili','Начать','Счёт','Коснитесь поля или нажмите пробел. Двойной прыжок доступен.','На страницу «Обо мне»','Игра окончена'],
+ ja:['アーカイブに戻る','旧サイトのツール、授業前の発表、プロジェクト記録、ミニゲーム。','授業前の発表','旧ツール集','FG2002 の録画','ジャンプゲーム','アクションゲーム','旧サイトからのお知らせ','Bilibili で見る','開始','スコア','画面をタップするかスペースキーを押します。二段ジャンプができます。','プロフィールに戻る','ゲーム終了']
 };
 
 const statusCopy={
@@ -15,8 +15,15 @@ const statusCopy={
  ja:{video:'Bilibili で元の動画を確認できません',summary:'確認できた動画ストリーム {count} 本 · 確認日 {date}'}
 };
 
+const platformCopy={
+ zh:{help:'跳过缺口，抵达右侧旗帜。沿途有三枚星屑可以收集。用方向键、空格或屏幕按钮操作。',left:'向左',right:'向右',jump:'跳跃',shards:'星屑',cleared:'通关！',fell:'掉下去了',retry:'重新开始'},
+ en:{help:'Jump across the gaps and reach the flag. Collect up to three stardust pieces along the way. Use the arrow keys, Space or the on-screen controls.',left:'Move left',right:'Move right',jump:'Jump',shards:'Stardust',cleared:'Level cleared!',fell:'You fell',retry:'Restart'},
+ ru:{help:'Перепрыгните разрывы и доберитесь до флага. По пути можно собрать три частицы звёздной пыли. Используйте стрелки, пробел или экранные кнопки.',left:'Влево',right:'Вправо',jump:'Прыжок',shards:'Звёздная пыль',cleared:'Уровень пройден!',fell:'Вы упали',retry:'Начать заново'},
+ ja:{help:'足場の間を跳び越えて旗を目指します。途中で星のかけらを3つ集められます。矢印キー、スペースキー、画面のボタンで操作できます。',left:'左へ移動',right:'右へ移動',jump:'ジャンプ',shards:'星のかけら',cleared:'クリア！',fell:'落ちてしまいました',retry:'最初から'}
+};
+
 export function archivePages(data,locale){
- const [back,intro,talks,tools,recording,jump,platform,notice,bilibili,start,score,jumpHelp,platformHelp,about,gameOver]=copy[locale];
+ const [back,intro,talks,tools,recording,jump,platform,notice,bilibili,start,score,jumpHelp,about,gameOver]=copy[locale];
  const route=path=>'/legacy/'+path;
  const status=statusCopy[locale];
  const unavailable=new Set(data.audit.unavailableVideos);
@@ -32,8 +39,11 @@ export function archivePages(data,locale){
  };
  const card=(path,title,meta='')=>`<li><a class="text-link" href="${route(path)}"><strong>${escape(title)}</strong>${meta}<span aria-hidden="true">›</span></a></li>`;
  const game=(mode,label,help)=>{
-  const controls=mode==='platform'?`<button type="button" data-control="left" aria-label="←">←</button><button type="button" data-control="right" aria-label="→">→</button><button type="button" data-control="jump" aria-label="↑">↑</button>`:'';
-  return `<p id="legacy-game-help">${escape(help)}</p><div class="legacy-game" data-legacy-game="${mode}" data-score="${escape(score)}" data-game-over="${escape(gameOver)}"><canvas width="720" height="360" tabindex="0" aria-label="${escape(label)}" aria-describedby="legacy-game-help"></canvas><div class="legacy-controls"><button type="button" data-start>${escape(start)}</button>${controls}<output aria-live="polite"></output></div></div><script type="module" src="/assets/legacy-game.js"></script>`;
+  const labels=platformCopy[locale];
+  const control=(name,symbol)=>`<button type="button" data-control="${name}" aria-label="${escape(labels[name])}">${symbol}</button>`;
+  const controls=mode==='platform'?`<div class="legacy-move">${control('left','←')}${control('right','→')}</div>${control('jump','↑')}`:'';
+  const messages=mode==='platform'?` data-shard-label="${escape(labels.shards)}" data-cleared="${escape(labels.cleared)}" data-fell="${escape(labels.fell)}" data-retry="${escape(labels.retry)}"`:'';
+  return `<p id="legacy-game-help">${escape(help)}</p><div class="legacy-game" data-legacy-game="${mode}" data-score="${escape(score)}" data-game-over="${escape(gameOver)}"${messages}><canvas width="720" height="360" tabindex="0" aria-label="${escape(label)}" aria-describedby="legacy-game-help"></canvas><div class="legacy-controls"><button type="button" data-start>${escape(start)}</button>${controls}<output aria-live="polite"></output></div></div><script type="module" src="/assets/legacy-game.js"></script>`;
  };
  const home=`<p class="lead">${escape(intro)}</p><ul class="legacy-grid">${[
   ['talks/',talks,`<small>${data.talks.length}</small>`],['recording/',recording],['jump/',jump],['platform/',platform]
@@ -47,7 +57,7 @@ export function archivePages(data,locale){
   ['talks/',talks,talkList],
   ['recording/',recording,video(data.recording,recording)],
   ['jump/',jump,game('jump',jump,jumpHelp)],
-  ['platform/',platform,game('platform',platform,platformHelp)],
+  ['platform/',platform,game('platform',platform,platformCopy[locale].help)],
   ...data.talks.map(entry=>['talks/'+entry.date+'/',entry.topic,dateMarkup(entry.date)+video(entry,entry.topic,'zh-CN'),'zh-CN'])
  ];
  return pages.map(([path,title,body,lang])=>({
