@@ -62,5 +62,8 @@ test('archive toolbox only contains verified replacements and retained links',()
   }
   assert.doesNotMatch(page,/tool\.retiehe\.com|mp\.weixin\.qq\.com|pan\.baidu\.com|wwei\.cn|102429\.htm|legacy-disabled|legacy\/(?:controller|project|recording-2024)\//);
   assert.doesNotMatch(read(locale+'/legacy/talks/index.html'),/seriesdetail/);
+  for(const route of ['controller','project','recording-2024']){
+   assert.equal(fs.existsSync(new URL(`../dist/${locale}/legacy/${route}/index.html`,import.meta.url)),false);
+  }
  }
 });
