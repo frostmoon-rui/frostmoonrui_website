@@ -30,7 +30,8 @@ function jump(){
 }
 
 function frame(now){
- const step=Math.min(2,(now-lastFrame)/16.67);
+ // The first animation timestamp can precede the click that started the game.
+ const step=Math.max(0,Math.min(2,(now-lastFrame)/16.67));
  lastFrame=now;
  if(platformMode){
   const dx=Number(controls.has('right'))-Number(controls.has('left'));
@@ -102,8 +103,18 @@ canvas.addEventListener('keyup',event=>controls.delete(keys[event.code]));
 canvas.addEventListener('blur',()=>controls.clear());
 for(const button of game.querySelectorAll('[data-control]')){
  const {control}=button.dataset;
- if(control==='jump'){button.addEventListener('click',jump);continue;}
+ if(control==='jump'){
+  button.addEventListener('pointerdown',event=>{
+   if(event.button!==0)return;
+   event.preventDefault();
+   jump();
+  });
+  button.addEventListener('click',event=>{if(event.detail===0)jump();});
+  continue;
+ }
  button.addEventListener('pointerdown',event=>{
+  if(event.button!==0)return;
+  event.preventDefault();
   button.setPointerCapture(event.pointerId);
   controls.add(control);
  });

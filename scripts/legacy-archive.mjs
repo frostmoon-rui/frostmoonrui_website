@@ -8,16 +8,32 @@ const copy={
  ja:['アーカイブに戻る','旧サイトのツール、授業前の発表、プロジェクト記録、ミニゲーム。','授業前の発表','旧ツール集','プロジェクト資料','消防車コントローラー','FG2002 の録画','2024年3月17日の録画','ジャンプゲーム','アクションゲーム','旧サイトからのお知らせ','Bilibili で見る','元の動画を開く','プロジェクトは終了しました。最後の更新は2022年1月2日で、動画が追加されました。','旧サイトの APK 2 本はエクスポートに含まれていませんでした。','開始','スコア','画面をタップするかスペースキーを押します。二段ジャンプができます。','矢印キーまたは画面上のボタンで移動とジャンプができます。','プロフィールに戻る','発表の全シリーズ','ゲーム終了']
 };
 
+const statusCopy={
+ zh:{unavailable:'原内容已失效',connection:'本次未能连通',redirected:'原地址已跳转',verification:'平台访问验证',region:'受地区限制',video:'哔哩哔哩未找到原视频',summary:'{count} 条视频流可读取 · 核验于 {date}'},
+ en:{unavailable:'Original content unavailable',connection:'Could not connect during the check',redirected:'Original address redirects',verification:'Provider verification',region:'Region restricted',video:'Original video unavailable on Bilibili',summary:'{count} video streams reachable · Checked {date}'},
+ ru:{unavailable:'Исходный материал недоступен',connection:'При проверке не удалось подключиться',redirected:'Исходный адрес перенаправляет',verification:'Проверка доступа сервисом',region:'Доступ ограничен по региону',video:'Исходное видео недоступно на Bilibili',summary:'Доступно видеопотоков: {count} · Проверено {date}'},
+ ja:{unavailable:'元のコンテンツは閲覧不可',connection:'確認時に接続できませんでした',redirected:'元のアドレスから転送',verification:'サービス側のアクセス確認',region:'地域制限あり',video:'Bilibili で元の動画を確認できません',summary:'確認できた動画ストリーム {count} 本 · 確認日 {date}'}
+};
+
 export function archivePages(data,locale){
  const [back,intro,talks,tools,project,controller,recording,recording2024,jump,platform,notice,bilibili,original,projectNote,missing,start,score,jumpHelp,platformHelp,about,series,gameOver]=copy[locale];
  const route=path=>'/legacy/'+path;
+ const status=statusCopy[locale];
+ const unavailable=new Set(data.audit.unavailableVideos);
+ const badge=kind=>kind?`<small class="legacy-status" data-legacy-status="${kind}">${escape(status[kind])}</small>`:'';
  const link=(url,label,lang='')=>{
   const external=/^https?:\/\//.test(url);
   return `<a class="text-link" href="${escape(url)}"${external?' target="_blank" rel="noopener noreferrer"':''}${lang?' lang="'+lang+'"':''}>${escape(label)}<span aria-hidden="true">${external?'↗':'›'}</span></a>`;
  };
- const video=(id,title,lang='')=>{
-  if(!/^BV[A-Za-z0-9]{10}$/.test(id))throw new Error('Invalid archived video ID');
-  return `<iframe class="legacy-video" src="https://player.bilibili.com/player.html?bvid=${id}&amp;autoplay=0" title="${escape(title)}"${lang?' lang="'+lang+'"':''} loading="lazy" allowfullscreen referrerpolicy="no-referrer"></iframe><p>${link('https://www.bilibili.com/video/'+id+'/',bilibili)}</p>`;
+ const checkedLink=(url,label,lang='')=>{
+  const kind=data.audit.links[url];
+  if(kind==='unavailable')return `<span class="legacy-disabled"><span${lang?' lang="'+lang+'"':''}>${escape(label)}</span>${badge(kind)}</span>`;
+  return link(url,label,lang)+badge(kind);
+ };
+ const video=({bvid,aid,cid},title,lang='')=>{
+  if(!/^BV[A-Za-z0-9]{10}$/.test(bvid)||!Number.isSafeInteger(aid)||aid<1||!Number.isSafeInteger(cid)||cid<1)throw new Error('Invalid archived video ID');
+  if(unavailable.has(bvid))return `<p class="legacy-video-status">${badge('video')}</p>`;
+  return `<iframe class="legacy-video" src="https://player.bilibili.com/player.html?bvid=${bvid}&amp;aid=${aid}&amp;cid=${cid}&amp;page=1&amp;autoplay=0" title="${escape(title)}"${lang?' lang="'+lang+'"':''} loading="lazy" allowfullscreen referrerpolicy="no-referrer"></iframe><p>${link('https://www.bilibili.com/video/'+bvid+'/',bilibili)}</p>`;
  };
  const card=(path,title,meta='')=>`<li><a class="text-link" href="${route(path)}"><strong>${escape(title)}</strong>${meta}<span aria-hidden="true">›</span></a></li>`;
  const game=(mode,label,help)=>{
@@ -26,20 +42,21 @@ export function archivePages(data,locale){
  };
  const home=`<p class="lead">${escape(intro)}</p><ul class="legacy-grid">${[
   ['talks/',talks,`<small>${data.talks.length}</small>`],['project/',project],['controller/',controller],['recording/',recording],['recording-2024/',recording2024],['jump/',jump],['platform/',platform]
- ].map(args=>card(...args)).join('')}</ul><section class="legacy-shelf"><h2>${escape(tools)}</h2><ul class="legacy-tools">${data.tools.map(item=>`<li>${link(item.url,item.label,'zh-CN')}</li>`).join('')}</ul></section><details class="legacy-shelf"><summary>${escape(notice)}</summary><div lang="zh-CN">${data.notice.map(line=>`<p>${escape(line)}</p>`).join('')}<p>感谢热铁盒提供数据技术支持。</p></div></details>`;
+ ].map(args=>card(...args)).join('')}</ul><section class="legacy-shelf"><h2>${escape(tools)}</h2><ul class="legacy-tools">${data.tools.map(item=>`<li>${checkedLink(item.url,item.label,'zh-CN')}</li>`).join('')}</ul></section><details class="legacy-shelf"><summary>${escape(notice)}</summary><div lang="zh-CN">${data.notice.map(line=>`<p>${escape(line)}</p>`).join('')}<p>感谢热铁盒提供数据技术支持。</p></div></details>`;
  const dates=new Intl.DateTimeFormat(locale,{dateStyle:'medium',timeZone:'UTC'});
  const dateMarkup=date=>`<time datetime="${date}">${dates.format(new Date(date))}</time>`;
- const talkList=`<ul class="legacy-grid">${data.talks.map(entry=>`<li><a class="text-link" href="${route('talks/'+entry.date+'/')}" ><strong lang="zh-CN">${escape(entry.topic)}</strong>${dateMarkup(entry.date)}<span aria-hidden="true">›</span></a></li>`).join('')}</ul><p>${link('https://space.bilibili.com/551858934/channel/seriesdetail?sid=2290897&ctype=0',series)}</p>`;
+ const summary=status.summary.replace('{count}',String(data.talks.filter(entry=>!unavailable.has(entry.bvid)).length)).replace('{date}',dates.format(new Date(data.audit.date)));
+ const talkList=`<p class="legacy-audit-summary">${escape(summary)}</p><ul class="legacy-grid">${data.talks.map(entry=>`<li><a class="text-link" href="${route('talks/'+entry.date+'/')}" ><strong lang="zh-CN">${escape(entry.topic)}</strong>${dateMarkup(entry.date)}${unavailable.has(entry.bvid)?badge('video'):''}<span aria-hidden="true">›</span></a></li>`).join('')}</ul><p>${checkedLink('https://space.bilibili.com/551858934/channel/seriesdetail?sid=2290897&ctype=0',series)}</p>`;
  const pages=[
   ['',archiveTitle[locale],home],
   ['talks/',talks,talkList],
-  ['project/',project,`<p>${escape(projectNote)}</p><p>${link(data.projectVideo,original)}</p>`],
+  ['project/',project,`<p>${escape(projectNote)}</p><p>${checkedLink(data.projectVideo,original)}</p>`],
   ['controller/',controller,`<p>${escape(missing)}</p><ul><li>Fire Car Controller</li><li>btcontroller</li></ul>`],
   ['recording/',recording,video(data.recording,recording)],
-  ['recording-2024/',recording2024,`<p>${link(data.recording2024,original)}</p>`],
+  ['recording-2024/',recording2024,`<p>${checkedLink(data.recording2024,original)}</p>`],
   ['jump/',jump,game('jump',jump,jumpHelp)],
   ['platform/',platform,game('platform',platform,platformHelp)],
-  ...data.talks.map(entry=>['talks/'+entry.date+'/',entry.topic,dateMarkup(entry.date)+video(entry.bvid,entry.topic,'zh-CN'),'zh-CN'])
+  ...data.talks.map(entry=>['talks/'+entry.date+'/',entry.topic,dateMarkup(entry.date)+video(entry,entry.topic,'zh-CN'),'zh-CN'])
  ];
  return pages.map(([path,title,body,lang])=>({
   route:'legacy/'+path,title,label:archiveTitle[locale],description:intro,lang,

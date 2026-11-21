@@ -75,7 +75,7 @@ export async function handle(request,env,fetcher=fetch){
   response.headers.set('X-Robots-Tag','noindex, nofollow');
   const csp="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'";
   if(/\/legacy\/(?:recording|talks\/\d{4}-\d{2}-\d{2})(?:\/index\.html|\/)?$/.test(url.pathname)){
-   response.headers.set('Content-Security-Policy',csp+'; frame-src https://player.bilibili.com');
+   response.headers.set('Content-Security-Policy',csp+'; frame-src https://player.bilibili.com https://www.bilibili.com/blackboard/webplayer/mbplayer.html');
   }
  }
  if(url.pathname==='/food-map/index.json'){
