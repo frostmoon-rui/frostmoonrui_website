@@ -259,8 +259,14 @@
       $('app').classList.toggle('compact-touch', this.shouldShowTouch());
       if (!on) this.releaseControls?.();
       $('hud').classList.toggle('hidden', !on);
-      $('touch').classList.toggle('hidden', !on || !this.shouldShowTouch());
-      if (!on) $('touch').classList.add('hidden');
+      this.updateTouchVisibility();
+    }
+
+    updateTouchVisibility() {
+      const overlays = ['pause', 'hint-panel', 'map-screen', 'settings-screen', 'dialogue', 'opening', 'ending'];
+      const blocked = overlays.some(id => !$(id).classList.contains('hidden'));
+      const playing = $('app').classList.contains('playing');
+      $('touch').classList.toggle('hidden', !playing || blocked || !this.shouldShowTouch());
     }
 
     onRoomChange(room) {
@@ -366,24 +372,19 @@
 
     // ---------- hint ----------
     openHint() {
-      this.releaseControls?.();
       if (NO.settings && NO.settings.hints === false) { this.toast(NO.t('toast_hint_locked')); return; }
       const room = NO.DATA.rooms[NO.state.room];
       if (!room) return;
-      this.hintResume = !!(NO.game && NO.game.mode === 'play' && !NO.game.paused);
-      if (NO.game && NO.game.mode === 'play') NO.game.paused = true;
+      this.openPlayPanel('hint-panel');
       this.currentHint = room.hints || NO.DATA.hintSets[room.hintKey] || NO.DATA.hintSets.hard;
       this.hintLayer = 0;
-      $('hint-panel').classList.remove('hidden');
       this.renderHint();
       if (NO.audio) NO.audio.play('ui');
     }
 
     closeHint() {
-      $('hint-panel').classList.add('hidden');
       this.currentHint = null;
-      if (this.hintResume && NO.game && NO.game.mode === 'play') NO.game.paused = false;
-      this.hintResume = false;
+      this.closePlayPanel('hint-panel');
     }
 
     renderHint() {
@@ -400,12 +401,14 @@
     // ---------- dialogue ----------
     showDialogue(lines, onClose) {
       if (!lines || !lines.length) { if (onClose) onClose(); return; }
+      this.releaseControls?.();
       this.dialogueLines = lines;
       this.dialogueIndex = 0;
       this.dialogueCallback = onClose || null;
       this.dialogueResume = NO.game && !NO.game.paused && NO.game.mode === 'play';
       if (NO.game && NO.game.mode === 'play') NO.game.paused = true;
       $('dialogue').classList.remove('hidden');
+      this.updateTouchVisibility();
       this.renderDialogueLine();
     }
 
@@ -460,6 +463,8 @@
         NO.game.paused = false;
       }
       this.dialogueResume = false;
+      this.releaseControls?.();
+      this.updateTouchVisibility();
       if (cb) cb();
     }
 
@@ -545,10 +550,7 @@
 
     // ---------- map ----------
     openMap() {
-      this.releaseControls?.();
-      if (NO.game && NO.game.mode === 'play') { NO.game.paused = true; }
-      $('pause').classList.add('hidden');
-      $('map-screen').classList.remove('hidden');
+      this.openPlayPanel('map-screen');
       this.renderMap();
     }
 
@@ -566,6 +568,31 @@
       progress.textContent = NO.t('rooms_found', { count: Object.keys(visited).length }) + ' · ' +
         NO.t('restorations', { count: repairs.length, total: NO.DATA.restorations.length });
       body.appendChild(progress);
+      const exits = NO.game.exits.filter(exit => {
+        const room = NO.DATA.rooms[exit.to];
+        return room && (!room.hiddenRoom || visited[room.id]);
+      });
+      if (exits.length) {
+        const section = document.createElement('section');
+        section.className = 'map-nearby';
+        const heading = document.createElement('h3');
+        heading.textContent = NO.t('map_exits', { room: NO.L(NO.DATA.rooms[current].name) });
+        section.appendChild(heading);
+        const list = document.createElement('ul');
+        for (const exit of exits) {
+          const item = document.createElement('li');
+          const status = document.createElement('span');
+          const open = NO.game.isRequiresMet(exit.requires);
+          item.textContent = NO.L(NO.DATA.rooms[exit.to].name);
+          status.className = open ? 'route-open' : 'route-locked';
+          status.textContent = NO.t(open ? 'map_route_open' : 'map_route_locked');
+          item.appendChild(status);
+          list.appendChild(item);
+        }
+        section.appendChild(list);
+        body.appendChild(section);
+      }
+
       for (const wing of NO.DATA.wings) {
         const rooms = NO.DATA.order.map(id => NO.DATA.rooms[id]).filter(r => r.wing === wing.id && !r.hiddenRoom);
         if (!rooms.length) continue;
@@ -598,8 +625,26 @@
     }
 
     closeMap() {
-      $('map-screen').classList.add('hidden');
-      if (NO.game && NO.game.mode === 'play') NO.game.paused = false;
+      this.closePlayPanel('map-screen');
+    }
+
+    openPlayPanel(id) {
+      this.releaseControls?.();
+      this.playPanelReturn = !NO.game.paused ? 'play' :
+        !$('pause').classList.contains('hidden') ? 'pause' : null;
+      NO.game.paused = true;
+      $('pause').classList.add('hidden');
+      $(id).classList.remove('hidden');
+      this.updateTouchVisibility();
+    }
+
+    closePlayPanel(id) {
+      $(id).classList.add('hidden');
+      this.releaseControls?.();
+      if (this.playPanelReturn === 'pause') $('pause').classList.remove('hidden');
+      else if (this.playPanelReturn === 'play') NO.game.paused = false;
+      this.playPanelReturn = null;
+      this.updateTouchVisibility();
     }
 
     // ---------- pause ----------
@@ -608,12 +653,13 @@
       if (!NO.game || NO.game.mode !== 'play') return;
       NO.game.paused = true;
       $('pause').classList.remove('hidden');
-      $('touch').classList.add('hidden');
+      this.updateTouchVisibility();
     }
 
     closePause() {
       $('pause').classList.add('hidden');
       if (NO.game && NO.game.mode === 'play' && !$('dialogue').classList.contains('hidden')) return;
+      this.releaseControls?.();
       if (NO.game && NO.game.mode === 'play') NO.game.paused = false;
       this.setPlaying(true);
     }
@@ -675,6 +721,7 @@
     checkOrientation() {
       $('app').classList.toggle('compact-touch', this.shouldShowTouch());
       $('orientation').classList.add('hidden');
+      this.updateTouchVisibility();
     }
 
     // ---------- helpers ----------
@@ -683,6 +730,7 @@
     }
 
     hideAllOverlays() {
+      this.playPanelReturn = null;
       for (const id of ['slots', 'pause', 'settings-screen', 'map-screen', 'dialogue', 'opening', 'ending', 'orientation']) {
         const el = $(id);
         if (el) el.classList.add('hidden');
@@ -713,9 +761,9 @@
         });
       });
 
-      $('btn-hint').addEventListener('click', () => this.openHint());
-      $('btn-map').addEventListener('click', () => this.openMap());
-      $('btn-pause').addEventListener('click', () => this.openPause());
+      $('btn-hint').addEventListener('click', () => { if (!NO.game?.paused) this.openHint(); });
+      $('btn-map').addEventListener('click', () => { if (!NO.game?.paused) this.openMap(); });
+      $('btn-pause').addEventListener('click', () => { if (!NO.game?.paused) this.openPause(); });
       $('btn-fullscreen').addEventListener('click', async () => {
         const app = $('app');
         this.releaseControls?.();
@@ -745,7 +793,7 @@
         this.closePause();
         NO.game.startAt(NO.state.room);
       });
-      $('btn-pause-hint').addEventListener('click', () => { this.closePause(); this.openHint(); });
+      $('btn-pause-hint').addEventListener('click', () => this.openHint());
       $('btn-pause-map').addEventListener('click', () => this.openMap());
       $('btn-pause-settings').addEventListener('click', () => this.openSettings('pause'));
       $('btn-save-export').addEventListener('click', () => { if (NO.actions) NO.actions.exportSave(); });
@@ -769,6 +817,7 @@
       $('dialogue-next').addEventListener('click', () => this.advanceDialogue());
       $('dialogue').addEventListener('click', (e) => { if (e.target.id === 'dialogue') this.closeDialogue(); });
       window.addEventListener('keydown', (e) => {
+        if (e.repeat) return;
         if (e.key === 'Escape') {
           if (!$('dialogue').classList.contains('hidden')) this.closeDialogue();
           else if (!$('hint-panel').classList.contains('hidden')) this.closeHint();
