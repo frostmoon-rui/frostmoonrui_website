@@ -11,7 +11,7 @@
     --muted: #94a3b8;
     --btn-scale: 1;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
   html, body {
     width: 100%; height: 100%; overflow: hidden;
     background: radial-gradient(circle at 50% 25%, #121d38 0%, #060913 75%);
@@ -251,7 +251,7 @@
     width: 100%; height: 74px; margin-top: 8px; padding: 8px; border-radius: 8px;
     background: rgba(4, 8, 18, 0.9); border: 1px solid var(--glass-border);
     color: var(--lunar); font-family: monospace; font-size: 11px; resize: none;
-    user-select: text;
+    -webkit-user-select: text; user-select: text;
   }
 
   /* Touch Controls */
@@ -294,9 +294,9 @@
   #app.immersive, #app:fullscreen { width:100vw; height:100dvh; background:#060913; }
   #hud { top:max(10px,env(safe-area-inset-top)); left:max(10px,env(safe-area-inset-left)); right:max(10px,env(safe-area-inset-right)); gap:8px; }
   #touch-controls { left:max(10px,env(safe-area-inset-left)); right:max(10px,env(safe-area-inset-right)); bottom:max(12px,env(safe-area-inset-bottom)); }
-  #touch-controls button { touch-action:none; }
+  #touch-controls button, #game-canvas, #hud button { touch-action:none; -webkit-touch-callout:none; }
   #key-bar { pointer-events:none; }
-  #rotate-hint { position:absolute; bottom:calc(96px + env(safe-area-inset-bottom)); inset-inline:18px; z-index:6; text-align:center; color:var(--muted); font-size:.8rem; pointer-events:none; }
+  #rotate-hint { margin:0; text-align:center; color:var(--muted); font-size:.8rem; pointer-events:none; }
   #hud-impact { gap:5px; white-space:nowrap; }
   .impact-segments { display:inline-flex; gap:2px; align-items:end; }
   .impact-segments i { display:block; width:4px; height:9px; border-radius:2px; background:#475569; }
@@ -309,3 +309,35 @@
   @media (prefers-reduced-motion:reduce) { .orbit-ring,.orbit-ring-inner,.mini-orbit { animation:none; } }
   .test-notes-link { color:var(--muted); font-size:.86rem; text-underline-offset:4px; padding:8px 12px; border-radius:18px; }
   .test-notes-link:hover,.test-notes-link:focus-visible { color:var(--text); }
+
+  /* Reserve separate rows for the stage and controls, including inside mobile webviews. */
+  #app.playing {
+    height:100%; height:100dvh;
+    display:grid; grid-template-rows:auto minmax(0,1fr) auto auto auto;
+    align-items:center; justify-content:stretch; gap:6px;
+    padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right))
+      max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
+  }
+  #app.playing > #hud { grid-row:1; position:relative; inset:auto; min-width:0; flex-wrap:wrap; }
+  #app.playing > #stage-wrap { grid-row:2; min-width:0; min-height:0; overflow:hidden; }
+  #app.playing > #key-bar { grid-row:3; position:relative; inset:auto; transform:none; justify-self:center; }
+  #app.playing > #rotate-hint { grid-row:4; }
+  #app.playing > #touch-controls { grid-row:5; position:relative; inset:auto; }
+  @media (any-pointer:coarse), (max-width:720px) {
+    #app.playing > #key-bar { display:none !important; }
+  }
+  @media (orientation:landscape) and (max-height:480px) {
+    #app.playing { gap:3px; }
+    #hud .hud-pill { font-size:11px; padding:4px 7px; }
+    #hud .hud-btn { min-height:34px; padding:4px 8px; }
+    #hud .hud-pill.hide-sm { display:none; }
+    .t-btn { width:clamp(42px,calc(48px * var(--btn-scale)),68px); height:clamp(42px,calc(48px * var(--btn-scale)),68px); }
+    .t-btn.jump { width:clamp(46px,calc(54px * var(--btn-scale)),74px); height:clamp(46px,calc(54px * var(--btn-scale)),74px); }
+  }
+
+  @media (orientation:landscape) and (max-height:300px) {
+    #app.playing { gap:2px; }
+    #hud .hud-btn { min-height:30px; }
+    .t-btn { width:clamp(40px,calc(42px * var(--btn-scale)),54px); height:clamp(40px,calc(42px * var(--btn-scale)),48px); }
+    .t-btn.jump { width:clamp(44px,calc(48px * var(--btn-scale)),60px); height:clamp(44px,calc(48px * var(--btn-scale)),52px); }
+  }

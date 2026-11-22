@@ -152,6 +152,7 @@
     }
     init() {
       if (this.ctx) {
+        if (this.bgmOn) this.startAmbient();
         if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
         return;
       }
@@ -163,31 +164,61 @@
     }
     startAmbient() {
       if (!this.ctx || this.bgmNodes) return;
-      try {
-        const master = this.ctx.createGain();
-        master.gain.value = 0.045;
-        master.connect(this.ctx.destination);
-        const freqs = [110, 164.81, 220, 329.63];
-        const oscs = freqs.map((f, idx) => {
-          const osc = this.ctx.createOscillator();
-          const g = this.ctx.createGain();
-          osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
-          osc.frequency.value = f;
-          g.gain.value = idx < 2 ? 0.35 : 0.14;
-          osc.connect(g);
-          g.connect(master);
-          osc.start();
-          return osc;
-        });
-        this.bgmNodes = { master, oscs };
-      } catch (_) {}
+      const audio = this.ctx;
+      const master = audio.createGain();
+      master.gain.value = 0.07;
+      master.connect(audio.destination);
+      const bars = [
+        { bass: 45, chord: [57, 64, 72, 76], melody: [76, null, 79, 81, null, 79, 76, null] },
+        { bass: 41, chord: [53, 60, 69, 72], melody: [72, null, 76, 77, null, 76, 72, null] },
+        { bass: 48, chord: [55, 60, 67, 76], melody: [79, null, 76, 74, null, 76, 79, null] },
+        { bass: 43, chord: [55, 62, 67, 71], melody: [83, null, 81, 79, null, 74, 71, null] },
+        { bass: 45, chord: [57, 64, 72, 76], melody: [76, null, 79, 81, null, 84, 83, null] },
+        { bass: 41, chord: [53, 60, 69, 72], melody: [81, null, 77, 76, null, 72, 76, null] },
+        { bass: 50, chord: [57, 62, 65, 69], melody: [77, null, 81, 86, null, 84, 81, null] },
+        { bass: 43, chord: [55, 62, 67, 71], melody: [79, null, 74, 71, null, 74, 76, null] }
+      ];
+      const eighth = 60 / 112 / 2;
+      let step = 0;
+      let next = audio.currentTime + 0.06;
+
+      const note = (pitch, time, duration, wave, volume) => {
+        const osc = audio.createOscillator();
+        const gain = audio.createGain();
+        osc.type = wave;
+        osc.frequency.value = 440 * 2 ** ((pitch - 69) / 12);
+        gain.gain.setValueAtTime(0.0001, time);
+        gain.gain.linearRampToValueAtTime(volume, time + 0.024);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(time);
+        osc.stop(time + duration);
+        osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+      };
+
+      const schedule = () => {
+        if (audio.state !== 'running') return;
+        if (next < audio.currentTime) next = audio.currentTime + 0.03;
+        while (next < audio.currentTime + 0.16) {
+          const bar = bars[Math.floor(step / 8)];
+          const beat = step % 8;
+          note(bar.chord[[0, 1, 2, 1, 3, 2, 1, 2][beat]], next, 0.32, 'sine', 0.15);
+          if (beat === 0 || beat === 4) note(bar.bass, next, 0.51, 'sine', 0.24);
+          if (bar.melody[beat] !== null) note(bar.melody[beat], next, 0.29, 'triangle', 0.15);
+          step = (step + 1) % (bars.length * 8);
+          next += eighth;
+        }
+      };
+      this.bgmNodes = { master, timer: setInterval(schedule, 50) };
+      schedule();
     }
     stopAmbient() {
       if (!this.bgmNodes) return;
-      try {
-        this.bgmNodes.oscs.forEach(o => o.stop());
-        this.bgmNodes.master.disconnect();
-      } catch (_) {}
+      const { master, timer } = this.bgmNodes;
+      clearInterval(timer);
+      master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.025);
+      setTimeout(() => master.disconnect(), 180);
       this.bgmNodes = null;
     }
     tone(freq, dur, type = 'sine', vol = 0.14, slideTo = null) {
@@ -559,27 +590,27 @@
       N1: {
         id: 'N1', gx: 2, gy: 1, zone: 'north',
         name: { zh: '摆渡长厅', en: 'Pendulum Hall', ru: 'Зал маятника', ja: '渡り廊下の広間' },
-        spawn: { x: 480, y: 455 },
+        spawn: { x: 375, y: 455 },
         hints: {
           zh: [
             '在移动平台顺着前进方向起跳时，你会继承平台的惯性，飞得比平时远得多。',
             '向西可进入月相棱镜阁（双色长廊），向东可去双级弹射塔，正上方则是星轨穹顶。',
-            '顺着摆渡平台向东跳到高台；或者从高台重落砸中中央弹射垫，直接弹射穿过顶部天窗进入星轨穹顶！'
+            '沿左侧台阶登上西侧高台，向右跳到中央弹射垫，再借力穿过天窗。'
           ],
           en: [
             'Jumping in the same direction a platform is moving transfers its horizontal momentum, letting you clear wide gaps.',
             'West leads to the Lunar Gallery, East to the Spring Tower, and straight up is the Starlight Dome.',
-            'Drop heavily from the mid-ledge onto the central spring pad to launch high enough to reach the top exit!'
+            'Climb the west steps, jump right to the central spring, then ride it through the skylight.'
           ],
           ru: [
             'Прыжок по ходу движения платформы передаёт импульс и увеличивает дальность.',
             'На запад — лунная галерея, на восток — башня батутов, вверх — купол.',
-            'Упадите с уступа на центральный батут, чтобы взлететь в верхний проход.'
+            'Поднимитесь по западным ступеням, прыгните вправо к центральному батуту и взлетите через верхний проход.'
           ],
           ja: [
             '移動足場の進行方向へジャンプすると慣性が乗り、普段より遠くへ跳べます。',
             '西は月相の回廊、東は弾射の塔、真上は星軌の穹頂へ繋がっています。',
-            '中段足場から中央の弾射パッドへ重着地すると、真上の天窓まで一気に跳ね上がれます。'
+            '左の段を登り、西の足場から中央の弾射パッドへ跳ぶと、天窓から上の部屋に入れます。'
           ]
         },
         stele: {
@@ -596,13 +627,14 @@
           { x: 0, y: 30, w: 30, h: 350 }, // left -> W1
           { x: 930, y: 30, w: 30, h: 350 }, // right -> N2
           { x: 0, y: 510, w: 420, h: 30 }, { x: 540, y: 510, w: 420, h: 30 }, // bottom -> H1
-          { x: 30, y: 400, w: 140, h: 22 },
+          { x: 30, y: 435, w: 140, h: 22 },
+          { x: 175, y: 364, w: 85, h: 18 },
           { x: 780, y: 370, w: 150, h: 22 },
           { x: 240, y: 290, w: 140, h: 22 }, // dive platform for center spring!
           { x: 580, y: 240, w: 140, h: 22 }
         ],
         movers: [
-          { x: 320, y: 410, w: 110, h: 20, x1: 220, x2: 610, y1: 410, y2: 410, speed: 155 }
+          { x: 320, y: 428, w: 110, h: 20, x1: 220, x2: 610, y1: 428, y2: 428, speed: 155 }
         ],
         springs: [
           { x: 452, y: 496, w: 56, h: 14 }, // Wait: bottom gap is 420..540! Put spring on solid at x=452 y=260? Let's put a bridge platform at x=420 y=380? Better: solid floor bridge or side spring!
@@ -612,7 +644,7 @@
           { dir: 'down', to: 'H1', tx: 480, ty: 60 },
           { dir: 'left', to: 'W1', tx: 880, ty: 455 },
           { dir: 'right', to: 'N2', tx: 54, ty: 455 },
-          { dir: 'up', to: 'N3', tx: 375, ty: 455 }
+          { dir: 'up', to: 'N3', tx: 570, ty: 455 }
         ]
       },
 
@@ -673,26 +705,26 @@
       N3: {
         id: 'N3', gx: 2, gy: 0, zone: 'north',
         name: { zh: '星轨穹顶', en: 'Starlight Belfry', ru: 'Звёздная колокольня', ja: '星軌の穹頂' },
-        spawn: { x: 480, y: 455 },
+        spawn: { x: 570, y: 455 },
         hints: {
           zh: [
             '星核Ⅲ在左侧封闭星室内，需要重落砸响高处的铜金共振板才能开门。',
-            '先借助移动平台的水平惯性跳到右侧弹射垫上方，再借助弹射冲上最高台，最后纵身砸向共振板！',
+            '从右侧台阶跳上弹射垫，升过高台后向左落在台上，再从左缘落向铜板。',
             '拿到星核Ⅲ后，直接从底部开口落回「摆渡长厅」即可。'
           ],
           en: [
             'Core III is locked on the left; its brass resonance plate sits on the mid-right ledge.',
-            'Ride the moving platform to gain speed, jump onto the right spring, climb to the high perch, and dive onto the resonance plate!',
+            'Take the right-hand steps to the spring. Steer left once above the high perch, land, then drop off its left edge onto the plate.',
             'Once Core III is yours, drop back down to Pendulum Hall.'
           ],
           ru: [
             'Ядро III заперто слева, а его плита находится на среднем правом уступе.',
-            'Используйте движущуюся платформу и батут справа, чтобы забраться повыше и ударить по плите.',
+            'Поднимитесь по правым ступеням к батуту. Взлетев выше площадки, сместитесь влево, приземлитесь и сойдите с левого края на плиту.',
             'Собрав Ядро III, вернитесь вниз в Зал маятника.'
           ],
           ja: [
             '星核Ⅲは左の扉の奥にあり、共鳴板は右の中段に置かれています。',
-            '移動足場の慣性で右へ飛び、弾射パッドで高台へ昇ってから共鳴板へ重着地しましょう。',
+            '右の段から弾射パッドへ。高台より上に出たら左へ着地し、その左端から共鳴板に落ちましょう。',
             '星核Ⅲを取ったら下の出口から戻れます。'
           ]
         },
@@ -704,15 +736,16 @@
           // Left Core III vault
           { x: 30, y: 350, w: 220, h: 24 },
           // Right side tower
-          { x: 760, y: 400, w: 170, h: 22 },
-          { x: 740, y: 200, w: 170, h: 22 }, // high dive perch
+          { x: 705, y: 465, w: 76, h: 18 },
+          { x: 770, y: 400, w: 160, h: 22 },
+          { x: 694, y: 200, w: 109, h: 22 }, // Leave clear space above the spring.
           { x: 560, y: 360, w: 140, h: 22 }  // plate ledge
         ],
         movers: [
           { x: 310, y: 390, w: 100, h: 20, x1: 270, x2: 520, y1: 390, y2: 390, speed: 150 }
         ],
         springs: [
-          { x: 820, y: 386, w: 54, h: 14 } // launches up to (740, 200)
+          { x: 820, y: 386, w: 54, h: 14, minimum: 850 }
         ],
         plates: [
           { id: 'p_n3_core', x: 588, y: 348, w: 84, h: 12, req: 2, action: 'openDoor', target: 'd_n3_core' }
@@ -721,10 +754,10 @@
           { id: 'd_n3_core', x: 225, y: 374, w: 24, h: 136, open: false }
         ],
         cores: [
-          { id: 'core_3', name: { zh: '动量之核', en: 'Momentum Core', ru: 'Ядро импульса', ja: '運動量の星核' }, x: 125, y: 455 }
+          { id: 'core_3', name: { zh: '动量之核', en: 'Momentum Core', ru: 'Ядро импульса', ja: '運動量の星核' }, x: 125, y: 475 }
         ],
         exits: [
-          { dir: 'down', to: 'N1', tx: 480, ty: 60 }
+          { dir: 'down', to: 'N1', tx: 590, ty: 65 }
         ]
       },
 
@@ -826,7 +859,8 @@
           { x: 140, y: 90, w: 120, h: 16 }, { x: 140, y: 180, w: 120, h: 16 },
           { x: 140, y: 106, w: 16, h: 74 }, { x: 244, y: 106, w: 16, h: 74 },
           // Wall blocking direct walk to bottom-left exit unless phase flips!
-          { x: 310, y: 360, w: 26, h: 150 }
+          { x: 310, y: 360, w: 26, h: 150 },
+          { x: 530, y: 453, w: 60, h: 18 }
         ],
         phaseSolids: [
           { x: 310, y: 240, w: 26, h: 120, phase: 0 }, // Cyan barrier blocking jump over wall in phase 0!
@@ -882,6 +916,8 @@
           { x: 930, y: 30, w: 30, h: 330 }, // right gap 360..510 -> H0 (gated by d_w3_h0 synced!)
           { x: 0, y: 510, w: 120, h: 30 }, { x: 240, y: 510, w: 720, h: 30 }, // bottom gap 120..240 -> S4 (glass)
           { x: 30, y: 370, w: 140, h: 22 },
+          { x: 170, y: 433, w: 68, h: 18 },
+          { x: 562, y: 427, w: 78, h: 18 },
           { x: 400, y: 260, w: 160, h: 24 }, // Core II altar
           { x: 640, y: 340, w: 130, h: 22 }  // dive ledge for shortcut plate
         ],
@@ -1053,15 +1089,15 @@
           { x: 380, y: 170, w: 200, h: 24 }  // Core IV high altar
         ],
         phaseSolids: [
-          { x: 630, y: 220, w: 140, h: 22, phase: 1 }, // Violet bridge to Core IV!
+          { x: 630, y: 220, w: 90, h: 22, phase: 1 }, // Violet bridge to Core IV!
           { x: 200, y: 240, w: 130, h: 22, phase: 0 }
         ],
         movers: [
-          { x: 240, y: 415, w: 110, h: 20, x1: 140, x2: 490, y1: 415, y2: 415, speed: 160 }
+          { x: 240, y: 429, w: 110, h: 20, x1: 140, x2: 565, y1: 429, y2: 429, speed: 160 }
         ],
         springs: [
-          { x: 825, y: 496, w: 56, h: 14 }, // Launches to right perch y=350
-          { x: 735, y: 336, w: 50, h: 14 }  // Launches up to violet bridge y=220!
+          { x: 825, y: 496, w: 56, h: 14, minimum: 730 }, // Launches to right perch y=350
+          { x: 744, y: 336, w: 42, h: 14, minimum: 680 }  // Launches up to violet bridge y=220!
         ],
         plates: [
           { id: 'p_s3_phase', x: 560, y: 498, w: 88, h: 12, req: 2, action: 'togglePhase', target: 'prism_s3' }
@@ -1169,7 +1205,7 @@
           { x: 0, y: 510, w: 960, h: 30 },
           { x: 80, y: 420, w: 120, h: 22 },
           { x: 170, y: 330, w: 130, h: 22 },
-          { x: 260, y: 235, w: 140, h: 22 }
+          { x: 260, y: 248, w: 140, h: 22 }
         ],
         plates: [
           { id: 'p_finale', x: 430, y: 498, w: 100, h: 12, req: 2, action: 'finale', target: 'ending' }
@@ -1229,8 +1265,8 @@
   ROOMS.N1.solids.push({ x: 420, y: 234, w: 120, h: 18 }); // Holds upper spring at y=220 cleanly!
   // Remove bottom-gap overlapping spring in N1, replace with solid floor spring at x=330
   ROOMS.N1.springs = [
-    { x: 330, y: 496, w: 54, h: 14 }, // Launches to (240, 290)
-    { x: 452, y: 220, w: 56, h: 14 }  // Launches up through top gap (420..540) to N3!
+    { x: 389, y: 496, w: 31, h: 14, minimum: 825 }, // Alternate route to the west ledge.
+    { x: 452, y: 220, w: 56, h: 14, minimum: 850 } // Launches through the top gap to N3.
   ];
   // Fix E3 weight & spring layout so E3 is 100% smooth and climbable
   ROOMS.E3.weights = [
@@ -1372,7 +1408,7 @@
   let resetConfirmArm = false;
 
   // Input
-  const keys = { left: false, right: false, jump: false, jumpJust: false, actJust: false };
+  const keys = { left: false, right: false, jumpJust: false, actJust: false };
 
   /* =========================================================
      6. ROOM LOADING & NEIGHBOR PRE-CACHE
@@ -1455,6 +1491,7 @@
   const fullscreenButton = document.getElementById('btn-fullscreen');
   const landscape = matchMedia('(orientation: landscape)');
   const coarsePointer = matchMedia('(any-pointer: coarse)');
+  const narrowViewport = matchMedia('(max-width: 860px)');
   let immersive = false;
 
   function updateFullscreen() {
@@ -1462,7 +1499,8 @@
     fullscreenButton.setAttribute('aria-pressed', String(active));
     setLabel('btn-fullscreen', active ? previewText[state.lang].exitFullscreen : previewText[state.lang].fullscreen);
     const rotateHint = document.getElementById('rotate-hint');
-    rotateHint.hidden = !playing || !coarsePointer.matches || landscape.matches;
+    rotateHint.hidden = !playing || !coarsePointer.matches || landscape.matches ||
+      !document.getElementById('touch-controls').classList.contains('visible');
     rotateHint.textContent = previewText[state.lang].rotate;
     resizeCanvas();
   }
@@ -1474,6 +1512,7 @@
   }
 
   fullscreenButton.addEventListener('click', async () => {
+    clearInput();
     if (document.fullscreenElement === app) {
       await document.exitFullscreen();
       return;
@@ -1495,12 +1534,18 @@
     updateFullscreen();
   });
   document.addEventListener('fullscreenchange', () => {
+    clearInput();
     if (!document.fullscreenElement) {
       try { screen.orientation?.unlock?.(); } catch (_) {}
     }
     updateFullscreen();
   });
-  landscape.addEventListener('change', updateFullscreen);
+  landscape.addEventListener('change', () => {
+    clearInput();
+    applySettingsUI();
+  });
+  coarsePointer.addEventListener('change', applySettingsUI);
+  narrowViewport.addEventListener('change', applySettingsUI);
 
   function applyLanguage() {
     const extra = previewText[state.lang];
@@ -1604,10 +1649,12 @@
     });
     document.documentElement.style.setProperty('--btn-scale', String(state.btnScale));
     const tc = document.getElementById('touch-controls');
-    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || window.innerWidth <= 860;
+    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || narrowViewport.matches;
     const showTouch = playing && (state.touchMode === 'on' || (state.touchMode === 'auto' && isTouchDevice));
+    if (!showTouch && tc.classList.contains('visible')) clearInput();
     tc.classList.toggle('visible', showTouch);
     tc.classList.toggle('swapped', state.handSwap);
+    updateFullscreen();
     updateHUD();
   }
 
@@ -1932,8 +1979,8 @@
     if (P.onGround) P.coyote = 0.11;
     else P.coyote = Math.max(0, P.coyote - dt);
 
-    if (keys.jumpJust) P.jumpBuf = 0.12;
-    else P.jumpBuf = Math.max(0, P.jumpBuf - dt);
+    P.jumpBuf = keys.jumpJust ? 0.12 : Math.max(0, P.jumpBuf - dt);
+    keys.jumpJust = false;
 
     if (P.jumpBuf > 0 && P.coyote > 0) {
       P.vy = JUMP_VY;
@@ -1946,11 +1993,6 @@
       P.squashX = 0.78; P.squashY = 1.26;
       sound.playJump();
       spawnParticles(P.x + P.w / 2, P.y + P.h, '#93c5fd', 6, 70);
-    }
-
-    // Variable jump height (short hop when releasing jump early!)
-    if (!keys.jump && P.vy < -180) {
-      P.vy += GRAVITY * 1.45 * dt;
     }
 
     // Gravity
@@ -2054,7 +2096,9 @@
     });
 
     // Interact (E / Stele / Astrolabe)
-    if (keys.actJust) {
+    const interact = keys.actJust;
+    keys.actJust = false;
+    if (interact) {
       if (currentRoom.stele) {
         const dx = Math.abs((P.x + P.w / 2) - currentRoom.stele.x);
         const dy = Math.abs((P.y + P.h / 2) - currentRoom.stele.y);
@@ -2109,8 +2153,6 @@
       if (ps.pulse > 0) ps.pulse = Math.max(0, ps.pulse - dt * 2.4);
     });
 
-    keys.jumpJust = false;
-    keys.actJust = false;
   }
 
   /* =========================================================
@@ -2456,36 +2498,75 @@
   /* =========================================================
      10. RESPONSIVE CANVAS SIZING & MAIN LOOP
      ========================================================= */
+  const stage = document.getElementById('stage-wrap');
+
   function resizeCanvas() {
-    const pad = window.innerWidth <= 720 ? 8 : 28;
-    const availW = Math.max(1, window.innerWidth - pad);
-    const availH = Math.max(1, window.innerHeight - pad);
-    const scale = Math.min(availW / W, availH / H);
-    canvas.style.width = `${Math.floor(W * scale)}px`;
-    canvas.style.height = `${Math.floor(H * scale)}px`;
-    if (playing) applySettingsUI();
+    const scale = Math.max(0, Math.min((stage.clientWidth - 8) / W, (stage.clientHeight - 8) / H));
+    canvas.style.width = Math.floor(W * scale) + 'px';
+    canvas.style.height = Math.floor(H * scale) + 'px';
   }
 
+  if (typeof ResizeObserver === 'function') new ResizeObserver(resizeCanvas).observe(stage);
+
   let rafId = null;
-  let lastTime = 0;
+  let lastTime = null;
+  let physicsTime = 0;
+  const physicsStep = 1 / 60;
   function loop(now) {
-    const dt = Math.min(0.033, (now - lastTime) / 1000 || 0.016);
-    lastTime = now;
     if (playing && !paused) {
-      updatePhysics(dt);
+      physicsTime += Math.min(0.05, (now - (lastTime ?? now)) / 1000);
+      while (physicsTime >= physicsStep) {
+        updatePhysics(physicsStep);
+        physicsTime -= physicsStep;
+      }
       render(now);
+    } else {
+      physicsTime = 0;
     }
+    lastTime = now;
     rafId = requestAnimationFrame(loop);
   }
 
   /* =========================================================
      11. INPUT BINDINGS (Keyboard + Touch + UI Buttons)
      ========================================================= */
-  function clearInput() {
-    for (const key of Object.keys(keys)) keys[key] = false;
-    document.querySelectorAll('.t-btn.pressed').forEach(button => button.classList.remove('pressed'));
+  const pressedKeys = new Set();
+  const activePointers = new Map();
+  const leftKeys = ['ArrowLeft', 'KeyA'];
+  const rightKeys = ['ArrowRight', 'KeyD'];
+  const jumpKeys = ['Space', 'ArrowUp', 'KeyW', 'KeyZ'];
+
+  function updateDirections() {
+    const controls = [...activePointers.values()];
+    keys.left = leftKeys.some(code => pressedKeys.has(code)) || controls.some(el => el.id === 'tc-left');
+    keys.right = rightKeys.some(code => pressedKeys.has(code)) || controls.some(el => el.id === 'tc-right');
   }
+
+  function releasePointer(id) {
+    const el = activePointers.get(id);
+    if (!el) return;
+    activePointers.delete(id);
+    el.classList.remove('pressed');
+    try {
+      if (el.hasPointerCapture?.(id)) el.releasePointerCapture(id);
+    } catch (_) {}
+    updateDirections();
+  }
+
+  function clearInput() {
+    pressedKeys.clear();
+    for (const id of activePointers.keys()) releasePointer(id);
+    for (const key of Object.keys(keys)) keys[key] = false;
+    P.jumpBuf = 0;
+  }
+
   window.addEventListener('blur', clearInput);
+  window.addEventListener('pagehide', clearInput);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) clearInput(); });
+  document.addEventListener('touchcancel', clearInput);
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    window.addEventListener(type, event => releasePointer(event.pointerId), true);
+  }
 
   window.addEventListener('keydown', e => {
     if (e.code === 'Escape') {
@@ -2500,12 +2581,12 @@
     if (!playing || e.target.matches?.('textarea,input,select,[contenteditable=true]')) return;
     if (paused && !['KeyM','KeyH'].includes(e.code)) return;
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
-    if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
-    if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
-    if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'KeyZ') {
-      if (!keys.jump) keys.jumpJust = true;
-      keys.jump = true;
+    if (e.repeat) return;
+    if (leftKeys.includes(e.code) || rightKeys.includes(e.code)) {
+      pressedKeys.add(e.code);
+      updateDirections();
     }
+    if (jumpKeys.includes(e.code)) keys.jumpJust = true;
     if (e.code === 'KeyE' || e.code === 'ArrowDown' || e.code === 'KeyS') keys.actJust = true;
     if (e.code === 'KeyR' && !paused) enterRoom(state.roomId);
     if (e.code === 'KeyM') {
@@ -2519,36 +2600,30 @@
   });
 
   window.addEventListener('keyup', e => {
-    if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
-    if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
-    if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'KeyZ') keys.jump = false;
+    if (pressedKeys.delete(e.code)) updateDirections();
   });
 
-  function bindTouch(id, onDown, onUp) {
+  for (const id of ['tc-left', 'tc-right', 'tc-jump', 'tc-act']) {
     const el = document.getElementById(id);
-    let pointer = null;
     el.addEventListener('pointerdown', event => {
-      if (pointer !== null || !playing || paused || event.button !== 0) return;
       event.preventDefault();
-      pointer = event.pointerId;
-      el.setPointerCapture(pointer);
+      if (!playing || paused || event.button !== 0 || [...activePointers.values()].includes(el)) return;
+      activePointers.set(event.pointerId, el);
+      try { el.setPointerCapture(event.pointerId); } catch (_) {}
       sound.init();
       el.classList.add('pressed');
-      onDown();
+      if (id === 'tc-jump') keys.jumpJust = true;
+      if (id === 'tc-act') keys.actJust = true;
+      updateDirections();
     });
-    for (const type of ['pointerup','pointercancel','lostpointercapture']) {
-      el.addEventListener(type, event => {
-        if (event.pointerId !== pointer) return;
-        pointer = null;
-        el.classList.remove('pressed');
-        onUp();
-      });
-    }
+    // If capture fails in an embedded browser, sliding off cannot leave a direction held.
+    el.addEventListener('pointerleave', event => {
+      if (!el.hasPointerCapture?.(event.pointerId)) releasePointer(event.pointerId);
+    });
   }
-  bindTouch('tc-left', () => { keys.left = true; }, () => { keys.left = false; });
-  bindTouch('tc-right', () => { keys.right = true; }, () => { keys.right = false; });
-  bindTouch('tc-jump', () => { if (!keys.jump) keys.jumpJust = true; keys.jump = true; }, () => { keys.jump = false; });
-  bindTouch('tc-act', () => { keys.actJust = true; }, () => {});
+  for (const el of [canvas, document.getElementById('touch-controls'), document.getElementById('hud')]) {
+    el.addEventListener('contextmenu', event => event.preventDefault());
+  }
 
   function startGame(resetNew) {
     sound.init();
@@ -2559,6 +2634,7 @@
     document.getElementById('hud').style.display = 'flex';
     document.getElementById('key-bar').style.display = 'flex';
     playing = true;
+    app.classList.add('playing');
     paused = false;
     enterRoom(state.roomId);
     applySettingsUI();
@@ -2593,6 +2669,8 @@
   document.getElementById('btn-back-title').addEventListener('click', () => {
     closeModal('modal-ending');
     playing = false;
+    app.classList.remove('playing');
+    clearInput();
     document.getElementById('hud').style.display = 'none';
     document.getElementById('key-bar').style.display = 'none';
     document.getElementById('touch-controls').classList.remove('visible');

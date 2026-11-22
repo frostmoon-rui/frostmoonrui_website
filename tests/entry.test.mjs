@@ -30,7 +30,7 @@ test('the public playtest article opens the standalone game without inline scrip
   assert.equal((article.match(new RegExp(`href="/${locale}/play/astrofall/"`,'g'))||[]).length,1);
   assert.ok(game.includes(`data-locale="${locale}"`));
   assert.ok(game.includes(`href="/${locale}/notes/astrofall-playtest/"`));
-  assert.match(game,/<script src="\/assets\/astrofall\.js" defer><\/script>/);
+  assert.match(game,/<script src="\/assets\/astrofall\.js\?v=\d+" defer><\/script>/);
   assert.doesNotMatch(game,/<script>|<style>/);
  }
 });
