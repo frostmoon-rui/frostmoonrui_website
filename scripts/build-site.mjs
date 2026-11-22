@@ -31,6 +31,38 @@ const astrofallShell={
  ru:['Обсерватория «Звездопад»','Подготовка звёздной карты…','Назад к статье о тестировании'],
  ja:['星墜の天文台','星図を準備しています…','プレイテスト記事に戻る']
 };
+const nightGame=read('templates/night-observatory.html');
+const nightWorker=read('templates/night-observatory-sw.js');
+const nightManifest=JSON.parse(read('templates/night-observatory.webmanifest'));
+const nightAssets=[...nightGame.matchAll(/(?:href|src)="((?:js\/|icons\/)[^"]+|style\.css)"/g)]
+ .map(match=>match[1]);
+const nightRevision=createHash('sha256').update(nightGame).update(nightWorker)
+ .update(JSON.stringify(nightManifest))
+ .update(nightAssets.map(asset=>read('dist/assets/night-observatory/'+asset)).join('')).digest('hex').slice(0,12);
+const nightAsset=asset=>'/assets/night-observatory/'+asset+'?v='+nightRevision;
+const nightTitles={
+ zh:['夜间天文台','用落地冲量、光线和重力探索 38 间房。','返回公测文章','经典版 · 16 室'],
+ en:['The Night Observatory','Explore 38 rooms using impact, light, and gravity.','Back to the playtest article','Classic edition · 16 rooms'],
+ ru:['Ночная обсерватория','Исследуйте 38 комнат, используя силу падения, свет и гравитацию.','Назад к статье о тестировании','Классическая версия · 16 комнат'],
+ ja:['夜の天文台','着地の衝撃、光、重力を使って38の部屋を探索。','プレイテスト記事に戻る','クラシック版 · 全16室'],
+};
+function writeNightGame(prefix, locale) {
+ const [title,description,notes,classic]=nightTitles[locale];
+ const route=prefix+'play/astrofall/';
+ const hrefs='<nav class="title-links"><a href="'+languagePath(locale,'notes/astrofall-playtest/')+'">'+escape(notes)+'</a><a href="'+languagePath(locale,'play/astrofall/classic/')+'">'+escape(classic)+'</a></nav>';
+ const html=nightGame
+  .replace('<html lang="en" data-locale="en">','<html lang="'+htmlLanguages[locale]+'" data-locale="'+locale+'">')
+  .replace(/<title>[^<]*<\/title>/,'<title>'+escape(title)+'</title>')
+  .replace(/(<meta name="description" content=")[^"]*/,(_,start)=>start+escape(description))
+  .replace(/(aria-label=")夜间天文台游戏画面"/,(_,start)=>start+escape(title)+'"')
+  .replace('href="manifest.webmanifest"','href="./manifest.webmanifest"')
+  .replace(/(href|src)="((?:js\/|icons\/)[^"]+|style\.css)"/g,(_,attr,asset)=>attr+'="'+nightAsset(asset)+'"')
+  .replace('<!--OBSERVATORY_LINKS-->',hrefs);
+ write(route+'index.html',html);
+ write(route+'sw.js',nightWorker.replace('__REVISION__',nightRevision).replace('__PRECACHE__',JSON.stringify(nightAssets.map(nightAsset))));
+ write(route+'manifest.webmanifest',JSON.stringify({...nightManifest,name:title,short_name:title,description,lang:htmlLanguages[locale],
+  start_url:'./',icons:nightManifest.icons.map(icon=>({...icon,src:nightAsset(icon.src)}))},null,2)+'\n');
+}
 const home=read('templates/home.html');
 const atlas=read('templates/food-map.html').replace('</head>','<link rel="stylesheet" href="/assets/map-tools.css"></head>');
 const notFound=read('templates/404.html');
@@ -68,8 +100,12 @@ for(const locale of locales){
   .replace(/(id="loader-title">)[^<]*/,`$1${escape(gameTitle)}`)
   .replace(/(id="loader-status">)[^<]*/,`$1${escape(loading)} 0%`)
   .replace('<!--PUBLIC_TEST_NOTES-->',`<a class="test-notes-link" href="${languagePath(locale,'notes/astrofall-playtest/')}">${escape(returnToNotes)}</a>`);
- write(`${locale}/play/astrofall/index.html`,game);
- if(locale==='en')write('play/astrofall/index.html',game);
+ write(`${locale}/play/astrofall/classic/index.html`,game);
+ writeNightGame(`${locale}/`,locale);
+ if(locale==='en'){
+  write('play/astrofall/classic/index.html',game);
+  writeNightGame('',locale);
+ }
  const roomHtml=secretPage(room,site,locale,catalog);
  write(`${locale}/about-secret/index.html`,roomHtml);
  if(locale==='en')write('about-secret/index.html',roomHtml);

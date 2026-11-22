@@ -38,7 +38,8 @@ function physics() {
       },
       position: () => ({ x: P.x, feet: P.y + P.h, grounded: P.onGround, room: state.roomId }),
       opened: id => state.openedDoors.includes(id),
-      hasCore: id => state.cores.includes(id)
+      hasCore: id => state.cores.includes(id),
+      broke: id => state.brokenGlass.includes(id)
     };
   })();`), globals);
 }
@@ -126,7 +127,8 @@ test('the west route crosses both phase switches and reaches Core II', () => {
   moveTo(133);
   ticks(130);
   assert.equal(game.position().room, 'W3');
-  jumpAcross(148, 370);
+  assert.equal(game.position().feet, 370);
+  moveTo(141);
   jumpAcross(240, 330);
   game.step(1, true);
   for (let i = 0; i < 100; i++) {
@@ -139,4 +141,15 @@ test('the west route crosses both phase switches and reaches Core II', () => {
   jumpAcross(466, 260);
   moveTo(475);
   assert.ok(game.hasCore('core_2'));
+});
+
+test('the Eclipse Altar glass shaft is open to a heavy drop from the left ledge', () => {
+  const { game, ticks, moveTo } = route();
+  game.enter('W3');
+  ticks(60);
+  assert.equal(game.position().feet, 370);
+  moveTo(173);
+  ticks(60);
+  assert.ok(game.broke('g_w3_vault'));
+  assert.equal(game.position().room, 'S4');
 });

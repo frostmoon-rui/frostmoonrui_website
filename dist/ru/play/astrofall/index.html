@@ -1,207 +1,307 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru" data-locale="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="robots" content="noindex">
-<link rel="icon" href="/favicon.jpg" type="image/jpeg">
-<title>Обсерватория «Звездопад»</title>
-<link rel="stylesheet" href="/assets/astrofall.css?v=3">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070b14">
+  <meta name="description" content="Исследуйте 38 комнат, используя силу падения, свет и гравитацию.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Ночная обсерватория</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/night-observatory/icons/favicon-32.png?v=cac1a6d5ebce">
+  <link rel="apple-touch-icon" href="/assets/night-observatory/icons/apple-touch-icon.png?v=cac1a6d5ebce">
+  <link rel="stylesheet" href="/assets/night-observatory/style.css?v=cac1a6d5ebce">
+  <meta name="robots" content="noindex">
 </head>
 <body>
 <div id="app">
-  <!-- Loading Screen -->
-  <div id="loader-screen">
-    <div class="orbital-spinner">
-      <div class="orbit-ring"></div>
-      <div class="orbit-ring-inner"></div>
-      <div class="moon-core"></div>
+  <canvas id="game" width="1280" height="720" aria-label="Ночная обсерватория"></canvas>
+  <div id="grain" aria-hidden="true"></div>
+  <div id="vignette" aria-hidden="true"></div>
+
+  <!-- Loading -->
+  <div id="loading" class="screen loading-screen">
+    <div class="loader-wrap">
+      <canvas id="orrery" width="340" height="340" aria-hidden="true"></canvas>
+      <div class="brand-block">
+        <div class="brand" data-i18n="title">夜间天文台</div>
+        <div class="brand-sub" data-i18n="subtitle">THE NIGHT OBSERVATORY</div>
+      </div>
+      <div id="load-step" class="load-step">正在校准星图</div>
+      <div class="load-track"><div id="load-bar"></div></div>
+      <div class="load-row">
+        <span id="load-pct">0%</span>
+        <span id="load-tip" class="load-tip"></span>
+      </div>
     </div>
-    <div class="loader-title" id="loader-title">Обсерватория «Звездопад»</div>
-    <div class="loader-bar-wrap" id="loader-progress" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="loader-bar-fill" id="loader-bar"></div></div>
-    <div class="loader-status" id="loader-status">Подготовка звёздной карты… 0%</div>
   </div>
 
-  <!-- Title Screen -->
-  <div id="title-screen" class="hidden">
-    <div class="title-badge" id="t-badge">KNOWLEDGE-GATED PLATFORMER</div>
-    <h1 class="title-main" id="t-main">星坠天文台</h1>
-    <p class="title-sub" id="t-sub">在安全的前厅领悟一条关于「坠落与共振」的法则，然后用它改写光影、借势飞跃，揭开 16 间互通星室中早已摆在眼前的秘密路线。</p>
-    <div class="title-actions">
-      <button class="btn-primary" id="btn-start">开始探索</button>
-      <button class="btn-glass" id="btn-continue" style="display:none;">继续存档</button>
-      <button class="btn-glass" id="btn-title-settings">设置与存档</button>
+  <!-- Title -->
+  <div id="title" class="screen title-screen hidden">
+    <div class="title-shade" aria-hidden="true"></div>
+    <div class="title-content">
+      <div class="title-top">
+        <div class="eyebrow" data-i18n="title_eyebrow">A NIGHT IN THREE MOTIONS</div>
+        <h1 class="logo" data-i18n="title">夜间天文台</h1>
+        <div class="logo-sub" data-i18n="subtitle">THE NIGHT OBSERVATORY</div>
+        <p class="tagline" data-i18n="tagline">光决定你落在哪，重力决定你往哪落，冲量决定你落得多重。</p>
+      </div>
+      <div class="title-bottom">
+        <div class="title-menu glass">
+          <button id="btn-continue" class="btn primary" data-i18n="continue">继续</button>
+          <button id="btn-new" class="btn" data-i18n="new_game">新游戏</button>
+          <button id="btn-load" class="btn" data-i18n="load_game">载入</button>
+          <button id="btn-settings" class="btn" data-i18n="settings">设置</button>
+            <button id="btn-about" class="btn ghost" data-i18n="about">关于</button>
+        </div>
+        <div class="title-side">
+          <div class="lang-switch" id="lang-switch"></div>
+          <div class="title-meta" data-i18n="title_meta">无外部素材 · 建议横屏 · 键盘 / 触屏</div>
+          <nav class="title-links"><a href="/ru/notes/astrofall-playtest/">Назад к статье о тестировании</a><a href="/ru/play/astrofall/classic/">Классическая версия · 16 комнат</a></nav>
+        </div>
+      </div>
     </div>
-    <div class="lang-row" id="title-langs">
-      <button class="lang-pill active" data-lang="zh">中文</button>
-      <button class="lang-pill" data-lang="en">English</button>
-      <button class="lang-pill" data-lang="ru">Русский</button>
-      <button class="lang-pill" data-lang="ja">日本語</button>
-    </div>
-    <a class="test-notes-link" href="/ru/notes/astrofall-playtest/">Назад к статье о тестировании</a>
   </div>
 
-  <!-- Game Stage -->
-  <div id="stage-wrap">
-    <canvas id="game-canvas" width="960" height="540"></canvas>
-    <div id="room-spinner"><div class="mini-orbit"></div></div>
+  <!-- Save slots -->
+  <div id="slots" class="screen slots-screen hidden">
+    <div class="panel glass wide">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow" data-i18n="archive">ARCHIVE</div>
+          <h2 data-i18n="save_slots">守夜人的记录</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close="slots" aria-label="Close">×</button>
+      </div>
+      <div id="slot-list" class="slot-list"></div>
+      <p class="fineprint" data-i18n="save_hint">三个存档位自动保存；也可以导出存档码换设备继续。</p>
+    </div>
   </div>
 
   <!-- HUD -->
-  <div id="hud" style="display:none;">
-    <div class="hud-group">
-      <div class="hud-pill"><span class="dot-gold"></span><span id="hud-room">星门前厅</span></div>
-      <div class="hud-pill" id="hud-cores"><span class="dot-gold"></span><span id="hud-cores-txt">星核 0/4</span></div>
-      <div class="hud-pill hide-sm" id="hud-shards"><span class="dot-lunar"></span><span id="hud-shards-txt">碎片 0/4</span></div>
-      <div class="hud-pill" id="hud-impact" data-grade="0"><span id="hud-impact-txt"></span><span class="impact-segments" aria-hidden="true"><i></i><i></i><i></i></span></div>
-      <div class="hud-pill hide-sm" id="hud-phase"><span class="dot-lunar" id="hud-phase-dot"></span><span id="hud-phase-txt">月光相位</span></div>
+  <div id="hud" class="hud hidden">
+    <div class="hud-left">
+      <div class="hud-room" id="hud-room">守夜厅</div>
+      <div class="hud-wing" id="hud-wing">NIGHTWATCH HALL</div>
+      <div class="sigil-row" id="hud-sigils"></div>
     </div>
-    <div class="hud-group">
-      <button class="hud-btn" id="btn-hint" title="提示 (H)">💡 <span id="lbl-hint">提示</span></button>
-      <button class="hud-btn" id="btn-map" title="星图 (M)">🗺 <span id="lbl-map">星图</span></button>
-      <button class="hud-btn" id="btn-reset" title="重置房间 (R)">↺</button>
-      <button class="hud-btn" id="btn-audio" title="声音">🔊</button>
-      <button class="hud-btn" id="btn-fullscreen" type="button" aria-pressed="false">⛶</button>
-      <button class="hud-btn" id="btn-settings" title="设置">⚙</button>
+    <div class="hud-right">
+      <button id="btn-hint" class="icon-btn hud-btn" title="Hint (H)" aria-label="Hint">
+        <span class="ico">✦</span><span class="hud-btn-label" data-i18n="hint">提示</span>
+      </button>
+      <button id="btn-map" class="icon-btn hud-btn" title="Map (M)" aria-label="Map">
+        <span class="ico">☾</span><span class="hud-btn-label" data-i18n="map">星图</span>
+      </button>
+      <button id="btn-fullscreen" class="hud-btn" type="button" title="Fullscreen"><span aria-hidden="true">⛶</span><span class="sr-only" data-i18n="fullscreen">Fullscreen</span></button>
+      <button id="btn-pause" class="icon-btn hud-btn" title="Pause (Esc)" aria-label="Pause">
+        <span class="ico">Ⅱ</span><span class="hud-btn-label" data-i18n="pause">暂停</span>
+      </button>
     </div>
+    <div id="hud-objective" class="hud-objective"></div>
+    <div id="autosave" class="autosave hidden"><span class="crescent">☾</span><span data-i18n="saved">已保存</span></div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" role="status" aria-live="polite"></div>
-  <div id="rotate-hint" hidden></div>
-
-  <!-- Keyboard Legend -->
-  <div id="key-bar" style="display:none;">
-    <span id="kb-move">A/D 移动</span>
-    <span>·</span>
-    <span id="kb-jump">Space 跳跃</span>
-    <span>·</span>
-    <span id="kb-act">E 互动</span>
-    <span>·</span>
-    <span id="kb-reset">R 重置房间</span>
-    <span>·</span>
-    <span id="kb-map">M 星图</span>
-  </div>
-
-  <!-- Touch Controls -->
-  <div id="touch-controls">
-    <div class="touch-cluster">
-      <button class="t-btn" id="tc-left">◀</button>
-      <button class="t-btn" id="tc-right">▶</button>
-    </div>
-    <div class="touch-cluster">
-      <button class="t-btn" id="tc-act">✦</button>
-      <button class="t-btn jump" id="tc-jump">▲</button>
-    </div>
-  </div>
-
-  <!-- Map Modal -->
-  <div class="modal-backdrop" id="modal-map">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div class="modal-title" id="m-map-title">天文台星图 (16 房间)</div>
-        <button class="modal-close" data-close="modal-map">×</button>
+  <!-- Hint panel -->
+  <div id="hint-panel" class="side-panel glass hidden">
+    <div class="panel-head">
+      <div>
+        <div class="eyebrow" data-i18n="conductor">THE CONDUCTOR</div>
+        <h3 data-i18n="hint_title">指挥家的记忆</h3>
       </div>
-      <div style="font-size:12px;color:var(--muted);" id="m-map-sub">金色边框为当前位置 · ★ 星核 · ✦ 隐藏星尘碎片</div>
-      <div class="map-grid" id="map-grid"></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
-        <button class="btn-glass" id="btn-warp-hub">返回大厅 (Hub)</button>
-        <button class="btn-glass" data-close="modal-map" id="btn-close-map">关闭</button>
+      <button class="icon-btn close-btn" data-close="hint-panel" aria-label="Close">×</button>
+    </div>
+    <div id="hint-body" class="hint-body"></div>
+    <div class="hint-actions">
+      <button id="btn-hint-more" class="btn small" data-i18n="hint_more">再想一点</button>
+      <button id="btn-hint-show" class="btn small ghost" data-i18n="hint_show">指给我看</button>
+    </div>
+  </div>
+
+  <!-- Pause -->
+  <div id="pause" class="screen pause-screen hidden">
+    <div class="panel glass narrow">
+      <div class="eyebrow" data-i18n="intermission">INTERMISSION</div>
+      <h2 data-i18n="paused">暂停</h2>
+      <div class="stack">
+        <button id="btn-resume" class="btn primary" data-i18n="resume">继续游戏</button>
+        <button id="btn-pause-hint" class="btn" data-i18n="hint">提示</button>
+        <button id="btn-pause-map" class="btn" data-i18n="map">星图</button>
+        <button id="btn-pause-settings" class="btn" data-i18n="settings">设置</button>
+        <button id="btn-save-export" class="btn ghost" data-i18n="export_save">导出存档</button>
+        <button id="btn-title" class="btn ghost" data-i18n="return_title">返回标题</button>
       </div>
     </div>
   </div>
 
-  <!-- Hint Modal -->
-  <div class="modal-backdrop" id="modal-hint">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div class="modal-title" id="m-hint-title">分层观察提示</div>
-        <button class="modal-close" data-close="modal-hint">×</button>
+  <!-- Settings -->
+  <div id="settings-screen" class="screen settings-screen hidden">
+    <div class="panel glass settings-panel">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow" data-i18n="calibration">CALIBRATION</div>
+          <h2 data-i18n="settings">设置</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close="settings-screen" aria-label="Close">×</button>
       </div>
-      <div id="hint-content"></div>
+      <div class="settings-grid">
+        <label class="setting">
+          <span data-i18n="language">语言</span>
+          <select id="set-language"></select>
+        </label>
+        <label class="setting">
+          <span data-i18n="music">音乐</span>
+          <input id="set-music" type="range" min="0" max="100" value="65">
+          <output id="out-music">65</output>
+        </label>
+        <label class="setting">
+          <span data-i18n="sfx">音效</span>
+          <input id="set-sfx" type="range" min="0" max="100" value="80">
+          <output id="out-sfx">80</output>
+        </label>
+        <label class="setting">
+          <span data-i18n="ambient">环境音</span>
+          <input id="set-ambient" type="range" min="0" max="100" value="55">
+          <output id="out-ambient">55</output>
+        </label>
+        <label class="setting">
+          <span data-i18n="screen_shake">屏幕震动</span>
+          <input id="set-shake" type="range" min="0" max="100" value="60">
+          <output id="out-shake">60</output>
+        </label>
+        <label class="setting toggle">
+          <span data-i18n="reduce_motion">减弱动态</span>
+          <input id="set-reduce" type="checkbox">
+          <span class="switch"></span>
+        </label>
+        <label class="setting toggle">
+          <span data-i18n="high_contrast">高对比</span>
+          <input id="set-contrast" type="checkbox">
+          <span class="switch"></span>
+        </label>
+        <label class="setting toggle">
+          <span data-i18n="sound_subtitles">声音字幕</span>
+          <input id="set-subtitles" type="checkbox" checked>
+          <span class="switch"></span>
+        </label>
+        <label class="setting toggle">
+          <span data-i18n="hints_enabled">分层提示</span>
+          <input id="set-hints" type="checkbox" checked>
+          <span class="switch"></span>
+        </label>
+        <label class="setting">
+          <span data-i18n="control_side">触屏方向</span>
+          <select id="set-side">
+            <option value="right" data-i18n="right_hand">右手跳跃</option>
+            <option value="left" data-i18n="left_hand">左手跳跃</option>
+          </select>
+        </label>
+        <label class="setting">
+          <span data-i18n="button_size">按钮大小</span>
+          <input id="set-buttons" type="range" min="80" max="140" value="100">
+          <output id="out-buttons">100%</output>
+        </label>
+      </div>
+      <div class="settings-footer">
+        <div class="save-code-row">
+          <label for="save-code" data-i18n="save_code">Save code</label>
+          <textarea id="save-code" rows="2" spellcheck="false" maxlength="64000"></textarea>
+          <button id="btn-import-code" class="btn ghost small" data-i18n="import_code">Import code</button>
+          <button id="btn-import" class="btn ghost small" data-i18n="import_save">Import save</button>
+        </div>
+        <button id="btn-reset" class="btn danger small" data-i18n="reset_progress">清空进度</button>
+        <button id="btn-settings-done" class="btn primary small" data-i18n="done">完成</button>
+      </div>
     </div>
   </div>
 
-  <!-- Settings Modal -->
-  <div class="modal-backdrop" id="modal-settings">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div class="modal-title" id="m-set-title">设置与存档管理</div>
-        <button class="modal-close" data-close="modal-settings">×</button>
-      </div>
-      <div class="setting-row">
-        <span id="s-lang-lbl">界面语言</span>
-        <div class="seg-group" id="set-langs">
-          <button class="seg-btn" data-lang="zh">中</button>
-          <button class="seg-btn" data-lang="en">EN</button>
-          <button class="seg-btn" data-lang="ru">RU</button>
-          <button class="seg-btn" data-lang="ja">日</button>
+  <!-- Map -->
+  <div id="map-screen" class="screen map-screen hidden">
+    <div class="panel glass map-panel">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow" data-i18n="star_chart">STAR CHART</div>
+          <h2 data-i18n="map">星图</h2>
         </div>
+        <button class="icon-btn close-btn" data-close="map-screen" aria-label="Close">×</button>
       </div>
-      <div class="setting-row">
-        <span id="s-sfx-lbl">机关与环境音效</span>
-        <div class="seg-group">
-          <button class="seg-btn" id="set-sfx-on">开启</button>
-          <button class="seg-btn" id="set-sfx-off">静音</button>
-        </div>
-      </div>
-      <div class="setting-row">
-        <span id="s-bgm-lbl">深空环境背景音</span>
-        <div class="seg-group">
-          <button class="seg-btn" id="set-bgm-on">开启</button>
-          <button class="seg-btn" id="set-bgm-off">关闭</button>
-        </div>
-      </div>
-      <div class="setting-row">
-        <span id="s-touch-lbl">屏幕触控按键</span>
-        <div class="seg-group">
-          <button class="seg-btn" id="set-touch-auto">自动</button>
-          <button class="seg-btn" id="set-touch-on">显示</button>
-          <button class="seg-btn" id="set-touch-off">隐藏</button>
-        </div>
-      </div>
-      <div class="setting-row">
-        <span id="s-hand-lbl">左右手布局</span>
-        <div class="seg-group">
-          <button class="seg-btn" id="set-hand-std">左手方向</button>
-          <button class="seg-btn" id="set-hand-swap">右手方向</button>
-        </div>
-      </div>
-      <div class="setting-row">
-        <span id="s-size-lbl">触控按键尺寸</span>
-        <div class="seg-group">
-          <button class="seg-btn" data-size="0.85">小</button>
-          <button class="seg-btn" data-size="1">中</button>
-          <button class="seg-btn" data-size="1.18">大</button>
-        </div>
-      </div>
-      <div style="margin-top:12px;">
-        <div style="font-size:12px;color:var(--muted);" id="s-save-lbl">跨设备存档码（自动保存在本浏览器）</div>
-        <textarea class="save-box" id="save-code-box" placeholder="点击「导出存档」生成存档码，或粘贴存档码后点击「导入」"></textarea>
-        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-          <button class="btn-glass" id="btn-export-save">导出并复制</button>
-          <button class="btn-glass" id="btn-import-save">导入存档</button>
-          <button class="btn-glass" id="btn-new-game" style="border-color:rgba(248,113,113,0.45);color:#fca5a5;">重置全部进度</button>
-        </div>
+      <div id="map-body" class="map-body"></div>
+      <p class="fineprint" data-i18n="map_hint">已探索的房间会亮起。没有目标箭头，只有你走过的路。</p>
+    </div>
+  </div>
+
+  <!-- Dialogue -->
+  <div id="dialogue" class="dialogue hidden">
+    <div class="dialogue-inner glass">
+      <div id="dialogue-speaker" class="dialogue-speaker">指挥家</div>
+      <div id="dialogue-text" class="dialogue-text"></div>
+      <div class="dialogue-foot">
+        <span class="dialogue-dots" id="dialogue-dots"></span>
+        <button id="dialogue-next" class="btn small" data-i18n="next">继续</button>
       </div>
     </div>
   </div>
 
-  <!-- Ending Modal -->
-  <div class="modal-backdrop" id="modal-ending">
-    <div class="modal-card" style="text-align:center;">
-      <div class="title-badge" id="end-badge" style="display:inline-block;">OBSERVATORY REKINDLED</div>
-      <h2 class="title-main" id="end-title" style="font-size:28px;">星象重启</h2>
-      <p id="end-desc" style="font-size:14px;line-height:1.7;color:#cbd5e1;margin:12px 0 18px;"></p>
-      <div id="end-stats" style="font-size:13px;color:var(--gold);margin-bottom:18px;"></div>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn-primary" id="btn-keep-exploring">继续自由探索</button>
-        <button class="btn-glass" id="btn-back-title">返回标题</button>
+  <!-- Opening -->
+  <div id="opening" class="screen opening-screen hidden">
+    <div class="opening-stars" aria-hidden="true"></div>
+    <div class="opening-content">
+      <div class="opening-line" data-i18n="opening_1">海面停在半空，像一张没有翻页的星图。</div>
+      <div class="opening-line dim" data-i18n="opening_2">最后一位守夜人回到了天文台。</div>
+      <div class="opening-line dim" data-i18n="opening_3">航标灯已经熄灭很久了。</div>
+      <button id="btn-skip-opening" class="btn ghost small" data-i18n="skip">跳过</button>
+    </div>
+  </div>
+
+  <!-- Ending -->
+  <div id="ending" class="screen ending-screen hidden">
+    <div class="ending-vignette" aria-hidden="true"></div>
+    <div class="ending-content">
+      <div class="eyebrow" data-i18n="ending_eyebrow">AN ENDING</div>
+      <h2 id="ending-title">夜航</h2>
+      <div id="ending-text" class="ending-text"></div>
+      <div id="ending-stats" class="ending-stats"></div>
+      <div class="ending-actions">
+        <button id="btn-ending-title" class="btn" data-i18n="return_title">返回标题</button>
+        <button id="btn-ending-continue" class="btn ghost" data-i18n="continue_explore">继续探索</button>
       </div>
     </div>
   </div>
+
+  <!-- Orientation -->
+  <div id="orientation" class="screen orientation-screen hidden">
+    <div class="phone-rotate">▭</div>
+    <h2 data-i18n="rotate_title">请横屏游玩</h2>
+    <p data-i18n="rotate_text">把设备转成横向，天文台会看得更清楚。</p>
+  </div>
+
+  <!-- Touch controls -->
+  <div id="touch" class="touch-controls hidden">
+    <div id="joystick" class="joystick">
+      <div class="joystick-ring"></div>
+      <div id="joystick-knob" class="joystick-knob"></div>
+    </div>
+    <div class="touch-right">
+      <button id="btn-touch-interact" class="touch-btn interact hidden" aria-label="Interact">✋</button>
+      <button id="btn-touch-jump" class="touch-btn jump" aria-label="Jump">↑</button>
+      <button id="btn-touch-brace" class="touch-btn brace" aria-label="Brace">↓</button>
+    </div>
+  </div>
+
+  <!-- Toasts / audio subtitles -->
+  <div id="subtitle" class="subtitle hidden"></div>
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Debug/test -->
+  <div id="debug" class="debug hidden"></div>
+  <pre id="test-results" class="test-results hidden"></pre>
 </div>
 
-<script src="/assets/astrofall.js?v=3" defer></script>
+<script defer src="/assets/night-observatory/js/i18n.js?v=cac1a6d5ebce"></script>
+<script defer src="/assets/night-observatory/js/data.js?v=cac1a6d5ebce"></script>
+<script defer src="/assets/night-observatory/js/audio.js?v=cac1a6d5ebce"></script>
+<script defer src="/assets/night-observatory/js/engine.js?v=cac1a6d5ebce"></script>
+<script defer src="/assets/night-observatory/js/ui.js?v=cac1a6d5ebce"></script>
+<script defer src="/assets/night-observatory/js/main.js?v=cac1a6d5ebce"></script>
 </body>
 </html>

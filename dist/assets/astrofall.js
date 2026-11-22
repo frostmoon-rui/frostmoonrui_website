@@ -878,7 +878,7 @@
         ],
         exits: [
           { dir: 'right', to: 'W1', tx: 54, ty: 345 },
-          { dir: 'down', to: 'W3', tx: 180, ty: 56 }
+          { dir: 'down', to: 'W3', tx: 95, ty: 56 }
         ]
       },
 
@@ -886,27 +886,27 @@
       W3: {
         id: 'W3', gx: 0, gy: 2, zone: 'west',
         name: { zh: '月蚀圣坛', en: 'Eclipse Altar', ru: 'Алтарь затмения', ja: '月蝕の聖壇' },
-        spawn: { x: 180, y: 60 },
+        spawn: { x: 95, y: 60 },
         hints: {
           zh: [
             '星核Ⅱ悬在中央月光高台之上；右下角共振板连着东侧通往起始房间「星门前厅」的捷径大门。',
             '利用左侧棱镜切换相位爬到星核Ⅱ，再重落砸响右下共振板，直接打通回家的近路！',
-            '别忘了留意左下角地板上那块微微发亮的裂纹玻璃——重落砸穿它，会通往隐藏的星渊密藏室。'
+            '从左边高台的右缘走下，落向两级台阶之间的裂纹玻璃。重落会砸开通往隐藏密室的入口。'
           ],
           en: [
             'Core II rests on the central altar; the brass plate on the right unlocks a shortcut straight back to the starting room (H0).',
             'Use the prism to reach Core II, then heavy-drop on the right plate to open the eastern shortcut gate.',
-            'Notice the cracked glass in the bottom-left floor—heavy-drop through it to uncover a secret vault!'
+            'Step off the right edge of the left ledge, then land on the cracked glass between the ledges to open the hidden vault.'
           ],
           ru: [
             'Ядро II на центральном алтаре, а плита справа открывает короткий путь назад в стартовую комнату.',
             'Переключите фазу призмой ради Ядра II, затем ударьте по правой плите.',
-            'Треснувшее стекло внизу слева скрывает тайник!'
+            'Сойдите с правого края левого уступа и упадите на треснувшее стекло между уступами. Под ним скрыт тайник.'
           ],
           ja: [
             '中央の祭壇に星核Ⅱがあり、右の共鳴板は最初の前室へ戻るショートカット扉に繋がっています。',
             'プリズムで足場を切り替えて星核Ⅱを取り、右の共鳴板へ重着地して近道を開けましょう。',
-            '左下のひび割れたガラスを重着地で砕くと隠し部屋へ降りられます。'
+            '左の高台の右端から降り、段の間にあるひび割れたガラスへ重着地すると隠し部屋へ進めます。'
           ]
         },
         initialPhase: 0,
@@ -915,8 +915,8 @@
           { x: 0, y: 30, w: 30, h: 480 },
           { x: 930, y: 30, w: 30, h: 330 }, // right gap 360..510 -> H0 (gated by d_w3_h0 synced!)
           { x: 0, y: 510, w: 120, h: 30 }, { x: 240, y: 510, w: 720, h: 30 }, // bottom gap 120..240 -> S4 (glass)
-          { x: 30, y: 370, w: 140, h: 22 },
-          { x: 170, y: 433, w: 68, h: 18 },
+          { x: 30, y: 370, w: 118, h: 22 },
+          { x: 212, y: 433, w: 64, h: 18 },
           { x: 562, y: 427, w: 78, h: 18 },
           { x: 400, y: 260, w: 160, h: 24 }, // Core II altar
           { x: 640, y: 340, w: 130, h: 22 }  // dive ledge for shortcut plate
