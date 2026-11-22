@@ -41,9 +41,6 @@
   function bell(id, x, y, duration, extra) {
     return seal(id, x, y, 'hard', Object.assign({ bell: true, latch: false, duration: duration || 8 }, extra || {}));
   }
-  function door(id, x, y, w, h, requires, extra) {
-    return Object.assign({ type: 'door', id, x, y, w, h, requires: requires || {}, open: false, timer: 0 }, extra || {});
-  }
   function exit(to, x, y, extra) {
     return Object.assign({ type: 'exit', id: 'exit_' + to + '_' + x + '_' + y, to, x, y, w: 64, h: 100 }, extra || {});
   }
@@ -201,14 +198,14 @@
     platforms: [
       ...base(1600, 720),
       P(160, 440, 160, 24),
-      P(200, 560, 80, 60),
+      P(125, 560, 70, 32),
       P(480, 620, 80, 18),
       P(520, 560, 80, 60),
       P(560, 520, 480, 40),
-      P(1180, 620, 60, 60),
+      P(1190, 620, 50, 60),
       P(1220, 560, 60, 60),
       P(1260, 520, 180, 40),
-      P(1416, 620, 84, 20)
+      P(1400, 620, 64, 20)
     ],
     objects: [
       // three wing doors
@@ -244,18 +241,8 @@
       sensor('hub_l1', 760, 460, 'lit', { w: 44, h: 44 }),
       anchor('hub_a1', 1450, 664, 'hub_z1'),
       zone('hub_z1', 1520, 300, 40, 380, 1),
-      // prism door on the raised platform
-      door('hub_prism', 880, 440, 44, 80, { seals: ['hub_s1'], sensors: ['hub_l1'], anchors: ['hub_a1'] }, {
-        kind: 'prism',
-        lockedText: txt('三个面分别回应力度、光、重力。', 'Three faces answer impact, light and gravity.', 'Три грани отвечают на импульс, свет и гравитацию.', '三つの面は衝撃、光、重力に応える。')
-      }),
-      exit('hub_study', 940, 440, { label: txt('书房', 'The Study', 'Кабинет', '書斎'), w: 58, h: 80 }),
-      // optional hidden door appears when 7+ echoes
-      door('hub_hidden', 1330, 520, 44, 80, { echoCount: 7 }, {
-        kind: 'hidden',
-        lockedText: txt('七段回声之后，墙上才会出现第八颗星。', 'After seven echoes, the eighth star appears on the wall.', 'После семи эхов на стене появится восьмая звезда.', '七つの響きのあと、壁に八つ目の星が現れる。')
-      }),
-      exit('hidden1', 1370, 520, { label: txt('第八颗星', 'The Eighth Star', 'Восьмая звезда', '八つ目の星'), w: 58, h: 80 }),
+      exit('hub_study', 850, 424, { requires: { seals: ['hub_s1'], sensors: ['hub_l1'], anchors: ['hub_a1'] }, lockedText: txt('三个面分别回应力度、光、重力。', 'Three faces answer impact, light and gravity.', 'Три грани отвечают на импульс, свет и гравитацию.', '三つの面は衝撃、光、重力に応える。'), label: txt('书房', 'The Study', 'Кабинет', '書斎'), w: 58, h: 96 }),
+      exit('hidden1', 1314, 432, { requires: { echoCount: 7 }, lockedText: txt('七段回声之后，墙上才会出现第八颗星。', 'After seven echoes, the eighth star appears on the wall.', 'После семи эхов на стене появится восьмая звезда.', '七つの響きのあと、壁に八つ目の星が現れる。'), label: txt('第八颗星', 'The Eighth Star', 'Восьмая звезда', '八つ目の星'), w: 58, h: 88 }),
       sign('hub_sign', 420, 620, 't1')
     ]
   });
@@ -301,8 +288,7 @@
     objects: [
       exit('hub', 70, 580, { label: txt('守夜厅', 'Nightwatch Hall', 'Зал ночного стража', '夜番の広間'), w: 58, h: 100 }),
       seal('t1_s', 740, 664, 'hard'),
-      door('t1_d', 1040, 560, 44, 120, { seals: ['t1_s'] }),
-      exit('tide2', 1160, 580, { label: txt('钟摆井', 'Pendulum Well', 'Колодец маятника', '振り子の井戸'), w: 60, h: 100 }),
+      exit('tide2', 1160, 580, { requires: { seals: ['t1_s'] }, label: txt('钟摆井', 'Pendulum Well', 'Колодец маятника', '振り子の井戸'), w: 60, h: 100 }),
       sign('t1_sign', 220, 620, 't1')
     ]
   });
@@ -325,8 +311,7 @@
       exit('tide1', 70, 580, { label: txt('第一声钟', 'The First Bell', 'Первый колокол', '最初の鐘'), w: 58, h: 100 }),
       seal('t2_hard', 385, 664, 'hard'),
       seal('t2_soft', 940, 586, 'soft'),
-      door('t2_d', 1160, 560, 44, 120, { seals: ['t2_soft'] }),
-      exit('tide3', 1210, 580, { label: txt('钟绳', 'Bell Cord', 'Колокольная верёвка', '鐘の綱'), w: 50, h: 100 }),
+      exit('tide3', 1194, 580, { requires: { seals: ['t2_soft'] }, label: txt('钟绳', 'Bell Cord', 'Колокольная верёвка', '鐘の綱'), w: 44, h: 100 }),
       sign('t2_sign', 180, 620, 't2')
     ]
   });
@@ -347,8 +332,7 @@
       exit('tide2', 70, 580, { w: 58, h: 100 }),
       mover('t3_m', 420, 560, 130, 20, 780, 560, 80, 0),
       bell('t3_b', 850, 604, 8),
-      door('t3_d', 1040, 560, 44, 120, { seals: ['t3_b'] }),
-      exit('tide4', 1160, 580, { w: 60, h: 100 }),
+      exit('tide4', 1160, 580, { requires: { seals: ['t3_b'] }, w: 60, h: 100 }),
       spike(360, 660, 620, 20, 'up'),
       sign('t3_sign', 220, 620, 't2')
     ]
@@ -370,8 +354,7 @@
     objects: [
       exit('tide3', 70, 580, { w: 58, h: 100 }),
       seal('t4_s', 1120, 664, 'hard'),
-      door('t4_d', 1160, 560, 44, 120, { seals: ['t4_s'] }),
-      exit('tide5', 1200, 580, { w: 50, h: 100 }),
+      exit('tide5', 1194, 580, { requires: { seals: ['t4_s'] }, w: 44, h: 100 }),
       sign('t4_sign', 180, 620, 't2')
     ]
   });
@@ -394,8 +377,7 @@
     objects: [
       exit('tide4', 70, 940, { w: 58, h: 100 }),
       seal('t5_s', 980, 1026, 'hard'),
-      door('t5_d', 1160, 920, 44, 120, { seals: ['t5_s'] }),
-      exit('tide6', 1200, 940, { w: 50, h: 100 }),
+      exit('tide6', 1194, 940, { requires: { seals: ['t5_s'] }, w: 44, h: 100 }),
       sign('t5_sign', 180, 980, 't1')
     ]
   });
@@ -417,8 +399,7 @@
       exit('tide5', 70, 580, { w: 58, h: 100 }),
       bell('t6_b1', 280, 664, 14),
       bell('t6_b2', 780, 664, 14),
-      door('t6_d', 1080, 560, 44, 120, { seals: ['t6_b1', 't6_b2'] }),
-      exit('tide7', 1180, 580, { w: 60, h: 100 }),
+      exit('tide7', 1180, 580, { requires: { seals: ['t6_b1', 't6_b2'] }, w: 60, h: 100 }),
       sign('t6_sign', 120, 620, 't2')
     ]
   });
@@ -449,8 +430,7 @@
       exit('echo1', 70, 440, { w: 58, h: 80 }),
       exit('echo2', 70, 320, { w: 58, h: 80 }),
       seal('t7_s', 1080, 286, 'hard'),
-      door('t7_d', 1160, 560, 44, 120, { seals: ['t7_s'] }),
-      exit('tide8', 1200, 580, { w: 50, h: 100 }),
+      exit('tide8', 1194, 580, { requires: { seals: ['t7_s'] }, w: 44, h: 100 }),
       sign('t7_sign', 180, 620, 't1')
     ]
   });
@@ -463,14 +443,15 @@
     platforms: [
       ...base(),
       fragile(260, 600, 160, 20),
-      P(760, 440, 160, 24)
+      P(552, 599, 98, 18),
+      P(653, 520, 112, 18),
+      P(760, 440, 146, 24)
     ],
     objects: [
       exit('tide7', 70, 580, { w: 58, h: 100 }),
       seal('t8_soft', 300, 586, 'soft'),
-      seal('t8_hard', 800, 664, 'hard'),
-      door('t8_d', 1080, 560, 44, 120, { seals: ['t8_soft', 't8_hard'] }),
-      exit('hub', 1180, 580, { w: 60, h: 100, grantSigil: 'tide', label: txt('守夜厅', 'Nightwatch Hall', 'Зал ночного стража', '夜番の広間') }),
+      seal('t8_hard', 928, 664, 'hard'),
+      exit('hub', 1180, 580, { requires: { seals: ['t8_soft', 't8_hard'] }, w: 60, h: 100, grantSigil: 'tide', label: txt('守夜厅', 'Nightwatch Hall', 'Зал ночного стража', '夜番の広間') }),
       sign('t8_sign', 180, 620, 't2')
     ]
   });
@@ -505,7 +486,7 @@
       P(600, 480, 24, 200, 'starGlass')
     ],
     objects: [
-      exit('light1', 70, 580, { w: 58, h: 100 }),
+      exit('light1', 59, 580, { w: 58, h: 100 }),
       lamp('l2_l', 80, 500, 1, 0),
       exit('light3', 1180, 580, { w: 60, h: 100 }),
       sign('l2_sign', 230, 480, 'l1')
@@ -550,11 +531,10 @@
       P(120, 600, 80, 60)
     ],
     objects: [
-      exit('light3', 70, 580, { w: 58, h: 100 }),
+      exit('light3', 59, 580, { w: 58, h: 100 }),
       lamp('l4_l', 80, 500, 1, 0),
       sensor('l4_s', 900, 500, 'dark', { hold: 6 }),
-      door('l4_d', 1080, 560, 44, 120, { sensors: ['l4_s'] }),
-      exit('light5', 1180, 580, { w: 60, h: 100 }),
+      exit('light5', 1180, 580, { requires: { sensors: ['l4_s'] }, w: 60, h: 100 }),
       sign('l4_sign', 180, 620, 'l1')
     ]
   });
@@ -596,8 +576,7 @@
       lamp('l6_l1', 100, 100, 0, 1), mirror('l6_m1', 80, 300, '/'), sensor('l6_s1', 300, 280, 'lit'),
       lamp('l6_l2', 500, 100, 0, 1), mirror('l6_m2', 480, 300, '/'), sensor('l6_s2', 700, 280, 'lit'),
       lamp('l6_l3', 900, 100, 0, 1), mirror('l6_m3', 880, 300, '/'), sensor('l6_s3', 1100, 280, 'lit'),
-      door('l6_d', 1160, 560, 44, 120, { sensors: ['l6_s1', 'l6_s2', 'l6_s3'] }),
-      exit('light7', 1200, 580, { w: 50, h: 100 }),
+      exit('light7', 1194, 580, { requires: { sensors: ['l6_s1', 'l6_s2', 'l6_s3'] }, w: 44, h: 100 }),
       sign('l6_sign', 180, 620, 'l1')
     ]
   });
@@ -619,14 +598,13 @@
     ],
     objects: [
       exit('light6', 70, 580, { w: 58, h: 100 }),
-      exit('echo3', 70, 440, { w: 58, h: 80 }),
-      exit('echo4', 70, 320, { w: 58, h: 80 }),
+      exit('echo3', 66, 415, { w: 58, h: 80 }),
+      exit('echo4', 134, 305, { w: 50, h: 80 }),
       lamp('l7_l', 100, 100, 0, 1),
       mirror('l7_m', 80, 300, '/'),
       sensor('l7_s', 700, 280, 'lit', { hold: 10 }),
       seal('l7_s2', 1010, 664, 'hard'),
-      door('l7_d', 1080, 560, 44, 120, { seals: ['l7_s2'] }),
-      exit('light8', 1180, 580, { w: 60, h: 100 }),
+      exit('light8', 1180, 580, { requires: { seals: ['l7_s2'] }, w: 60, h: 100 }),
       sign('l7_sign', 180, 620, 'l1')
     ]
   });
@@ -652,8 +630,7 @@
       mirror('l8_m', 80, 300, '/'),
       sensor('l8_s', 500, 280, 'lit'),
       seal('l8_s2', 1095, 664, 'hard'),
-      door('l8_d', 1120, 560, 44, 120, { sensors: ['l8_s'], seals: ['l8_s2'] }),
-      exit('hub', 1200, 580, { w: 50, h: 100, grantSigil: 'light', label: txt('守夜厅', 'Nightwatch Hall', 'Зал ночного стража', '夜番の広間') }),
+      exit('hub', 1194, 580, { requires: { sensors: ['l8_s'], seals: ['l8_s2'] }, w: 44, h: 100, grantSigil: 'light', label: txt('守夜厅', 'Nightwatch Hall', 'Зал ночного стража', '夜番の広間') }),
       sign('l8_sign', 180, 620, 'l1')
     ]
   });
@@ -682,8 +659,7 @@
       exit('grav1', 70, 580, { w: 58, h: 100 }),
       zone('g2_z', 500, 40, 600, 640, -1),
       seal('g2_s', 500, 40, 'hard'),
-      door('g2_d', 950, 40, 44, 120, { seals: ['g2_s'] }),
-      exit('grav3', 1000, 40, { w: 60, h: 100 }),
+      exit('grav3', 1000, 40, { requires: { seals: ['g2_s'] }, w: 60, h: 100 }),
       sign('g2_sign', 260, 620, 'g1')
     ]
   });
@@ -701,8 +677,7 @@
       mover('g3_m', 350, 560, 120, 20, 750, 560, 70, 0),
       zone('g3_z', 300, 40, 600, 640, -1),
       seal('g3_s', 320, 40, 'hard'),
-      door('g3_d', 1000, 560, 44, 120, { seals: ['g3_s'] }),
-      exit('grav4', 1160, 580, { w: 60, h: 100 }),
+      exit('grav4', 1160, 580, { requires: { seals: ['g3_s'] }, w: 60, h: 100 }),
       sign('g3_sign', 220, 620, 'g1')
     ]
   });
@@ -721,8 +696,7 @@
       exit('grav3', 70, 580, { w: 58, h: 100 }),
       anchor('g4_a', 300, 664, 'g4_z'),
       zone('g4_z', 500, 40, 500, 640, 1),
-      door('g4_d', 950, 40, 44, 120, { anchors: ['g4_a'] }),
-      exit('grav5', 1000, 40, { w: 60, h: 100 }),
+      exit('grav5', 1000, 40, { requires: { anchors: ['g4_a'] }, w: 60, h: 100 }),
       sign('g4_sign', 180, 620, 't1')
     ]
   });
@@ -738,8 +712,7 @@
       exit('grav4', 70, 940, { w: 58, h: 100 }),
       zone('g5_z', 300, 40, 600, 1000, -1),
       bell('g5_b', 300, 40, 12),
-      door('g5_d', 950, 40, 44, 120, { seals: ['g5_b'] }),
-      exit('grav6', 1000, 40, { w: 60, h: 100 }),
+      exit('grav6', 1000, 40, { requires: { seals: ['g5_b'] }, w: 60, h: 100 }),
       sign('g5_sign', 180, 980, 'g1')
     ]
   });
@@ -781,20 +754,20 @@
       P(860, 540, 80, 20),
       P(900, 440, 80, 20),
       P(910, 360, 120, 20),
+      P(45, 940, 100, 18),
       P(40, 820, 100, 20),
       P(40, 700, 100, 20)
     ],
     objects: [
-      exit('grav6', 70, 940, { w: 58, h: 100 }),
-      exit('echo5', 70, 860, { w: 58, h: 80 }),
+      exit('grav6', 70, 956, { w: 58, h: 84 }),
+      exit('echo5', 70, 856, { w: 58, h: 84 }),
       exit('echo6', 70, 740, { w: 58, h: 80 }),
       lamp('g7_l', 100, 100, 0, 1),
       mirror('g7_m1', 80, 300, '\\'),
       mirror('g7_m2', 950, 300, '\\'),
       zone('g7_z', 300, 40, 600, 1000, -1),
       seal('g7_s', 320, 40, 'hard'),
-      door('g7_d', 950, 40, 44, 120, { seals: ['g7_s'] }),
-      exit('grav8', 1000, 40, { w: 60, h: 100 }),
+      exit('grav8', 1000, 40, { requires: { seals: ['g7_s'] }, w: 60, h: 100 }),
       sign('g7_sign', 180, 980, 'g1')
     ]
   });
@@ -823,8 +796,7 @@
       mirror('g8_m2', 950, 300, '\\'),
       zone('g8_z', 300, 40, 600, 1000, -1),
       seal('g8_s', 320, 40, 'hard'),
-      door('g8_d', 950, 40, 44, 120, { seals: ['g8_s'] }),
-      exit('hub', 1000, 40, { w: 60, h: 100, grantSigil: 'gravity', label: txt('守夜厅', 'Nightwatch Hall', 'Зал ночного стража', '夜番の広間') }),
+      exit('hub', 1000, 40, { requires: { seals: ['g8_s'] }, w: 60, h: 100, grantSigil: 'gravity', label: txt('守夜厅', 'Nightwatch Hall', 'Зал ночного стража', '夜番の広間') }),
       sign('g8_sign', 180, 980, 'g1')
     ]
   });
@@ -852,8 +824,7 @@
       sensor('f_sen', 760, 280, 'lit'),
       anchor('f_a', 1000, 664, 'f_z'),
       zone('f_z', 1040, 290, 100, 390, 1),
-      door('f_d', 1140, 470, 40, 210, { seals: ['f_s1'], sensors: ['f_sen'], anchors: ['f_a'] }),
-      exit('final_orrery', 1188, 540, { w: 60, h: 140 }),
+      exit('final_orrery', 1178, 580, { requires: { seals: ['f_s1'], sensors: ['f_sen'], anchors: ['f_a'] }, w: 58, h: 100 }),
       sign('f_sign', 180, 620, 'final')
     ]
   });
@@ -879,8 +850,7 @@
       sensor('fo_sen', 760, 280, 'lit'),
       zone('fo_z', 900, 40, 300, 640, -1),
       seal('fo_s2', 900, 40, 'hard'),
-      door('fo_d', 700, 480, 60, 200, { seals: ['fo_s1', 'fo_s2'], sensors: ['fo_sen'] }),
-      exit('final_ascent', 780, 540, { w: 60, h: 140 }),
+      exit('final_ascent', 780, 540, { requires: { seals: ['fo_s1', 'fo_s2'], sensors: ['fo_sen'] }, w: 60, h: 140 }),
       sign('fo_sign', 180, 620, 'final')
     ]
   });
@@ -898,8 +868,7 @@
       P(600, 740, 140, 20),
       P(800, 640, 140, 20),
       P(1000, 540, 140, 20),
-      P(1000, 440, 140, 20),
-      P(1120, 440, 120, 20)
+      P(1000, 440, 240, 20)
     ],
     objects: [
       exit('final_orrery', 70, 940, { w: 58, h: 100 }),
@@ -961,9 +930,8 @@
     objects: [
       exit('tide7', 70, 580, { w: 58, h: 100 }),
       seal('e1_s', 420, 664, 'hard'),
-      door('e1_d', 900, 560, 44, 120, { seals: ['e1_s'] }),
-      echo('echo1', 1000, 560, 'echo1'),
-      exit('tide7', 1120, 580, { w: 58, h: 100 }),
+      echo('echo1', 1000, 560, 'echo1', { gate: 'tide7' }),
+      exit('tide7', 1120, 580, { requires: { seals: ['e1_s'] }, w: 58, h: 100 }),
       sign('e1_sign', 180, 620, 't1')
     ]
   });
@@ -976,15 +944,16 @@
     platforms: [
       ...base(),
       fragile(260, 600, 180, 20),
-      P(760, 440, 160, 24)
+      P(552, 599, 98, 18),
+      P(653, 520, 112, 18),
+      P(760, 440, 146, 24)
     ],
     objects: [
       exit('tide7', 70, 580, { w: 58, h: 100 }),
       seal('e2_s', 300, 586, 'soft'),
-      seal('e2_h', 800, 664, 'hard'),
-      door('e2_d', 1000, 560, 44, 120, { seals: ['e2_s', 'e2_h'] }),
-      echo('echo2', 1100, 560, 'echo2'),
-      exit('tide7', 1180, 580, { w: 50, h: 100 }),
+      seal('e2_h', 928, 664, 'hard'),
+      echo('echo2', 1100, 560, 'echo2', { gate: 'tide7' }),
+      exit('tide7', 1180, 580, { requires: { seals: ['e2_s', 'e2_h'] }, w: 50, h: 100 }),
       sign('e2_sign', 180, 620, 't2')
     ]
   });
@@ -1024,7 +993,7 @@
       P(560, 480, 24, 200, 'starGlass')
     ],
     objects: [
-      exit('light7', 70, 580, { w: 58, h: 100 }),
+      exit('light7', 59, 580, { w: 58, h: 100 }),
       lamp('e4_l', 80, 500, 1, 0),
       echo('echo4', 1000, 560, 'echo4'),
       exit('light7', 1120, 580, { w: 58, h: 100 }),
@@ -1042,9 +1011,8 @@
       exit('grav7', 70, 580, { w: 58, h: 100 }),
       zone('e5_z', 400, 40, 500, 640, -1),
       seal('e5_s', 420, 40, 'hard'),
-      door('e5_d', 1000, 40, 44, 120, { seals: ['e5_s'] }),
-      echo('echo5', 1080, 100, 'echo5'),
-      exit('grav7', 1140, 100, { w: 50, h: 100 }),
+      echo('echo5', 1080, 100, 'echo5', { gate: 'grav7' }),
+      exit('grav7', 1140, 100, { requires: { seals: ['e5_s'] }, w: 50, h: 100 }),
       sign('e5_sign', 240, 620, 'g1')
     ]
   });
@@ -1093,54 +1061,11 @@
       sensor('h1_sen', 760, 280, 'lit'),
       anchor('h1_a', 1000, 664, 'h1_z'),
       zone('h1_z', 1040, 290, 100, 390, 1),
-      door('h1_d', 1140, 470, 40, 210, { seals: ['h1_s'], sensors: ['h1_sen'], anchors: ['h1_a'] }),
-      echo('hidden1', 1190, 565, 'hidden1'),
-      exit('hub', 1190, 580, { w: 60, h: 100 }),
+      echo('hidden1', 1190, 565, 'hidden1', { gate: 'hub' }),
+      exit('hub', 1180, 580, { requires: { seals: ['h1_s'], sensors: ['h1_sen'], anchors: ['h1_a'] }, w: 60, h: 100 }),
       sign('h1_sign', 180, 620, 'final')
     ]
   });
-
-  // Lock exits that sit behind a gate with the same requirement as the gate.
-  // This prevents interacting with a destination through a closed door.
-  const behindDoor = {
-    tide1: { tide2: 't1_d' },
-    tide2: { tide3: 't2_d' },
-    tide3: { tide4: 't3_d' },
-    tide4: { tide5: 't4_d' },
-    tide5: { tide6: 't5_d' },
-    tide6: { tide7: 't6_d' },
-    tide7: { tide8: 't7_d' },
-    tide8: { hub: 't8_d' },
-    light4: { light5: 'l4_d' },
-    light6: { light7: 'l6_d' },
-    light7: { light8: 'l7_d' },
-    light8: { hub: 'l8_d' },
-    grav2: { grav3: 'g2_d' },
-    grav3: { grav4: 'g3_d' },
-    grav4: { grav5: 'g4_d' },
-    grav5: { grav6: 'g5_d' },
-    grav7: { grav8: 'g7_d' },
-    grav8: { hub: 'g8_d' },
-    final_gate: { final_orrery: 'f_d' },
-    final_orrery: { final_ascent: 'fo_d' },
-    echo1: { tide7: 'e1_d' },
-    echo2: { tide7: 'e2_d' },
-    echo5: { grav7: 'e5_d' },
-    hidden1: { hub: 'h1_d' },
-    hub: { hub_study: 'hub_prism', hidden1: 'hub_hidden' }
-  };
-  for (const rid in behindDoor) {
-    const room = rooms[rid];
-    if (!room) continue;
-    for (const to in behindDoor[rid]) {
-      const doorId = behindDoor[rid][to];
-      const gate = room.objects.find(o => o.id === doorId);
-      if (!gate) continue;
-      for (const e of room.objects) {
-        if (e.type === 'exit' && e.to === to && e.x >= gate.x) e.requires = gate.requires;
-      }
-    }
-  }
 
   // ---------- exports ----------
   NO.DATA = {
@@ -1164,6 +1089,6 @@
       { id: 'final', name: txt('星图仪', 'The Orrery', 'Планетарий', '星図儀'), color: '#f2b56b' }
     ],
     T, W, H, GY,
-    P, star, fragile, bridge, base, R, seal, bell, door, exit, echo, sign, mirror, lamp, sensor, zone, anchor, mover, spike, deco, txt
+    P, star, fragile, bridge, base, R, seal, bell, exit, echo, sign, mirror, lamp, sensor, zone, anchor, mover, spike, deco, txt
   };
 })();

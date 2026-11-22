@@ -38,6 +38,13 @@
     ctx.closePath();
   }
 
+  function exitFrame(e) {
+    const w = Math.min(30, e.w / 2 - 3) * 2;
+    const h = Math.min(76, e.h - 3);
+    const inverted = e.y === 40;
+    return { x: e.x + (e.w - w) / 2, y: inverted ? e.y : e.y + e.h - h, w, h, inverted };
+  }
+
   function pill(ctx, x, y, w, h, fill, stroke) {
     roundRect(ctx, x, y, w, h, h / 2);
     if (fill) { ctx.fillStyle = fill; ctx.fill(); }
@@ -237,42 +244,69 @@
       for (const t of this.trail) t.life -= dt;
       this.trail = this.trail.filter(t => t.life > 0);
     }
+    sweep(axis, amount) {
+      if (!amount) return null;
+      const other = axis === 'x' ? 'y' : 'x';
+      const size = axis === 'x' ? 'w' : 'h';
+      const crossSize = axis === 'x' ? 'h' : 'w';
+      const leading = this[axis] + (amount > 0 ? this[size] : 0);
+      const target = leading + amount;
+      let boundary = target;
+      let hit = null;
+      for (const r of this.game.solidRects()) {
+        if (this[other] >= r[other] + r[crossSize] || this[other] + this[crossSize] <= r[other]) continue;
+        const face = r[axis] + (amount < 0 ? r[size] : 0);
+        const crossed = amount > 0 ? leading <= face && face < boundary : leading >= face && face > boundary;
+        if (crossed) { boundary = face; hit = r; }
+      }
+      this[axis] = boundary - (amount > 0 ? this[size] : 0);
+      return hit;
+    }
+
     moveX(dx) {
-      if (!dx) return;
-      this.x += dx;
-      for (const r of this.game.solidRects()) {
-        if (!overlap(this.rect, r)) continue;
-        if (dx > 0) this.x = r.x - this.w;
-        else this.x = r.x + r.w;
-        this.vx = 0;
-      }
+      if (this.sweep('x', dx)) this.vx = 0;
     }
-    moveY(dy, fallBefore) {
+
+    moveY(dy, impact) {
       if (!dy) return;
-      this.y += dy;
-      let landed = null;
-      for (const r of this.game.solidRects()) {
-        if (!overlap(this.rect, r)) continue;
-        if (dy > 0) {
-          this.y = r.y - this.h;
-          if (this.gravitySign > 0) landed = r;
-        } else {
-          this.y = r.y + r.h;
-          if (this.gravitySign < 0) landed = r;
-        }
-        this.vy = 0;
-      }
-      if (landed) {
-        this.onGround = true;
-        this.groundObj = landed.source || null;
-        this.landingRect = landed;
-        this.lastImpact = fallBefore;
-        if (!this.wasOnGround) this.justLanded = true;
-      } else {
-        this.onGround = false;
-        this.groundObj = null;
+      const hit = this.sweep('y', dy);
+      if (hit) this.vy = 0;
+      this.onGround = !!hit && dy * this.gravitySign > 0;
+      this.groundObj = this.onGround ? hit.source : null;
+      if (this.onGround) {
+        this.landingRect = hit;
+        this.lastImpact = impact;
+        this.justLanded = !this.wasOnGround;
       }
     }
+
+    clearEmbedding() {
+      const solids = this.game.solidRects();
+      const body = this.rect;
+      const inside = solids.filter(rect => overlap(body, rect));
+      if (!inside.length) return true;
+      const candidates = inside.flatMap(rect => [
+        { x: rect.x - this.w, y: this.y }, { x: rect.x + rect.w, y: this.y },
+        { x: this.x, y: rect.y - this.h }, { x: this.x, y: rect.y + rect.h },
+      ]);
+      candidates.sort((a,b) => dist2(a,this) - dist2(b,this));
+      for (const candidate of candidates) {
+        const box = { ...candidate, w: this.w, h: this.h };
+        if (box.x < 0 || box.x + box.w > this.game.room.w || box.y < 0) continue;
+        if (solids.some(rect => overlap(box,rect))) continue;
+        if (candidate.x !== this.x) this.vx = 0;
+        if (candidate.y !== this.y) {
+          this.vy = 0;
+          this.onGround = false;
+          this.groundObj = null;
+        }
+        this.x = candidate.x;
+        this.y = candidate.y;
+        return true;
+      }
+      return false;
+    }
+
     predictedTier() {
       const v = Math.abs(this.vy) * (this.bracing ? BRACE_MULT : 1);
       return tierRank(v);
@@ -305,7 +339,6 @@
       this.transition = null;
       this.seals = {};
       this.sensors = {};
-      this.doors = {};
       this.mirrors = [];
       this.lamps = [];
       this.zones = [];
@@ -349,7 +382,6 @@
       this.roomTime = 0;
       this.seals = {};
       this.sensors = {};
-      this.doors = {};
       this.mirrors = [];
       this.lamps = [];
       this.zones = [];
@@ -366,13 +398,12 @@
       this.deadTimer = 0;
       this._solidCache = null;
       this._beamsDirty = true;
-      this._doorState = {};
+      this._exitState = {};
       this.hintPulse = 0;
       this.hintPulseTargets = [];
       for (const o of room.objects) {
         if (o.type === 'seal') this.seals[o.id] = o;
         else if (o.type === 'sensor') this.sensors[o.id] = o;
-        else if (o.type === 'door') this.doors[o.id] = o;
         else if (o.type === 'mirror') this.mirrors.push(o);
         else if (o.type === 'lamp') this.lamps.push(o);
         else if (o.type === 'zone') this.zones.push(o);
@@ -445,16 +476,11 @@
       return p.type === 'solid' || p.type === 'spring';
     }
 
-    isDoorOpen(d) { return this.isRequiresMet(d.requires); }
-
     solidRects() {
       if (this._solidCache) return this._solidCache;
       const out = [];
       for (const p of this.room.platforms) {
         if (this.isPlatformSolid(p)) out.push({ x: p.x, y: p.y, w: p.w, h: p.h, source: p, kind: p.type });
-      }
-      for (const d of Object.values(this.doors)) {
-        if (!this.isDoorOpen(d)) out.push({ x: d.x, y: d.y, w: d.w, h: d.h, source: d, kind: 'door' });
       }
       for (const m of this.movers) {
         out.push({ x: m.x, y: m.y, w: m.w, h: m.h, source: m, kind: 'mover' });
@@ -513,19 +539,16 @@
       }
     }
 
-    updateDoors() {
-      const was = this._doorState || {};
-      const now = {};
-      for (const d of Object.values(this.doors)) {
-        now[d.id] = this.isDoorOpen(d);
-        if (now[d.id] && !was[d.id]) {
+    updateExits() {
+      for (const e of this.exits) {
+        if (!e.requires || !Object.keys(e.requires).length) continue;
+        const open = this.isRequiresMet(e.requires);
+        if (open && this._exitState[e.id] === false) {
           this.sfx('door');
-          this.emitDoor(d);
+          this.emitDoor(e);
         }
-        d.open = now[d.id];
+        this._exitState[e.id] = open;
       }
-      this._doorState = now;
-      this._solidCache = null;
     }
 
     computeBeams() {
@@ -540,7 +563,6 @@
           blockers.push(p);
         }
       }
-      for (const d of Object.values(this.doors)) if (!this.isDoorOpen(d)) blockers.push(d);
       for (const m of this.movers) blockers.push(m);
       for (const lamp of this.lamps) {
         let x = lamp.x, y = lamp.y;
@@ -679,13 +701,32 @@
       const p = this.player;
       // echoes
       for (const e of this.echoes) {
-        if (e.taken) continue;
+        if (e.taken || !this.echoAvailable(e)) continue;
         if (overlap(p.rect, e)) this.collectEcho(e);
       }
       // interact prompt
       this.prompt = this.findInteractable();
       if (this.prompt && this.input.pressed('interact')) this.interact(this.prompt);
       if (NO.ui && NO.ui.setInteractAvailable) NO.ui.setInteractAvailable(!!this.prompt, this.prompt ? this.prompt.label : '');
+    }
+
+    echoAvailable(e) {
+      if (!e.gate) return true;
+      const portal = this.exits.find(exit => exit.to === e.gate && exit.requires);
+      return !!portal && this.isRequiresMet(portal.requires);
+    }
+
+    interactionClear(from, targetX, targetY) {
+      const dx = targetX - from.cx;
+      const dy = targetY - from.cy;
+      const slices = Math.ceil(Math.hypot(dx, dy) / 4);
+      const solids = this.solidRects();
+      for (let i = 1; i <= slices; i++) {
+        const x = from.cx + dx * i / slices;
+        const y = from.cy + dy * i / slices;
+        if (solids.some(r => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h)) return false;
+      }
+      return true;
     }
 
     findInteractable() {
@@ -697,7 +738,7 @@
         const ox = obj.x + (obj.w || 40) / 2;
         const oy = obj.y + (obj.h || 40) / 2;
         const d = (ox - cx) * (ox - cx) + (oy - cy) * (oy - cy);
-        if (d < bestD) { bestD = d; best = { obj, label, kind }; }
+        if (d < bestD && this.interactionClear(p, ox, oy)) { bestD = d; best = { obj, label, kind }; }
       };
       for (const e of this.exits) {
         const target = e.to && NO.DATA.rooms[e.to];
@@ -721,7 +762,6 @@
       } else if (target.kind === 'sign') {
         const text = NO.DATA.story.signs[target.obj.textKey];
         if (text && NO.ui) NO.ui.showDialogue([{ speaker: 'conductor', text }], () => {});
-        else if (text && NO.ui) NO.ui.showDialogue([{ speaker: 'conductor', text }], () => {});
       } else if (target.kind === 'exit') {
         this.useExit(target.obj);
       }
@@ -846,8 +886,13 @@
       this.computeBeams();
       this.updateSensors(dt);
       this.updateSeals(dt);
-      this.updateDoors();
+      this.updateExits();
       this._solidCache = null;
+      if (!this.player.clearEmbedding()) {
+        this.kill('crush');
+        this.input.endFrame();
+        return;
+      }
       this.player.update(dt);
       if (this.player.justLanded) {
         this.handleLanding(this.player, this.player.lastImpact, this.player.landingRect);
@@ -930,7 +975,7 @@
       this.hintPulseTargets = [];
       if (!this.room) return;
       for (const o of this.room.objects) {
-        if (['seal', 'door', 'sensor', 'mirror', 'anchor', 'exit'].includes(o.type)) this.hintPulseTargets.push(o);
+        if (['seal', 'sensor', 'mirror', 'anchor', 'exit'].includes(o.type)) this.hintPulseTargets.push(o);
       }
       this.sfx('ui');
     }
@@ -1699,7 +1744,6 @@
       for (const o of this.room.objects) {
         if (o.type === 'seal') this.drawSeal(ctx, o);
         else if (o.type === 'bell') this.drawSeal(ctx, o);
-        else if (o.type === 'door') this.drawDoor(ctx, o);
         else if (o.type === 'sensor') this.drawSensor(ctx, o);
         else if (o.type === 'mirror') this.drawMirror(ctx, o);
         else if (o.type === 'lamp') this.drawLamp(ctx, o);
@@ -1765,72 +1809,6 @@
         ctx.strokeStyle = col;
         ctx.lineWidth = 1;
         ctx.beginPath(); ctx.arc(cx, cy - 14, 30 + pulse * 10, 0, Math.PI * 2); ctx.stroke();
-      }
-      ctx.restore();
-    }
-
-    drawDoor(ctx, d) {
-      const open = this.isDoorOpen(d);
-      const prism = d.kind === 'prism';
-      const hidden = d.kind === 'hidden';
-      const cx = d.x + d.w / 2;
-      const req = d.requires || {};
-      ctx.save();
-      if (hidden && Object.keys(this.state.echoes || {}).length < 7) ctx.globalAlpha = 0.38;
-      // pillars + lintel
-      ctx.fillStyle = 'rgba(5,9,16,.96)';
-      ctx.fillRect(d.x - 12, d.y - 18, 8, d.h + 18);
-      ctx.fillRect(d.x + d.w + 4, d.y - 18, 8, d.h + 18);
-      ctx.fillRect(d.x - 12, d.y - 18, d.w + 24, 10);
-      ctx.strokeStyle = open ? 'rgba(99,226,208,.9)' : 'rgba(242,181,107,.55)';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(d.x - 12, d.y - 18, d.w + 24, d.h + 18);
-      // status lamp
-      ctx.fillStyle = open ? '#63e2d0' : '#f2b56b';
-      ctx.globalAlpha = open ? 0.9 : 0.55;
-      ctx.beginPath(); ctx.arc(cx, d.y - 13, 3, 0, Math.PI * 2); ctx.fill();
-      ctx.globalAlpha = 1;
-      if (!open) {
-        ctx.fillStyle = 'rgba(22,35,54,.98)';
-        ctx.fillRect(d.x, d.y, d.w, d.h);
-        ctx.strokeStyle = 'rgba(242,181,107,.30)';
-        ctx.lineWidth = 1;
-        for (let y = d.y + 14; y < d.y + d.h; y += 20) {
-          ctx.beginPath(); ctx.moveTo(d.x + 3, y); ctx.lineTo(d.x + d.w - 3, y); ctx.stroke();
-        }
-        ctx.fillStyle = 'rgba(242,181,107,.20)';
-        ctx.fillRect(d.x + 4, d.y + 4, 2, d.h - 8);
-        if (prism) {
-          const cols = ['#f2b56b', '#db93ac', '#9e8cf4'];
-          const active = [
-            (req.seals || []).every(id => this.seals[id] && this.seals[id].active),
-            (req.sensors || []).every(id => this.sensors[id] && this.sensors[id].active),
-            (req.anchors || []).every(id => (this.anchors.find(a => a.id === id) || {}).used)
-          ];
-          for (let i = 0; i < 3; i++) {
-            const y = d.y + 28 + i * Math.max(20, (d.h - 56) / 3);
-            ctx.fillStyle = cols[i];
-            ctx.globalAlpha = active[i] ? 0.9 : 0.16;
-            ctx.beginPath(); ctx.arc(cx, y, 5, 0, Math.PI * 2); ctx.fill();
-            ctx.globalAlpha = 1;
-          }
-        }
-        if (hidden) {
-          ctx.fillStyle = 'rgba(219,147,172,.6)';
-          ctx.beginPath(); ctx.arc(cx, d.y + d.h / 2, 4, 0, Math.PI * 2); ctx.fill();
-        }
-      } else {
-        const g = ctx.createLinearGradient(0, d.y, 0, d.y + d.h);
-        g.addColorStop(0, 'rgba(99,226,208,.16)');
-        g.addColorStop(1, 'rgba(99,226,208,.03)');
-        ctx.fillStyle = g;
-        ctx.fillRect(d.x, d.y, d.w, d.h);
-        ctx.strokeStyle = 'rgba(99,226,208,.55)';
-        ctx.setLineDash([4, 6]);
-        ctx.strokeRect(d.x + 3, d.y + 3, d.w - 6, d.h - 6);
-        ctx.setLineDash([]);
-        ctx.fillStyle = 'rgba(220,255,250,.5)';
-        ctx.fillRect(d.x + 2, d.y + 2, 1, d.h - 4);
       }
       ctx.restore();
     }
@@ -1942,6 +1920,7 @@
       if (e.taken) return;
       const bob = Math.sin(this.time * 2 + e.x * 0.01) * 4;
       ctx.save();
+      if (!this.echoAvailable(e)) ctx.globalAlpha = 0.28;
       ctx.translate(e.x + e.w / 2, e.y + e.h / 2 + bob);
       const g = ctx.createRadialGradient(0, 0, 1, 0, 0, 42);
       g.addColorStop(0, 'rgba(255,225,240,.34)');
@@ -1971,61 +1950,50 @@
     }
 
     drawExit(ctx, e) {
-      const unlocked = this.isRequiresMet(e.requires);
-      const cx = e.x + e.w / 2;
-      const target = e.to && NO.DATA.rooms[e.to];
-      const label = NO.L(e.label) || (target ? NO.L(target.name) : '');
+      const open = this.isRequiresMet(e.requires);
+      const focused = this.prompt?.obj === e;
+      const frame = exitFrame(e);
+      const accent = open ? '#63e2d0' : '#e9b579';
+      const halfWidth = frame.w / 2;
+      const height = frame.h;
       ctx.save();
-      if (unlocked) {
-        const g = ctx.createRadialGradient(cx, e.y + e.h * 0.45, 4, cx, e.y + e.h * 0.45, 100);
-        g.addColorStop(0, 'rgba(242,181,107,.22)');
-        g.addColorStop(0.55, 'rgba(242,181,107,.07)');
-        g.addColorStop(1, 'rgba(242,181,107,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(cx, e.y + e.h * 0.45, 100, 0, Math.PI * 2); ctx.fill();
+      ctx.translate(frame.x + halfWidth, frame.inverted ? frame.y : frame.y + frame.h);
+      ctx.scale(1, frame.inverted ? -1 : 1);
+
+      if (focused && open) {
+        const glow = ctx.createLinearGradient(0, -height, 0, 0);
+        glow.addColorStop(0, 'rgba(99,226,208,.12)');
+        glow.addColorStop(1, 'rgba(99,226,208,0)');
+        roundRect(ctx, -halfWidth, -height, halfWidth * 2, height, 9);
+        ctx.fillStyle = glow;
+        ctx.fill();
       }
-      ctx.globalAlpha = unlocked ? 1 : 0.48;
-      // floor pad
-      ctx.fillStyle = unlocked ? 'rgba(242,181,107,.18)' : 'rgba(236,231,218,.06)';
-      roundRect(ctx, e.x - 10, e.y + e.h - 12, e.w + 20, 12, 6); ctx.fill();
-      // frame
-      ctx.fillStyle = 'rgba(5,10,18,.94)';
-      roundRect(ctx, e.x - 4, e.y - 8, e.w + 8, e.h + 8, 7); ctx.fill();
-      ctx.strokeStyle = unlocked ? 'rgba(242,181,107,.85)' : 'rgba(236,231,218,.24)';
-      ctx.lineWidth = 1.6;
-      ctx.stroke();
-      ctx.fillStyle = unlocked ? 'rgba(242,181,107,.11)' : 'rgba(236,231,218,.025)';
-      ctx.fillRect(e.x + 3, e.y + 3, e.w - 6, e.h - 6);
-      // arch
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = focused ? 2.6 : 1.5;
+      ctx.globalAlpha = focused ? 1 : 0.68;
       ctx.beginPath();
-      ctx.arc(cx, e.y + 22, e.w * 0.34, Math.PI, 0);
-      ctx.strokeStyle = unlocked ? 'rgba(255,218,158,.75)' : 'rgba(236,231,218,.18)';
-      ctx.lineWidth = 1.4;
+      ctx.moveTo(-halfWidth, -3);
+      ctx.lineTo(-halfWidth, -height + 11);
+      ctx.quadraticCurveTo(-halfWidth, -height, -halfWidth + 11, -height);
+      ctx.lineTo(halfWidth - 11, -height);
+      ctx.quadraticCurveTo(halfWidth, -height, halfWidth, -height + 11);
+      ctx.lineTo(halfWidth, -3);
       ctx.stroke();
-      // vertical waypoint light
-      if (unlocked) {
-        const lg = ctx.createLinearGradient(0, e.y + 10, 0, e.y + e.h - 8);
-        lg.addColorStop(0, 'rgba(242,181,107,.0)');
-        lg.addColorStop(0.5, 'rgba(242,181,107,.13)');
-        lg.addColorStop(1, 'rgba(242,181,107,0)');
-        ctx.fillStyle = lg;
-        ctx.fillRect(cx - 2, e.y + 8, 4, e.h - 16);
-      }
-      // label
-      if (label) {
-        ctx.font = '11px system-ui, sans-serif';
-        const tw = ctx.measureText(label).width;
-        pill(ctx, cx - tw / 2 - 10, e.y - 34, tw + 20, 22, 'rgba(5,10,18,.82)', unlocked ? 'rgba(242,181,107,.45)' : 'rgba(236,231,218,.16)');
-        ctx.fillStyle = unlocked ? 'rgba(255,238,210,.95)' : 'rgba(236,231,218,.55)';
-        ctx.textAlign = 'center';
-        ctx.fillText(label, cx, e.y - 19);
-      }
-      if (!unlocked) {
-        ctx.fillStyle = 'rgba(236,231,218,.55)';
-        ctx.beginPath(); ctx.arc(cx, e.y + 54, 7, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = 'rgba(5,10,18,.9)';
-        ctx.fillRect(cx - 1, e.y + 51, 2, 6);
-        ctx.beginPath(); ctx.arc(cx, e.y + 49, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = accent;
+      roundRect(ctx, -halfWidth, -4, halfWidth * 2, 4, 2);
+      ctx.fill();
+
+      const cy = -height / 2;
+      if (open) {
+        ctx.beginPath();
+        ctx.moveTo(0, cy - 6); ctx.lineTo(5, cy); ctx.lineTo(0, cy + 6);
+        ctx.lineTo(-5, cy); ctx.closePath(); ctx.fill();
+      } else {
+        roundRect(ctx, -5, cy - 1, 10, 8, 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(0, cy - 1, 3.5, Math.PI, 0);
+        ctx.stroke();
       }
       ctx.restore();
     }
@@ -2181,12 +2149,13 @@
       if (!this.prompt) return;
       const o = this.prompt.obj;
       const label = this.prompt.label || '';
-      const x = o.x + (o.w || 40) / 2;
-      const y = o.y - 18;
+      const center = o.x + (o.w || 40) / 2;
+      const y = o.y === 40 && o.type === 'exit' ? o.y + o.h + 28 : o.y - 4;
       ctx.save();
       ctx.font = '11px system-ui, sans-serif';
       ctx.textAlign = 'center';
       const w = Math.max(58, ctx.measureText(label).width + 32);
+      const x = clamp(center, this.cam.x + w/2 + 8, this.cam.x + VIEW_W - w/2 - 8);
       pill(ctx, x - w / 2, y - 18, w, 24, 'rgba(6,10,18,.88)', 'rgba(242,181,107,.45)');
       ctx.fillStyle = '#f2b56b';
       ctx.fillText('E', x - w / 2 + 12, y - 2);
@@ -2222,7 +2191,7 @@
     }
   }
 
-  NO.util = { clamp, lerp, approach, overlap, dist2, tierRank, tierName, tierColor, roundRect, pill, VIEW_W, VIEW_H };
+  NO.util = { clamp, lerp, approach, overlap, dist2, tierRank, tierName, tierColor, roundRect, pill, exitFrame, VIEW_W, VIEW_H };
   NO.Input = Input;
   NO.Player = Player;
   NO.Game = Game;

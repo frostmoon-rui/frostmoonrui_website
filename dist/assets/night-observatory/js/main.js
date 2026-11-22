@@ -474,7 +474,7 @@
       ok(!!r.spawn, 'spawn exists: ' + id);
       ok(Array.isArray(r.platforms) && r.platforms.length > 0, 'platforms exist: ' + id);
       for (const o of r.objects) {
-        if (o.type === 'door') {
+        if (o.type === 'exit') {
           for (const sid of (o.requires && o.requires.seals) || []) ok(!!r.objects.find(x => x.id === sid), id + ' door seal exists: ' + sid);
           for (const sid of (o.requires && o.requires.sensors) || []) ok(!!r.objects.find(x => x.id === sid), id + ' door sensor exists: ' + sid);
           for (const sid of (o.requires && o.requires.anchors) || []) ok(!!r.objects.find(x => x.id === sid), id + ' door anchor exists: ' + sid);
@@ -596,7 +596,7 @@
       p.x = 850 - 12; p.y = 500; p.vy = 900; p.onGround = false;
       for (let i = 0; i < 40; i++) g.update(1 / 60);
       ok(g.seals.t3_b.active, 'tide3 bell rings on a heavy landing');
-      ok(g.isDoorOpen(g.doors.t3_d), 'tide3 door opens after bell');
+      ok(g.isRequiresMet(g.exits.find(e => e.to === 'tide4').requires), 'tide3 door opens after bell');
     });
     testRoom('final_choice', g => {
       const e = g.exits.find(x => x.ending === 'eighth');

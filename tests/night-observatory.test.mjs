@@ -31,7 +31,7 @@ const secretRoute = [
  'hub-hidden','hidden1',...finale,'eighth',
 ];
 
-function play(route) {
+function loadGameEngine() {
  const sandbox = {document:{addEventListener(){}},navigator:{},addEventListener(){}};
  sandbox.window = sandbox;
  vm.createContext(sandbox);
@@ -39,7 +39,11 @@ function play(route) {
   const url = new URL(file+'.js',asset);
   vm.runInContext(readFileSync(url,'utf8'),sandbox,{filename:fileURLToPath(url)});
  }
- const {NO} = sandbox;
+ return sandbox.NO;
+}
+
+function play(route) {
+ const NO = loadGameEngine();
  assert.equal(Object.keys(NO.DATA.rooms).length,60);
  assert.equal(new Set(NO.DATA.order).size,60);
  assert.ok(Object.values(NO.DATA.classicRooms).every(id=>Object.hasOwn(NO.DATA.rooms,id)));
@@ -101,4 +105,72 @@ test('a fresh player collects all eight echoes and reaches the hidden ending', (
  assert.equal(Object.keys(state.echoes).length,8);
  assert.equal(Object.keys(state.visited).length,60);
  assert.equal(Object.keys(state.flags).length,16);
+});
+
+test('every room has separate, unobstructed portal frames and a safe spawn', () => {
+ const NO = loadGameEngine();
+ const {overlap,exitFrame} = NO.util;
+ for (const room of Object.values(NO.DATA.rooms)) {
+  const portals = room.objects.filter(object => object.type === 'exit');
+  const fixed = room.platforms.filter(platform => ['solid','spring'].includes(platform.type));
+  assert.ok(!room.objects.some(object => object.type === 'door'),room.id);
+  const spawn = {x:room.spawn.x-12,y:room.spawn.y-40,w:24,h:40};
+  assert.ok(!fixed.some(platform=>overlap(spawn,platform)),room.id+' spawn');
+  for (const [index, portal] of portals.entries()) {
+   const frame = exitFrame(portal);
+   assert.ok(!fixed.some(platform=>overlap(frame,platform)),room.id+' '+portal.id+' intersects terrain');
+   assert.ok(!portals.slice(index+1).some(other=>overlap(frame,exitFrame(other))),room.id+' '+portal.id+' overlaps another portal');
+  }
+  for (const echo of room.objects.filter(object => object.type === 'echo' && object.gate)) {
+   assert.equal(portals.filter(portal => portal.to === echo.gate && portal.requires).length,1,echo.id);
+  }
+ }
+});
+
+test('a locked threshold remains walkable while travel and its echo stay gated', () => {
+ const NO = loadGameEngine();
+ const game = new NO.Game({getContext:()=>({})},{sigils:{},flags:{},echoes:{},visited:{}});
+ game.loadRoom('echo2');
+ game.fading = null;
+ const exit = game.exits.find(portal => portal.requires);
+ const echo = game.echoes[0];
+ game.player.x = exit.x + exit.w/2 - game.player.w/2;
+ game.player.y = 640;
+ assert.ok(!game.solidRects().some(rect=>NO.util.overlap(game.player.rect,rect)));
+ assert.equal(game.findInteractable().obj,exit);
+ game.useExit(exit);
+ assert.equal(game.pendingRoom,null);
+ assert.equal(game.echoAvailable(echo),false);
+ game.seals.e2_s.active = true;
+ assert.equal(game.echoAvailable(echo),false);
+ game.seals.e2_h.active = true;
+ assert.equal(game.echoAvailable(echo),true);
+ game.useExit(exit);
+ assert.equal(game.pendingRoom.to,'tide7');
+});
+
+test('the player contacts the nearest surface and cannot interact through stone', () => {
+ const NO = loadGameEngine();
+ const game = new NO.Game({getContext:()=>({})},{sigils:{},flags:{},echoes:{},visited:{}});
+ game.loadRoom('hub');
+ const player = game.player;
+ const near = {x:100,y:580,w:18,h:92};
+ const far = {x:140,y:580,w:16,h:92};
+ game._solidCache = [far,near];
+ player.x = 60; player.y = 620;
+ player.moveX(130);
+ assert.equal(player.x,near.x-player.w);
+ assert.equal(game.interactionClear(player,130,640),false);
+
+ const lower = {x:40,y:660,w:84,h:18};
+ const upper = {x:40,y:598,w:84,h:18};
+ game._solidCache = [lower,upper];
+ player.x = 70; player.y = 480; player.wasOnGround = false;
+ player.moveY(155,900);
+ assert.equal(player.y,upper.y-player.h);
+ assert.equal(player.landingRect,upper);
+ assert.equal(player.lastImpact,900);
+ player.y = 613;
+ assert.equal(player.clearEmbedding(),true);
+ assert.ok(!game.solidRects().some(rect=>NO.util.overlap(player.rect,rect)));
 });

@@ -3,7 +3,7 @@
   'use strict';
   const NO = window.NO;
   const D = NO.DATA;
-  const { rooms, story, txt, P, R, base, fragile, bridge, seal, bell, mirror, lamp, sensor, zone, anchor, mover, door, exit, sign } = D;
+  const { rooms, story, txt, P, R, base, fragile, bridge, seal, bell, mirror, lamp, sensor, zone, anchor, mover, exit, sign } = D;
   const floor = 680;
   const near = (x, y = 580, w = 64, h = 100) => ({ x, y, w, h });
   const steps = (...ledges) => ledges.map(([x, y, width]) => P(x, y, width, 20));
@@ -223,7 +223,7 @@
   divert('grav8','hub','relay_gravity');
   divert('final_orrery','final_ascent','final_crossing');
   divert('final_ascent','final_orrery','dawn');
-  rooms.hub.objects.push(exit('archive_rotunda', 95, 415, { label: names('archive_rotunda') }));
+  rooms.hub.objects.push(exit('archive_rotunda', 315, 580, { label: names('archive_rotunda') }));
 
   const oldIndex = D.main;
   D.main = [
