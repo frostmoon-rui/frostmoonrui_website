@@ -1,7 +1,7 @@
 {
-  "name": "夜の天文台",
-  "short_name": "夜の天文台",
-  "description": "着地の衝撃、光、重力を使って38の部屋を探索。",
+  "name": "星墜の天文台",
+  "short_name": "星墜の天文台",
+  "description": "60の部屋をめぐり、雲海の航路標識を復旧する。",
   "lang": "ja",
   "start_url": "./",
   "scope": "./",
@@ -15,19 +15,19 @@
   ],
   "icons": [
     {
-      "src": "/assets/night-observatory/icons/icon-192.png?v=cac1a6d5ebce",
+      "src": "/assets/night-observatory/icons/icon-192.png?v=4ab53c748f8f",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/night-observatory/icons/icon-512.png?v=cac1a6d5ebce",
+      "src": "/assets/night-observatory/icons/icon-512.png?v=4ab53c748f8f",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/night-observatory/icons/icon-512.png?v=cac1a6d5ebce",
+      "src": "/assets/night-observatory/icons/icon-512.png?v=4ab53c748f8f",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

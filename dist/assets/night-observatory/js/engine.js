@@ -389,12 +389,13 @@
       this.cam.y = clamp(this.player.cy - VIEW_H / 2, 0, Math.max(0, room.h - VIEW_H));
       this.state.room = id;
       this.state.visited = this.state.visited || {};
+      const firstVisit = !this.state.visited[id];
       this.state.visited[id] = true;
       this.state.lastSpawn = { x: sp.x, y: sp.y };
       this.fade = 1;
       this.fading = 'in';
       this.mode = 'play';
-      if (NO.onRoomChange) NO.onRoomChange(room);
+      if (NO.onRoomChange) NO.onRoomChange(room, firstVisit);
       if (NO.requestSave) NO.requestSave('room');
       if (opts && opts.silent) this.fade = 0;
     }
@@ -431,6 +432,7 @@
       if (req.seals) for (const id of req.seals) { const s = this.seals[id]; if (!s || !s.active) return false; }
       if (req.sensors) for (const id of req.sensors) { const s = this.sensors[id]; if (!s || !s.active) return false; }
       if (req.anchors) for (const id of req.anchors) { const a = this.anchors.find(x => x.id === id); if (!a || !a.used) return false; }
+      if (req.breaks && !req.breaks.every(id => this.room.platforms.some(p => p.id === id && p.broken))) return false;
       if (req.flags) for (const f of req.flags) { if (!this.stateFlags[f]) return false; }
       return true;
     }
@@ -440,7 +442,7 @@
       if (p.type === 'starGlass') return !!p.lit;
       if (p.type === 'fragile') return !p.broken;
       if (p.type === 'bridge') return this.isRequiresMet(p.requires);
-      return p.type === 'solid';
+      return p.type === 'solid' || p.type === 'spring';
     }
 
     isDoorOpen(d) { return this.isRequiresMet(d.requires); }
@@ -609,7 +611,7 @@
       this.emitLand(player, rank);
       if (rank === 2) this.shake = Math.max(this.shake, 5);
       else if (rank === 1) this.shake = Math.max(this.shake, 2);
-      if (rect && rect.source && rect.source.type === 'fragile' && rank >= 1) {
+      if (rect?.source?.type === 'fragile' && rank >= (rect.source.breakRank ?? 1)) {
         rect.source.broken = true;
         this.emitBreak(rect.source);
         player.onGround = false;
@@ -646,6 +648,15 @@
           this.shake = Math.max(this.shake, 4);
         }
         a.used = true;
+      }
+      if (rect?.source?.type === 'spring') {
+        player.vy = -Math.max(rect.source.strength, v * 1.3) * player.gravitySign;
+        player.onGround = false;
+        player.groundObj = null;
+        player.coyote = 0;
+        player.jumpBuffer = 0;
+        this.sfx('spring');
+        this.emitJump(player);
       }
       if (this.player) {
         this.player.onGround = player.onGround;
@@ -731,6 +742,12 @@
         this.sfx('sigil');
         if (NO.ui) NO.ui.refreshHud();
         if (NO.requestSave) NO.requestSave('sigil');
+      }
+      if (exitObj.chapterReward && !this.stateFlags[exitObj.chapterReward]) {
+        this.stateFlags[exitObj.chapterReward] = true;
+        this.sfx('sigil');
+        NO.ui?.showReward?.(NO.t('restore_reward', { room: NO.L(this.room.name) }));
+        NO.requestSave?.('reward');
       }
       if (exitObj.ending) {
         if (NO.ui) NO.ui.showEnding(exitObj.ending, this);
@@ -1501,9 +1518,29 @@
         if (p.type === 'starGlass') this.drawStarGlass(ctx, p);
         else if (p.type === 'fragile') this.drawFragile(ctx, p);
         else if (p.type === 'bridge') this.drawBridge(ctx, p);
+        else if (p.type === 'spring') this.drawSpring(ctx, p);
         else this.drawSolid(ctx, p);
       }
       for (const m of this.movers) this.drawMover(ctx, m);
+    }
+
+    drawSpring(ctx, p) {
+      ctx.save();
+      ctx.shadowColor = '#63e2d0';
+      ctx.shadowBlur = 14;
+      roundRect(ctx, p.x, p.y, p.w, p.h, 8);
+      ctx.fillStyle = '#193d43';
+      ctx.fill();
+      ctx.strokeStyle = '#63e2d0';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      const x = p.x + p.w/2;
+      ctx.beginPath();
+      ctx.moveTo(x-12,p.y+14);
+      ctx.lineTo(x,p.y+5);
+      ctx.lineTo(x+12,p.y+14);
+      ctx.stroke();
+      ctx.restore();
     }
 
     drawSolid(ctx, p) {

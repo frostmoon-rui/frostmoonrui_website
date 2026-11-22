@@ -4,19 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#070b14">
-  <meta name="description" content="着地の衝撃、光、重力を使って38の部屋を探索。">
+  <meta name="description" content="60の部屋をめぐり、雲海の航路標識を復旧する。">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>夜の天文台</title>
+  <title>星墜の天文台</title>
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/night-observatory/icons/favicon-32.png?v=cac1a6d5ebce">
-  <link rel="apple-touch-icon" href="/assets/night-observatory/icons/apple-touch-icon.png?v=cac1a6d5ebce">
-  <link rel="stylesheet" href="/assets/night-observatory/style.css?v=cac1a6d5ebce">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/night-observatory/icons/favicon-32.png?v=4ab53c748f8f">
+  <link rel="apple-touch-icon" href="/assets/night-observatory/icons/apple-touch-icon.png?v=4ab53c748f8f">
+  <link rel="stylesheet" href="/assets/night-observatory/style.css?v=4ab53c748f8f">
   <meta name="robots" content="noindex">
 </head>
 <body>
 <div id="app">
-  <canvas id="game" width="1280" height="720" aria-label="夜の天文台"></canvas>
+  <canvas id="game" width="1280" height="720" aria-label="星墜の天文台"></canvas>
   <div id="grain" aria-hidden="true"></div>
   <div id="vignette" aria-hidden="true"></div>
 
@@ -25,8 +25,8 @@
     <div class="loader-wrap">
       <canvas id="orrery" width="340" height="340" aria-hidden="true"></canvas>
       <div class="brand-block">
-        <div class="brand" data-i18n="title">夜间天文台</div>
-        <div class="brand-sub" data-i18n="subtitle">THE NIGHT OBSERVATORY</div>
+        <div class="brand" data-i18n="title">星坠天文台</div>
+        <div class="brand-sub" data-i18n="subtitle">ASTROFALL OBSERVATORY</div>
       </div>
       <div id="load-step" class="load-step">正在校准星图</div>
       <div class="load-track"><div id="load-bar"></div></div>
@@ -43,8 +43,8 @@
     <div class="title-content">
       <div class="title-top">
         <div class="eyebrow" data-i18n="title_eyebrow">A NIGHT IN THREE MOTIONS</div>
-        <h1 class="logo" data-i18n="title">夜间天文台</h1>
-        <div class="logo-sub" data-i18n="subtitle">THE NIGHT OBSERVATORY</div>
+        <h1 class="logo" data-i18n="title">星坠天文台</h1>
+        <div class="logo-sub" data-i18n="subtitle">ASTROFALL OBSERVATORY</div>
         <p class="tagline" data-i18n="tagline">光决定你落在哪，重力决定你往哪落，冲量决定你落得多重。</p>
       </div>
       <div class="title-bottom">
@@ -58,7 +58,7 @@
         <div class="title-side">
           <div class="lang-switch" id="lang-switch"></div>
           <div class="title-meta" data-i18n="title_meta">无外部素材 · 建议横屏 · 键盘 / 触屏</div>
-          <nav class="title-links"><a href="/ja/notes/astrofall-playtest/">プレイテスト記事に戻る</a><a href="/ja/play/astrofall/classic/">クラシック版 · 全16室</a></nav>
+          <nav class="title-links"><a href="/ja/notes/astrofall-playtest/">ゲーム紹介</a></nav>
         </div>
       </div>
     </div>
@@ -85,6 +85,7 @@
       <div class="hud-room" id="hud-room">守夜厅</div>
       <div class="hud-wing" id="hud-wing">NIGHTWATCH HALL</div>
       <div class="sigil-row" id="hud-sigils"></div>
+      <span id="hud-progress" class="hud-progress"></span>
     </div>
     <div class="hud-right">
       <button id="btn-hint" class="icon-btn hud-btn" title="Hint (H)" aria-label="Hint">
@@ -98,6 +99,7 @@
         <span class="ico">Ⅱ</span><span class="hud-btn-label" data-i18n="pause">暂停</span>
       </button>
     </div>
+    <div id="route-reward" class="route-reward hidden" role="status"></div>
     <div id="hud-objective" class="hud-objective"></div>
     <div id="autosave" class="autosave hidden"><span class="crescent">☾</span><span data-i18n="saved">已保存</span></div>
   </div>
@@ -129,6 +131,7 @@
         <button id="btn-pause-map" class="btn" data-i18n="map">星图</button>
         <button id="btn-pause-settings" class="btn" data-i18n="settings">设置</button>
         <button id="btn-save-export" class="btn ghost" data-i18n="export_save">导出存档</button>
+        <button id="btn-room-reset" class="btn ghost" data-i18n="reset_room">Restart room</button>
         <button id="btn-title" class="btn ghost" data-i18n="return_title">返回标题</button>
       </div>
     </div>
@@ -297,11 +300,12 @@
   <pre id="test-results" class="test-results hidden"></pre>
 </div>
 
-<script defer src="/assets/night-observatory/js/i18n.js?v=cac1a6d5ebce"></script>
-<script defer src="/assets/night-observatory/js/data.js?v=cac1a6d5ebce"></script>
-<script defer src="/assets/night-observatory/js/audio.js?v=cac1a6d5ebce"></script>
-<script defer src="/assets/night-observatory/js/engine.js?v=cac1a6d5ebce"></script>
-<script defer src="/assets/night-observatory/js/ui.js?v=cac1a6d5ebce"></script>
-<script defer src="/assets/night-observatory/js/main.js?v=cac1a6d5ebce"></script>
+<script defer src="/assets/night-observatory/js/i18n.js?v=4ab53c748f8f"></script>
+<script defer src="/assets/night-observatory/js/data.js?v=4ab53c748f8f"></script>
+<script defer src="/assets/night-observatory/js/campaign.js?v=4ab53c748f8f"></script>
+<script defer src="/assets/night-observatory/js/audio.js?v=4ab53c748f8f"></script>
+<script defer src="/assets/night-observatory/js/engine.js?v=4ab53c748f8f"></script>
+<script defer src="/assets/night-observatory/js/ui.js?v=4ab53c748f8f"></script>
+<script defer src="/assets/night-observatory/js/main.js?v=4ab53c748f8f"></script>
 </body>
 </html>

@@ -24,32 +24,28 @@ for(const locale of locales.filter(code=>code!=='en')){
  source[locale]=JSON.parse(read(`content/pages.${locale}.json`));
  if(JSON.stringify(source[locale].map(p=>p.path))!==JSON.stringify(english.map(p=>p.path)))throw new Error(`Incomplete ${locale} article catalog`);
 }
-const astrofall=read('templates/astrofall.html');
-const astrofallShell={
- zh:['星坠天文台','正在初始化星图…','返回公测文章'],
- en:['Astrofall Observatory','Preparing the star map…','Back to the playtest article'],
- ru:['Обсерватория «Звездопад»','Подготовка звёздной карты…','Назад к статье о тестировании'],
- ja:['星墜の天文台','星図を準備しています…','プレイテスト記事に戻る']
-};
 const nightGame=read('templates/night-observatory.html');
 const nightWorker=read('templates/night-observatory-sw.js');
 const nightManifest=JSON.parse(read('templates/night-observatory.webmanifest'));
 const nightAssets=[...nightGame.matchAll(/(?:href|src)="((?:js\/|icons\/)[^"]+|style\.css)"/g)]
  .map(match=>match[1]);
-const nightRevision=createHash('sha256').update(nightGame).update(nightWorker)
+const normalizeNewlines=text=>text.replace(/\r\n/g,'\n');
+const nightRevision=createHash('sha256').update(normalizeNewlines(nightGame)).update(normalizeNewlines(nightWorker))
  .update(JSON.stringify(nightManifest))
- .update(nightAssets.map(asset=>read('dist/assets/night-observatory/'+asset)).join('')).digest('hex').slice(0,12);
+ .update(nightAssets.map(asset=>normalizeNewlines(read('dist/assets/night-observatory/'+asset))).join('')).digest('hex').slice(0,12);
 const nightAsset=asset=>'/assets/night-observatory/'+asset+'?v='+nightRevision;
 const nightTitles={
- zh:['夜间天文台','用落地冲量、光线和重力探索 38 间房。','返回公测文章','经典版 · 16 室'],
- en:['The Night Observatory','Explore 38 rooms using impact, light, and gravity.','Back to the playtest article','Classic edition · 16 rooms'],
- ru:['Ночная обсерватория','Исследуйте 38 комнат, используя силу падения, свет и гравитацию.','Назад к статье о тестировании','Классическая версия · 16 комнат'],
- ja:['夜の天文台','着地の衝撃、光、重力を使って38の部屋を探索。','プレイテスト記事に戻る','クラシック版 · 全16室'],
+ zh:['星坠天文台','穿过 60 间房，重启云海上方的航标。','游戏介绍'],
+ en:['Astrofall Observatory','Cross 60 rooms to restore a beacon above the cloud sea.','About the game'],
+ ru:['Обсерватория «Звездопад»','Пройдите 60 комнат и восстановите маяк над облачным морем.','Об игре'],
+ ja:['星墜の天文台','60の部屋をめぐり、雲海の航路標識を復旧する。','ゲーム紹介'],
 };
 function writeNightGame(prefix, locale) {
- const [title,description,notes,classic]=nightTitles[locale];
+ const [title,description,notes]=nightTitles[locale];
  const route=prefix+'play/astrofall/';
- const hrefs='<nav class="title-links"><a href="'+languagePath(locale,'notes/astrofall-playtest/')+'">'+escape(notes)+'</a><a href="'+languagePath(locale,'play/astrofall/classic/')+'">'+escape(classic)+'</a></nav>';
+ const hrefs='<nav class="title-links"><a href="'+languagePath(locale,'notes/astrofall-playtest/')+'">'+escape(notes)+'</a></nav>';
+ const destination='/'+route;
+ write(route+'classic/index.html','<!doctype html><html lang="'+htmlLanguages[locale]+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url='+destination+'"><title>'+escape(title)+'</title></head><body><a href="'+destination+'">'+escape(title)+'</a></body></html>');
  const html=nightGame
   .replace('<html lang="en" data-locale="en">','<html lang="'+htmlLanguages[locale]+'" data-locale="'+locale+'">')
   .replace(/<title>[^<]*<\/title>/,'<title>'+escape(title)+'</title>')
@@ -93,19 +89,8 @@ for(const prefix of ['',...locales.map(locale=>`${locale}/`)]){
  }
 }
 for(const locale of locales){
- const [gameTitle,loading,returnToNotes]=astrofallShell[locale];
- const game=astrofall
-  .replace('<html lang="zh-CN" data-locale="zh">',`<html lang="${htmlLanguages[locale]}" data-locale="${locale}">`)
-  .replace(/<title>[^<]*<\/title>/,`<title>${escape(gameTitle)}</title>`)
-  .replace(/(id="loader-title">)[^<]*/,`$1${escape(gameTitle)}`)
-  .replace(/(id="loader-status">)[^<]*/,`$1${escape(loading)} 0%`)
-  .replace('<!--PUBLIC_TEST_NOTES-->',`<a class="test-notes-link" href="${languagePath(locale,'notes/astrofall-playtest/')}">${escape(returnToNotes)}</a>`);
- write(`${locale}/play/astrofall/classic/index.html`,game);
- writeNightGame(`${locale}/`,locale);
- if(locale==='en'){
-  write('play/astrofall/classic/index.html',game);
-  writeNightGame('',locale);
- }
+ writeNightGame(locale+'/',locale);
+ if(locale==='en')writeNightGame('',locale);
  const roomHtml=secretPage(room,site,locale,catalog);
  write(`${locale}/about-secret/index.html`,roomHtml);
  if(locale==='en')write('about-secret/index.html',roomHtml);

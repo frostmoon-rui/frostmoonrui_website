@@ -7,7 +7,7 @@
   <meta name="description" content="夜间天文台 — 一款关于落下、光与重力的 H5 解谜平台游戏。">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>The Night Observatory</title>
+  <title>Astrofall Observatory</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -25,8 +25,8 @@
     <div class="loader-wrap">
       <canvas id="orrery" width="340" height="340" aria-hidden="true"></canvas>
       <div class="brand-block">
-        <div class="brand" data-i18n="title">夜间天文台</div>
-        <div class="brand-sub" data-i18n="subtitle">THE NIGHT OBSERVATORY</div>
+        <div class="brand" data-i18n="title">星坠天文台</div>
+        <div class="brand-sub" data-i18n="subtitle">ASTROFALL OBSERVATORY</div>
       </div>
       <div id="load-step" class="load-step">正在校准星图</div>
       <div class="load-track"><div id="load-bar"></div></div>
@@ -43,8 +43,8 @@
     <div class="title-content">
       <div class="title-top">
         <div class="eyebrow" data-i18n="title_eyebrow">A NIGHT IN THREE MOTIONS</div>
-        <h1 class="logo" data-i18n="title">夜间天文台</h1>
-        <div class="logo-sub" data-i18n="subtitle">THE NIGHT OBSERVATORY</div>
+        <h1 class="logo" data-i18n="title">星坠天文台</h1>
+        <div class="logo-sub" data-i18n="subtitle">ASTROFALL OBSERVATORY</div>
         <p class="tagline" data-i18n="tagline">光决定你落在哪，重力决定你往哪落，冲量决定你落得多重。</p>
       </div>
       <div class="title-bottom">
@@ -85,6 +85,7 @@
       <div class="hud-room" id="hud-room">守夜厅</div>
       <div class="hud-wing" id="hud-wing">NIGHTWATCH HALL</div>
       <div class="sigil-row" id="hud-sigils"></div>
+      <span id="hud-progress" class="hud-progress"></span>
     </div>
     <div class="hud-right">
       <button id="btn-hint" class="icon-btn hud-btn" title="Hint (H)" aria-label="Hint">
@@ -98,6 +99,7 @@
         <span class="ico">Ⅱ</span><span class="hud-btn-label" data-i18n="pause">暂停</span>
       </button>
     </div>
+    <div id="route-reward" class="route-reward hidden" role="status"></div>
     <div id="hud-objective" class="hud-objective"></div>
     <div id="autosave" class="autosave hidden"><span class="crescent">☾</span><span data-i18n="saved">已保存</span></div>
   </div>
@@ -129,6 +131,7 @@
         <button id="btn-pause-map" class="btn" data-i18n="map">星图</button>
         <button id="btn-pause-settings" class="btn" data-i18n="settings">设置</button>
         <button id="btn-save-export" class="btn ghost" data-i18n="export_save">导出存档</button>
+        <button id="btn-room-reset" class="btn ghost" data-i18n="reset_room">Restart room</button>
         <button id="btn-title" class="btn ghost" data-i18n="return_title">返回标题</button>
       </div>
     </div>
@@ -299,6 +302,7 @@
 
 <script defer src="js/i18n.js"></script>
 <script defer src="js/data.js"></script>
+<script defer src="js/campaign.js"></script>
 <script defer src="js/audio.js"></script>
 <script defer src="js/engine.js"></script>
 <script defer src="js/ui.js"></script>

@@ -21,6 +21,11 @@ export async function handle(request,env,fetcher=fetch){
  let assetPath=url.pathname;try{for(let i=0;i<4;i++){const decoded=decodeURIComponent(assetPath);if(decoded===assetPath)break;assetPath=decoded;}}catch{return new Response('Not found',{status:404});}
  if(assetPath.toLowerCase().includes('__studio'))return new Response('Not found',{status:404,headers:{'Cache-Control':'no-store','X-Robots-Tag':'noindex, nofollow'}});
 
+ const oldGame = assetPath.match(/^\/(?:((?:zh|en|ru|ja))\/)?play\/astrofall\/classic(?:\/(?:index\.html)?)?$/);
+ if(oldGame&&(request.method==='GET'||request.method==='HEAD')){
+  const prefix=oldGame[1]?'/'+oldGame[1]:'';
+  return Response.redirect(new URL(prefix+'/play/astrofall/',url),308);
+ }
  if(url.pathname.startsWith('/api/community/')||['/api/studio/community','/api/studio/health'].includes(url.pathname))return handleCommunity(request,env);
  if(url.pathname.startsWith('/api/studio/'))return handleStudio(request,env,fetcher);
  if(url.pathname==='/api/map-config'){

@@ -291,6 +291,9 @@
           this.tone(80, 0.6, 'sine', 0.08, t, 36);
           this.noiseBurst(0.5, 500, 0.06, t);
           break;
+        case 'spring':
+          this.tone(240, 0.19, 'triangle', 0.065, t, 670);
+          break;
         case 'sigil':
           [261.63, 329.63, 392, 523.25].forEach((f, i) => this.tone(f, 1.8, 'sine', 0.03, t + i * 0.08));
           break;

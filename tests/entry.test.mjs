@@ -22,7 +22,7 @@ test('cached return skips motion for either accessibility or owner preference',(
 test('cached animation can be canceled when preferences or visibility change',()=>{for(const kind of ['reduced','owner','visibilitychange']){const s=fixture();s.events.pageshow({persisted:true});if(kind==='reduced'){s.media.matches=true;s.events.reduced();}else if(kind==='owner'){s.document.body.dataset.motion='false';s.events.owner();}else{s.document.visibilityState='hidden';s.events.visibilitychange();}assert.equal(s.canceled(),1);}});
 test('entry does not intercept navigation, forms or create simulated progress',()=>{const source=read('dist/assets/entry.js');assert.doesNotMatch(source,/preventDefault|fetch\(|localStorage|sessionStorage|addEventListener\('click'|addEventListener\('submit'/);assert.doesNotMatch(read('dist/assets/entry.css'),/width:100vw|white-space:nowrap/);});
 
-test('the public playtest opens the full game and preserves the classic entry in every locale',()=>{
+test('the article and legacy bookmarks lead to a single playable game in every locale',()=>{
  for(const locale of ['en','zh','ru','ja']){
   const sitePath=path=>fs.readFileSync(new URL(`../dist/${locale}/${path}/index.html`,import.meta.url),'utf8');
   const article=sitePath('notes/astrofall-playtest');
@@ -31,9 +31,10 @@ test('the public playtest opens the full game and preserves the classic entry in
   assert.equal(article.split(`href="/${locale}/play/astrofall/"`).length,2);
   assert.ok(game.includes(`data-locale="${locale}"`));
   assert.ok(game.includes(`href="/${locale}/notes/astrofall-playtest/"`));
-  assert.ok(game.includes(`href="/${locale}/play/astrofall/classic/"`));
+  assert.ok(!game.includes(`href="/${locale}/play/astrofall/classic/"`));
   assert.match(game,/<script defer src="\/assets\/night-observatory\/js\/main\.js\?v=[a-f0-9]+"><\/script>/);
-  assert.match(classic,/<script src="\/assets\/astrofall\.js\?v=\d+" defer><\/script>/);
+  assert.ok(classic.includes(`content="0;url=/${locale}/play/astrofall/"`));
+  assert.doesNotMatch(classic,/<script|<canvas/);
   assert.doesNotMatch(game,/<script>|<style>/);
  }
 });

@@ -289,7 +289,16 @@
         const cls = k === 'tide' ? 'impact' : k === 'light' ? 'light' : 'gravity';
         return `<div class="sigil ${cls}${on}" title="${this.esc(this.sigilName(k))}">${k === 'tide' ? 'Ⅰ' : k === 'light' ? 'Ⅱ' : 'Ⅲ'}</div>`;
       }).join('');
+      $('hud-progress').textContent = NO.t('rooms_found', { count: Object.keys(st.visited || {}).length });
       this.updateObjective();
+    }
+
+    showReward(message) {
+      const banner = $('route-reward');
+      banner.textContent = message;
+      banner.classList.remove('hidden');
+      clearTimeout(this.rewardTimer);
+      this.rewardTimer = setTimeout(() => banner.classList.add('hidden'), 2900);
     }
 
     updateObjective() {
@@ -551,8 +560,14 @@
       const current = st.room;
       const echoes = st.echoes || {};
       body.innerHTML = '';
+      const progress = document.createElement('p');
+      progress.className = 'map-summary';
+      const repairs = NO.DATA.restorations.filter(id => st.flags?.[id]);
+      progress.textContent = NO.t('rooms_found', { count: Object.keys(visited).length }) + ' · ' +
+        NO.t('restorations', { count: repairs.length, total: NO.DATA.restorations.length });
+      body.appendChild(progress);
       for (const wing of NO.DATA.wings) {
-        const rooms = Object.values(NO.DATA.rooms).filter(r => r.wing === wing.id && !r.hiddenRoom);
+        const rooms = NO.DATA.order.map(id => NO.DATA.rooms[id]).filter(r => r.wing === wing.id && !r.hiddenRoom);
         if (!rooms.length) continue;
         const group = document.createElement('div');
         group.className = 'map-wing';
@@ -566,7 +581,7 @@
           const seen = !!visited[r.id];
           const optional = (NO.DATA.optional || []).includes(r.id);
           const el = document.createElement('div');
-          el.className = 'map-room' + (seen ? ' visited' : ' unseen') + (r.id === current ? ' current' : '') + (optional ? ' optional' : '');
+          el.className = 'map-room' + (seen ? ' visited' : ' unseen') + (r.id === current ? ' current' : '') + (optional ? ' optional' : '') + (repairs.includes(r.id) ? ' restored' : '');
           el.textContent = NO.L(r.name);
           el.title = seen ? NO.L(r.name) : (NO.L({ zh: '未探索', en: 'Unexplored', ru: 'Не изучено', ja: '未探索' }));
           if (optional && seen) {
@@ -725,6 +740,11 @@
       });
 
       $('btn-resume').addEventListener('click', () => this.closePause());
+      $('btn-room-reset').addEventListener('click', () => {
+        this.releaseControls?.();
+        this.closePause();
+        NO.game.startAt(NO.state.room);
+      });
       $('btn-pause-hint').addEventListener('click', () => { this.closePause(); this.openHint(); });
       $('btn-pause-map').addEventListener('click', () => this.openMap());
       $('btn-pause-settings').addEventListener('click', () => this.openSettings('pause'));

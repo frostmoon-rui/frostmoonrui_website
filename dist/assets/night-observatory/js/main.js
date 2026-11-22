@@ -53,24 +53,31 @@
     }
     newState(slot) {
       const now = Date.now();
+      const room = NO.DATA.firstRoom;
       return {
-        version: 1,
-        slot: slot,
-        room: 'hub',
+        version: 2,
+        slot,
+        room,
         spawn: null,
-        lastSpawn: { x: 160, y: 680 },
+        lastSpawn: { ...NO.DATA.rooms[room].spawn },
         sigils: { tide: false, light: false, gravity: false },
         echoes: {},
         endings: {},
         flags: {},
         ending: null,
         playtime: 0,
-        visited: { hub: true },
+        visited: {},
         createdAt: now,
         updatedAt: now
       };
     }
     migrate(s) {
+      if (s && Object.hasOwn(NO.DATA.classicRooms, s.roomId) && (s.started === true || s.version === 1 || s.version == null)) {
+        const room = NO.DATA.classicRooms[s.roomId];
+        const visited = Object.fromEntries((Array.isArray(s.visited) ? s.visited : [])
+          .filter(id => Object.hasOwn(NO.DATA.classicRooms, id)).map(id => [NO.DATA.classicRooms[id], true]));
+        return { ...this.newState(1), room, visited, flags: { introSeen: true, importedClassic: true } };
+      }
       if (!s || typeof s !== 'object' || !Object.hasOwn(NO.DATA.rooms, s.room)) throw new Error('Unknown save room');
       const base = this.newState([1, 2, 3].includes(s.slot) ? s.slot : 1);
       const out = { ...base, room: s.room };
@@ -80,7 +87,7 @@
       out.sigils = { ...base.sigils, ...flags(s.sigils, Object.keys(base.sigils)) };
       out.echoes = flags(s.echoes, echoIds);
       out.endings = flags(s.endings, Object.keys(NO.DATA.story.endings));
-      out.flags = flags(s.flags, ['introSeen']);
+      out.flags = flags(s.flags, ['introSeen','importedClassic',...NO.DATA.restorations]);
       out.visited = { ...base.visited, ...flags(s.visited, Object.keys(NO.DATA.rooms)) };
       out.ending = Object.hasOwn(NO.DATA.story.endings, s.ending) ? s.ending : null;
       for (const key of ['playtime', 'createdAt', 'updatedAt']) {
@@ -95,6 +102,20 @@
         } else if (key === 'lastSpawn') out[key] = { ...room.spawn };
       }
       return out;
+    }
+    importClassic() {
+      if (!this.storageOk) return;
+      try {
+        const marker = 'nightObservatory.classicMigration';
+        if (localStorage.getItem(marker)) return;
+        const raw = localStorage.getItem('astrofall_observatory_save_v2') || localStorage.getItem('astrofall_observatory_save_v1');
+        if (!raw) return;
+        const state = this.migrate(JSON.parse(raw));
+        const free = this.list().findIndex(slot => slot === null);
+        if (free < 0 || !state.flags.importedClassic || !this.save(free + 1, state)) return;
+        if (!this.getActive()) this.setActive(free + 1);
+        localStorage.setItem(marker, '1');
+      } catch (_) {}
     }
     load(slot) {
       if (!this.storageOk) return null;
@@ -143,7 +164,7 @@
       if (!json) {
         try { json = JSON.parse(decodeURIComponent(escape(atob(text)))); } catch (e) {}
       }
-      if (!json || !json.room || !json.sigils) throw new Error('bad save');
+      if (!json || !json.room && !json.roomId) throw new Error('bad save');
       return this.migrate(json);
     }
     resetAll() {
@@ -154,6 +175,7 @@
 
   NO.SaveManager = SaveManager;
   NO.save = new SaveManager();
+  NO.save.importClassic();
   NO.settings = NO.save.loadSettings();
   if (params.get('lang') && NO.I18N[params.get('lang')]) NO.settings.lang = params.get('lang');
   NO.setLang(NO.settings.lang || NO.detectLang());
@@ -187,12 +209,15 @@
   }
 
   NO.requestSave = (reason) => {
-    if (reason === 'room' || reason === 'sigil' || reason === 'echo' || reason === 'ending' || reason === 'choice') saveState(reason);
+    if (reason === 'room' || reason === 'reward' || reason === 'sigil' || reason === 'echo' || reason === 'ending' || reason === 'choice') saveState(reason);
     else debouncedSave(reason);
   };
-  NO.onRoomChange = (room) => {
+  NO.onRoomChange = (room, firstVisit) => {
     if (NO.ui) NO.ui.onRoomChange(room);
     if (NO.audio) NO.audio.setMode(room.bg || 'hub');
+    if (firstVisit && room.chapter && !NO.testMode) {
+      NO.ui.showDialogue([{ speaker: 'conductor', text: room.chapter }], () => {});
+    }
   };
   NO.toast = (msg) => { if (NO.ui) NO.ui.toast(msg); };
   NO.onSoundCue = (name) => { if (NO.ui) NO.ui.showSubtitle(name); };
@@ -241,7 +266,7 @@
       $('title').classList.add('hidden');
       $('slots').classList.add('hidden');
       NO.ui.setPlaying(true);
-      NO.game.loadRoom('hub', NO.DATA.rooms.hub.spawn, { silent: true });
+      NO.game.loadRoom(state.room, null, { silent: true });
       NO.game.fade = 1; NO.game.fading = 'in';
       if (NO.audio) { NO.audio.ensure(); NO.audio.setMode('hub'); }
       if (!params.get('nointro')) NO.actions.showIntro();
@@ -437,8 +462,8 @@
     const ok = (cond, msg) => { out.push((cond ? 'PASS ' : 'FAIL ') + msg); if (!cond) fail++; };
     const rooms = NO.DATA.rooms;
     const ids = Object.keys(rooms);
-    ok(ids.length === 38, 'total room count is 38 (' + ids.length + ')');
-    ok(NO.DATA.main.length === 30, 'main room count is 30 (' + NO.DATA.main.length + ')');
+    ok(ids.length === 60, 'total room count is 60 (' + ids.length + ')');
+    ok(NO.DATA.main.length === 52, 'main room count is 52 (' + NO.DATA.main.length + ')');
     ok(NO.DATA.optional.length === 8, 'optional room count is 8 (' + NO.DATA.optional.length + ')');
     for (const id of NO.DATA.main) ok(!!rooms[id], 'main room exists: ' + id);
     for (const id of NO.DATA.optional) ok(!!rooms[id], 'optional room exists: ' + id);
