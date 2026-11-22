@@ -222,7 +222,8 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:14px;height:14px;b
 .touch-btn:active,.touch-btn.held{background:rgba(242,181,107,.18);border-color:var(--amber);transform:scale(.94)}
 .touch-btn.jump{border-color:rgba(242,181,107,.45);color:var(--amber);width:calc(78px * var(--btn-scale,1));height:calc(78px * var(--btn-scale,1))}
 .touch-btn.brace{color:var(--teal);border-color:rgba(99,226,208,.35)}
-.touch-btn.interact{width:calc(54px * var(--btn-scale,1));height:calc(54px * var(--btn-scale,1));font-size:18px;margin-bottom:8px;border-color:rgba(219,147,172,.4)}
+.touch-btn.interact{width:calc(54px * var(--btn-scale,1));height:calc(54px * var(--btn-scale,1));font-size:18px;margin-bottom:8px;border-color:rgba(219,147,172,.4);opacity:.64}
+.touch-btn.interact.ready,.touch-btn.interact.held{opacity:1;color:var(--teal);border-color:var(--teal);background:rgba(21,54,64,.92)}
 .touch-controls.left-handed .joystick{left:auto;right:calc(20px + var(--safe-right))}
 .touch-controls.left-handed .touch-right{right:auto;left:calc(18px + var(--safe-left));flex-direction:row-reverse}
 

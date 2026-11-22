@@ -270,6 +270,7 @@
     }
 
     onRoomChange(room) {
+      this.setInteractAvailable(false);
       this.setPlaying(true);
       this.refreshHud();
       this.updateObjective();
@@ -366,8 +367,10 @@
     setInteractAvailable(on, label) {
       const btn = $('btn-touch-interact');
       if (!btn) return;
-      btn.classList.toggle('hidden', !on || !this.shouldShowTouch());
-      btn.setAttribute('aria-label', label || 'Interact');
+      btn.classList.toggle('ready', on);
+      const action = NO.t('control_interact');
+      const name = label && label !== NO.t('interact_hint') ? action + ' · ' + label : action;
+      if (btn.getAttribute('aria-label') !== name) btn.setAttribute('aria-label', name);
     }
 
     // ---------- hint ----------
