@@ -43,7 +43,7 @@ function physics() {
   })();`), globals);
 }
 
-test('the north route reaches Core III and returns through the floor without bouncing back', () => {
+function route() {
   const game = physics();
   const ticks = (count, direction = 0) => {
     for (let i = 0; i < count; i++) game.step(direction);
@@ -68,6 +68,11 @@ test('the north route reaches Core III and returns through the floor without bou
     assert.equal(game.position().feet, ledge);
   };
 
+  return { game, ticks, moveTo, jumpAcross };
+}
+
+test('the north route reaches Core III and returns through the floor without bouncing back', () => {
+  const { game, ticks, moveTo, jumpAcross } = route();
   game.enter('N1');
   ticks(3);
   moveTo(187);
@@ -102,4 +107,36 @@ test('the north route reaches Core III and returns through the floor without bou
   moveTo(470);
   ticks(83);
   assert.equal(game.position().room, 'N1');
+});
+
+test('the west route crosses both phase switches and reaches Core II', () => {
+  const { game, ticks, moveTo, jumpAcross } = route();
+  game.enter('W2', 880, 345);
+  ticks(30);
+  moveTo(776);
+  game.step(-1, true);
+  moveTo(627);
+  ticks(65);
+  moveTo(603);
+  jumpAcross(550, 453);
+  jumpAcross(484, 390);
+  moveTo(436);
+  jumpAcross(315, 360);
+  jumpAcross(267, 340);
+  moveTo(133);
+  ticks(130);
+  assert.equal(game.position().room, 'W3');
+  jumpAcross(148, 370);
+  jumpAcross(240, 330);
+  game.step(1, true);
+  for (let i = 0; i < 100; i++) {
+    const { x, feet, grounded } = game.position();
+    if (grounded && feet === 250) break;
+    game.step(x < 284 || (feet < 250 && x < 340) ? 1 : 0);
+  }
+  assert.equal(game.position().feet, 250);
+  moveTo(365);
+  jumpAcross(466, 260);
+  moveTo(475);
+  assert.ok(game.hasCore('core_2'));
 });

@@ -923,7 +923,7 @@
         ],
         phaseSolids: [
           { x: 220, y: 330, w: 130, h: 22, phase: 0 },
-          { x: 260, y: 240, w: 120, h: 22, phase: 1 }
+          { x: 310, y: 250, w: 80, h: 22, phase: 1 }
         ],
         prisms: [
           { x: 285, y: 295 }
