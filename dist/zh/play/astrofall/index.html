@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-locale="zh">
+<html lang="zh-CN" data-locale="zh" data-locale-routing="path">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -9,14 +9,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>星坠天文台</title>
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/night-observatory/icons/favicon-32.png?v=001e2dc4b28e">
-  <link rel="apple-touch-icon" href="/assets/night-observatory/icons/apple-touch-icon.png?v=001e2dc4b28e">
-  <link rel="stylesheet" href="/assets/night-observatory/style.css?v=001e2dc4b28e">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/night-observatory/icons/favicon-32.png?v=257467a7bc0e">
+  <link rel="apple-touch-icon" href="/assets/night-observatory/icons/apple-touch-icon.png?v=257467a7bc0e">
+  <link rel="stylesheet" href="/assets/night-observatory/style.css?v=257467a7bc0e">
   <meta name="robots" content="noindex">
 </head>
 <body>
 <div id="app">
-  <canvas id="game" width="1280" height="720" aria-label="星坠天文台"></canvas>
+  <canvas id="game" width="1280" height="720" data-i18n-aria-label="game_canvas" aria-label="星坠天文台游戏画面"></canvas>
   <div id="grain" aria-hidden="true"></div>
   <div id="vignette" aria-hidden="true"></div>
 
@@ -26,9 +26,9 @@
       <canvas id="orrery" width="340" height="340" aria-hidden="true"></canvas>
       <div class="brand-block">
         <div class="brand" data-i18n="title">星坠天文台</div>
-        <div class="brand-sub" data-i18n="subtitle">ASTROFALL OBSERVATORY</div>
+        <div class="brand-sub" data-i18n="subtitle">解谜平台游戏</div>
       </div>
-      <div id="load-step" class="load-step">正在校准星图</div>
+      <div id="load-step" class="load-step" data-i18n="loading">正在校准星图</div>
       <div class="load-track"><div id="load-bar"></div></div>
       <div class="load-row">
         <span id="load-pct">0%</span>
@@ -42,9 +42,9 @@
     <div class="title-shade" aria-hidden="true"></div>
     <div class="title-content">
       <div class="title-top">
-        <div class="eyebrow" data-i18n="title_eyebrow">A NIGHT IN THREE MOTIONS</div>
+        <div class="eyebrow" data-i18n="title_eyebrow">一夜，三种力量</div>
         <h1 class="logo" data-i18n="title">星坠天文台</h1>
-        <div class="logo-sub" data-i18n="subtitle">ASTROFALL OBSERVATORY</div>
+        <div class="logo-sub" data-i18n="subtitle">解谜平台游戏</div>
         <p class="tagline" data-i18n="tagline">光决定你落在哪，重力决定你往哪落，冲量决定你落得多重。</p>
       </div>
       <div class="title-bottom">
@@ -58,7 +58,7 @@
         <div class="title-side">
           <div class="lang-switch" id="lang-switch"></div>
           <div class="title-meta" data-i18n="title_meta">无外部素材 · 建议横屏 · 键盘 / 触屏</div>
-          <nav class="title-links"><a href="/zh/notes/astrofall-playtest/">游戏介绍</a></nav>
+          <nav class="title-links"><a id="game-article" data-i18n="game_article" hreflang="zh-CN" href="/zh/notes/astrofall-playtest/">游戏介绍</a></nav>
         </div>
       </div>
     </div>
@@ -69,10 +69,10 @@
     <div class="panel glass wide">
       <div class="panel-head">
         <div>
-          <div class="eyebrow" data-i18n="archive">ARCHIVE</div>
+          <div class="eyebrow" data-i18n="archive">存档</div>
           <h2 data-i18n="save_slots">守夜人的记录</h2>
         </div>
-        <button class="icon-btn close-btn" data-close="slots" aria-label="Close">×</button>
+        <button class="icon-btn close-btn" data-close="slots" aria-label="关闭" data-i18n-aria-label="close">×</button>
       </div>
       <div id="slot-list" class="slot-list"></div>
       <p class="fineprint" data-i18n="save_hint">三个存档位自动保存；也可以导出存档码换设备继续。</p>
@@ -88,14 +88,14 @@
       <span id="hud-progress" class="hud-progress"></span>
     </div>
     <div class="hud-right">
-      <button id="btn-hint" class="icon-btn hud-btn" title="Hint (H)" aria-label="Hint">
+      <button id="btn-hint" class="icon-btn hud-btn" title="提示" data-i18n-title="hint" aria-label="提示" data-i18n-aria-label="hint">
         <span class="ico">✦</span><span class="hud-btn-label" data-i18n="hint">提示</span>
       </button>
-      <button id="btn-map" class="icon-btn hud-btn" title="Map (M)" aria-label="Map">
+      <button id="btn-map" class="icon-btn hud-btn" title="星图" data-i18n-title="map" aria-label="星图" data-i18n-aria-label="map">
         <span class="ico">☾</span><span class="hud-btn-label" data-i18n="map">星图</span>
       </button>
-      <button id="btn-fullscreen" class="hud-btn" type="button" title="Fullscreen"><span aria-hidden="true">⛶</span><span class="sr-only" data-i18n="fullscreen">Fullscreen</span></button>
-      <button id="btn-pause" class="icon-btn hud-btn" title="Pause (Esc)" aria-label="Pause">
+      <button id="btn-fullscreen" class="hud-btn" type="button" title="横屏全屏" data-i18n-title="fullscreen"><span aria-hidden="true">⛶</span><span class="sr-only" data-i18n="fullscreen">横屏全屏</span></button>
+      <button id="btn-pause" class="icon-btn hud-btn" title="暂停" data-i18n-title="pause" aria-label="暂停" data-i18n-aria-label="pause">
         <span class="ico">Ⅱ</span><span class="hud-btn-label" data-i18n="pause">暂停</span>
       </button>
     </div>
@@ -111,7 +111,7 @@
         <div class="eyebrow" data-i18n="conductor">THE CONDUCTOR</div>
         <h3 data-i18n="hint_title">指挥家的记忆</h3>
       </div>
-      <button class="icon-btn close-btn" data-close="hint-panel" aria-label="Close">×</button>
+      <button class="icon-btn close-btn" data-close="hint-panel" aria-label="关闭" data-i18n-aria-label="close">×</button>
     </div>
     <div id="hint-body" class="hint-body"></div>
     <div class="hint-actions">
@@ -131,7 +131,7 @@
         <button id="btn-pause-map" class="btn" data-i18n="map">星图</button>
         <button id="btn-pause-settings" class="btn" data-i18n="settings">设置</button>
         <button id="btn-save-export" class="btn ghost" data-i18n="export_save">导出存档</button>
-        <button id="btn-room-reset" class="btn ghost" data-i18n="reset_room">Restart room</button>
+        <button id="btn-room-reset" class="btn ghost" data-i18n="reset_room">返回本房间入口</button>
         <button id="btn-title" class="btn ghost" data-i18n="return_title">返回标题</button>
       </div>
     </div>
@@ -145,7 +145,7 @@
           <div class="eyebrow" data-i18n="calibration">CALIBRATION</div>
           <h2 data-i18n="settings">设置</h2>
         </div>
-        <button class="icon-btn close-btn" data-close="settings-screen" aria-label="Close">×</button>
+        <button class="icon-btn close-btn" data-close="settings-screen" aria-label="关闭" data-i18n-aria-label="close">×</button>
       </div>
       <div class="settings-grid">
         <label class="setting">
@@ -207,10 +207,10 @@
       </div>
       <div class="settings-footer">
         <div class="save-code-row">
-          <label for="save-code" data-i18n="save_code">Save code</label>
+          <label for="save-code" data-i18n="save_code">存档码</label>
           <textarea id="save-code" rows="2" spellcheck="false" maxlength="64000"></textarea>
-          <button id="btn-import-code" class="btn ghost small" data-i18n="import_code">Import code</button>
-          <button id="btn-import" class="btn ghost small" data-i18n="import_save">Import save</button>
+          <button id="btn-import-code" class="btn ghost small" data-i18n="import_code">导入存档码</button>
+          <button id="btn-import" class="btn ghost small" data-i18n="import_save">导入存档</button>
         </div>
         <button id="btn-reset" class="btn danger small" data-i18n="reset_progress">清空进度</button>
         <button id="btn-settings-done" class="btn primary small" data-i18n="done">完成</button>
@@ -223,10 +223,10 @@
     <div class="panel glass map-panel">
       <div class="panel-head">
         <div>
-          <div class="eyebrow" data-i18n="star_chart">STAR CHART</div>
+          <div class="eyebrow" data-i18n="star_chart">星图</div>
           <h2 data-i18n="map">星图</h2>
         </div>
-        <button class="icon-btn close-btn" data-close="map-screen" aria-label="Close">×</button>
+        <button class="icon-btn close-btn" data-close="map-screen" aria-label="关闭" data-i18n-aria-label="close">×</button>
       </div>
       <div id="map-body" class="map-body"></div>
       <p class="fineprint" data-i18n="map_hint">已探索的房间会亮起。没有目标箭头，只有你走过的路。</p>
@@ -260,7 +260,7 @@
   <div id="ending" class="screen ending-screen hidden">
     <div class="ending-vignette" aria-hidden="true"></div>
     <div class="ending-content">
-      <div class="eyebrow" data-i18n="ending_eyebrow">AN ENDING</div>
+      <div class="eyebrow" data-i18n="ending_eyebrow">结局</div>
       <h2 id="ending-title">夜航</h2>
       <div id="ending-text" class="ending-text"></div>
       <div id="ending-stats" class="ending-stats"></div>
@@ -285,9 +285,9 @@
       <div id="joystick-knob" class="joystick-knob"></div>
     </div>
     <div class="touch-right">
-      <button id="btn-touch-interact" class="touch-btn interact" aria-label="Interact">✋</button>
-      <button id="btn-touch-jump" class="touch-btn jump" aria-label="Jump">↑</button>
-      <button id="btn-touch-brace" class="touch-btn brace" aria-label="Brace">↓</button>
+      <button id="btn-touch-interact" class="touch-btn interact" aria-label="交互" data-i18n-aria-label="control_interact">✋</button>
+      <button id="btn-touch-jump" class="touch-btn jump" aria-label="跳跃" data-i18n-aria-label="control_jump">↑</button>
+      <button id="btn-touch-brace" class="touch-btn brace" aria-label="缓冲" data-i18n-aria-label="control_brace">↓</button>
     </div>
   </div>
 
@@ -300,12 +300,12 @@
   <pre id="test-results" class="test-results hidden"></pre>
 </div>
 
-<script defer src="/assets/night-observatory/js/i18n.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/data.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/campaign.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/audio.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/engine.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/ui.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/main.js?v=001e2dc4b28e"></script>
+<script defer src="/assets/night-observatory/js/i18n.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/data.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/campaign.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/audio.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/engine.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/ui.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/main.js?v=257467a7bc0e"></script>
 </body>
 </html>

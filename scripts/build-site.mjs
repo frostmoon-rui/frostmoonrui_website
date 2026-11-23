@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
+import {runInNewContext} from 'node:vm';
 import {fileURLToPath} from 'node:url';
 import {locales,htmlLanguages,escape,loadCatalog,localizeHtml,languagePath} from './i18n.mjs';
 import {exportFood,foodNotePath} from './food-export.mjs';
@@ -34,23 +35,43 @@ const nightRevision=createHash('sha256').update(normalizeNewlines(nightGame)).up
  .update(JSON.stringify(nightManifest))
  .update(nightAssets.map(asset=>normalizeNewlines(read('dist/assets/night-observatory/'+asset))).join('')).digest('hex').slice(0,12);
 const nightAsset=asset=>'/assets/night-observatory/'+asset+'?v='+nightRevision;
-const nightTitles={
- zh:['星坠天文台','穿过 60 间房，重启云海上方的航标。','游戏介绍'],
- en:['Astrofall Observatory','Cross 60 rooms to restore a beacon above the cloud sea.','About the game'],
- ru:['Обсерватория «Звездопад»','Пройдите 60 комнат и восстановите маяк над облачным морем.','Об игре'],
- ja:['星墜の天文台','60の部屋をめぐり、雲海の航路標識を復旧する。','ゲーム紹介'],
+const gameRuntime={window:{}};
+runInNewContext(read('dist/assets/night-observatory/js/i18n.js'),gameRuntime);
+const nightLabels=gameRuntime.window.NO.I18N;
+const nightDescriptions={
+ zh:'穿过 60 间房，重启云海上方的航标。',
+ en:'Cross 60 rooms to restore a beacon above the cloud sea.',
+ ru:'Пройдите 60 комнат и восстановите маяк над облачным морем.',
+ ja:'60の部屋をめぐり、雲海の航路標識を復旧する。',
 };
+function localizeNightMarkup(html,locale){
+ const translate=key=>{
+  const label=nightLabels[locale][key];
+  if(typeof label!=='string')throw new Error('Missing '+locale+' game label: '+key);
+  return escape(label);
+ };
+ return html
+  .replace(/(<([a-z][a-z0-9]*)\b[^>]*\bdata-i18n="([^"]+)"[^>]*>)[^<]*(<\/\2>)/g,
+   (_,open,tag,key,close)=>open+translate(key)+close)
+  .replace(/<[a-z][^>]*\bdata-i18n-(?:aria-label|title)="[^"]+"[^>]*>/g,tag=>{
+   for(const attr of ['aria-label','title']){
+    const key=tag.match(new RegExp('data-i18n-'+attr+'="([^"]+)"'))?.[1];
+    if(key)tag=tag.replace(new RegExp('(\\s'+attr+'=")[^"]*'),(_,open)=>open+translate(key));
+   }
+   return tag;
+  });
+}
 function writeNightGame(prefix, locale) {
- const [title,description,notes]=nightTitles[locale];
+ const {title,game_article:notes}=nightLabels[locale];
+ const description=nightDescriptions[locale];
  const route=prefix+'play/astrofall/';
- const hrefs='<nav class="title-links"><a href="'+languagePath(locale,'notes/astrofall-playtest/')+'">'+escape(notes)+'</a></nav>';
+ const hrefs='<nav class="title-links"><a id="game-article" data-i18n="game_article" hreflang="'+htmlLanguages[locale]+'" href="'+languagePath(locale,'notes/astrofall-playtest/')+'">'+escape(notes)+'</a></nav>';
  const destination='/'+route;
  write(route+'classic/index.html','<!doctype html><html lang="'+htmlLanguages[locale]+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url='+destination+'"><title>'+escape(title)+'</title></head><body><a href="'+destination+'">'+escape(title)+'</a></body></html>');
- const html=nightGame
-  .replace('<html lang="en" data-locale="en">','<html lang="'+htmlLanguages[locale]+'" data-locale="'+locale+'">')
+ const html=localizeNightMarkup(nightGame,locale)
+  .replace('<html lang="en" data-locale="en">','<html lang="'+htmlLanguages[locale]+'" data-locale="'+locale+'" data-locale-routing="path">')
   .replace(/<title>[^<]*<\/title>/,'<title>'+escape(title)+'</title>')
   .replace(/(<meta name="description" content=")[^"]*/,(_,start)=>start+escape(description))
-  .replace(/(aria-label=")夜间天文台游戏画面"/,(_,start)=>start+escape(title)+'"')
   .replace('href="manifest.webmanifest"','href="./manifest.webmanifest"')
   .replace(/(href|src)="((?:js\/|icons\/)[^"]+|style\.css)"/g,(_,attr,asset)=>attr+'="'+nightAsset(asset)+'"')
   .replace('<!--OBSERVATORY_LINKS-->',hrefs);

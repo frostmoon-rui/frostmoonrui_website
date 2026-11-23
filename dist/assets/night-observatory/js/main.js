@@ -177,8 +177,40 @@
   NO.save = new SaveManager();
   NO.save.importClassic();
   NO.settings = NO.save.loadSettings();
-  if (params.get('lang') && NO.I18N[params.get('lang')]) NO.settings.lang = params.get('lang');
-  NO.setLang(NO.settings.lang || NO.detectLang());
+  const localeRoutes = document.documentElement.dataset.localeRouting === 'path';
+  const requestedLang = params.get('lang');
+  const routeLang = localeRoutes && document.documentElement.dataset.locale;
+  NO.settings.lang = NO.LANGS.includes(requestedLang) ? requestedLang : routeLang || NO.settings.lang || NO.detectLang();
+  NO.setLang(NO.settings.lang);
+  function registerGameWorker() {
+    if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0 && !params.has('nosw')) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+  }
+
+  NO.syncGameLocale = function () {
+    document.documentElement.dataset.locale = NO.lang;
+    const article = $('game-article');
+    if (article) {
+      const url = new URL(article.href);
+      url.pathname = '/' + NO.lang + '/notes/astrofall-playtest/';
+      article.href = url.href;
+      article.hreflang = document.documentElement.lang;
+    }
+    if (!localeRoutes) return;
+    const url = new URL(location.href);
+    if (NO.lang !== 'en' || url.pathname !== '/play/astrofall/') {
+      url.pathname = '/' + NO.lang + '/play/astrofall/';
+    }
+    if (url.searchParams.has('lang')) url.searchParams.delete('lang');
+    const manifest = document.querySelector('link[rel="manifest"]');
+    if (manifest) manifest.href = url.pathname + 'manifest.webmanifest';
+    if (url.href !== location.href) {
+      const moved = url.pathname !== location.pathname;
+      history.replaceState(history.state, '', url);
+      if (moved && NO.boot?.done) registerGameWorker();
+    }
+  };
   NO.isTouch = params.get('touch') === '1' || (('ontouchstart' in window) || (navigator.maxTouchPoints > 0)) && window.matchMedia('(pointer: coarse)').matches;
 
   const canvas = $('game');
@@ -379,9 +411,7 @@
     NO.ui.showTitle();
     NO.audio.setSettings(NO.settings);
     NO.audio.setMode('title');
-    if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0 && !params.has('nosw')) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    }
+    registerGameWorker();
     if (NO.debugMode) $('debug').classList.remove('hidden');
     if (NO.testMode) runTests();
     else {

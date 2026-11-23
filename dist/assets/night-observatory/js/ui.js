@@ -28,10 +28,12 @@
     // ---------- i18n ----------
     applyI18n() {
       for (const el of $$('[data-i18n]')) {
-        const key = el.getAttribute('data-i18n');
-        const val = NO.t(key);
-        if (el.tagName === 'OPTION') el.textContent = val;
-        else el.textContent = val;
+        el.textContent = NO.t(el.getAttribute('data-i18n'));
+      }
+      for (const attribute of ['aria-label', 'title']) {
+        for (const el of $$('[data-i18n-' + attribute + ']')) {
+          el.setAttribute(attribute, NO.t(el.getAttribute('data-i18n-' + attribute)));
+        }
       }
       const langSel = $('set-language');
       if (langSel) {
@@ -44,7 +46,8 @@
           langSel.appendChild(o);
         }
       }
-      document.documentElement.lang = NO.lang === 'zh' ? 'zh-CN' : NO.lang;
+      document.title = NO.t('title');
+      NO.syncGameLocale?.();
     }
 
     renderLanguagePills() {
@@ -55,6 +58,8 @@
         const b = document.createElement('button');
         b.className = 'lang-pill' + (l === NO.lang ? ' active' : '');
         b.textContent = NO.LANG_NAMES[l];
+        b.lang = l === 'zh' ? 'zh-CN' : l;
+        b.setAttribute('aria-pressed', String(l === NO.lang));
         b.addEventListener('click', () => {
           NO.setLang(l);
           NO.settings.lang = l;
@@ -63,7 +68,6 @@
           this.renderLanguagePills();
           this.applySettingsUI();
           this.refreshHud();
-          if (NO.onLanguageChange) NO.onLanguageChange();
         });
         wrap.appendChild(b);
       }
@@ -285,7 +289,7 @@
         $('hud-room').textContent = NO.L(room.name);
         const wing = NO.DATA.wings.find(w => w.id === room.wing);
         if (room.wing === 'hub') {
-          $('hud-wing').textContent = NO.L({ zh: '中庭 · ATRIUM', en: 'ATRIUM', ru: 'АТРИУМ', ja: 'アトリウム' });
+          $('hud-wing').textContent = NO.L({ zh: '中庭', en: 'ATRIUM', ru: 'АТРИУМ', ja: 'アトリウム' });
         } else {
           $('hud-wing').textContent = wing ? NO.L(wing.name).toUpperCase() : '';
         }
@@ -603,7 +607,7 @@
         group.className = 'map-wing';
         const head = document.createElement('div');
         head.className = 'map-wing-head';
-        head.innerHTML = `<div class="map-wing-name">${this.esc(NO.L(wing.name))}</div><div class="map-wing-sub">${wing.id.toUpperCase()}</div>`;
+        head.innerHTML = `<div class="map-wing-name">${this.esc(NO.L(wing.name))}</div>`;
         group.appendChild(head);
         const grid = document.createElement('div');
         grid.className = 'map-rooms';

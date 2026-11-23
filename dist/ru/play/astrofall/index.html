@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" data-locale="ru">
+<html lang="ru" data-locale="ru" data-locale-routing="path">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -9,14 +9,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Обсерватория «Звездопад»</title>
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/night-observatory/icons/favicon-32.png?v=001e2dc4b28e">
-  <link rel="apple-touch-icon" href="/assets/night-observatory/icons/apple-touch-icon.png?v=001e2dc4b28e">
-  <link rel="stylesheet" href="/assets/night-observatory/style.css?v=001e2dc4b28e">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/night-observatory/icons/favicon-32.png?v=257467a7bc0e">
+  <link rel="apple-touch-icon" href="/assets/night-observatory/icons/apple-touch-icon.png?v=257467a7bc0e">
+  <link rel="stylesheet" href="/assets/night-observatory/style.css?v=257467a7bc0e">
   <meta name="robots" content="noindex">
 </head>
 <body>
 <div id="app">
-  <canvas id="game" width="1280" height="720" aria-label="Обсерватория «Звездопад»"></canvas>
+  <canvas id="game" width="1280" height="720" data-i18n-aria-label="game_canvas" aria-label="Игровой экран обсерватории"></canvas>
   <div id="grain" aria-hidden="true"></div>
   <div id="vignette" aria-hidden="true"></div>
 
@@ -25,10 +25,10 @@
     <div class="loader-wrap">
       <canvas id="orrery" width="340" height="340" aria-hidden="true"></canvas>
       <div class="brand-block">
-        <div class="brand" data-i18n="title">星坠天文台</div>
-        <div class="brand-sub" data-i18n="subtitle">ASTROFALL OBSERVATORY</div>
+        <div class="brand" data-i18n="title">Обсерватория «Звездопад»</div>
+        <div class="brand-sub" data-i18n="subtitle">Платформер-головоломка</div>
       </div>
-      <div id="load-step" class="load-step">正在校准星图</div>
+      <div id="load-step" class="load-step" data-i18n="loading">Настраиваем звёздную карту</div>
       <div class="load-track"><div id="load-bar"></div></div>
       <div class="load-row">
         <span id="load-pct">0%</span>
@@ -42,23 +42,23 @@
     <div class="title-shade" aria-hidden="true"></div>
     <div class="title-content">
       <div class="title-top">
-        <div class="eyebrow" data-i18n="title_eyebrow">A NIGHT IN THREE MOTIONS</div>
-        <h1 class="logo" data-i18n="title">星坠天文台</h1>
-        <div class="logo-sub" data-i18n="subtitle">ASTROFALL OBSERVATORY</div>
-        <p class="tagline" data-i18n="tagline">光决定你落在哪，重力决定你往哪落，冲量决定你落得多重。</p>
+        <div class="eyebrow" data-i18n="title_eyebrow">Ночь трёх сил</div>
+        <h1 class="logo" data-i18n="title">Обсерватория «Звездопад»</h1>
+        <div class="logo-sub" data-i18n="subtitle">Платформер-головоломка</div>
+        <p class="tagline" data-i18n="tagline">Свет решает, куда ты приземлишься. Гравитация — куда ты падаешь. Импульс — насколько сильно.</p>
       </div>
       <div class="title-bottom">
         <div class="title-menu glass">
-          <button id="btn-continue" class="btn primary" data-i18n="continue">继续</button>
-          <button id="btn-new" class="btn" data-i18n="new_game">新游戏</button>
-          <button id="btn-load" class="btn" data-i18n="load_game">载入</button>
-          <button id="btn-settings" class="btn" data-i18n="settings">设置</button>
-            <button id="btn-about" class="btn ghost" data-i18n="about">关于</button>
+          <button id="btn-continue" class="btn primary" data-i18n="continue">Продолжить</button>
+          <button id="btn-new" class="btn" data-i18n="new_game">Новая игра</button>
+          <button id="btn-load" class="btn" data-i18n="load_game">Загрузить</button>
+          <button id="btn-settings" class="btn" data-i18n="settings">Настройки</button>
+            <button id="btn-about" class="btn ghost" data-i18n="about">Об игре</button>
         </div>
         <div class="title-side">
           <div class="lang-switch" id="lang-switch"></div>
-          <div class="title-meta" data-i18n="title_meta">无外部素材 · 建议横屏 · 键盘 / 触屏</div>
-          <nav class="title-links"><a href="/ru/notes/astrofall-playtest/">Об игре</a></nav>
+          <div class="title-meta" data-i18n="title_meta">Без внешних файлов · Лучше горизонтально · Клавиатура / касание</div>
+          <nav class="title-links"><a id="game-article" data-i18n="game_article" hreflang="ru" href="/ru/notes/astrofall-playtest/">Об игре</a></nav>
         </div>
       </div>
     </div>
@@ -69,13 +69,13 @@
     <div class="panel glass wide">
       <div class="panel-head">
         <div>
-          <div class="eyebrow" data-i18n="archive">ARCHIVE</div>
-          <h2 data-i18n="save_slots">守夜人的记录</h2>
+          <div class="eyebrow" data-i18n="archive">АРХИВ</div>
+          <h2 data-i18n="save_slots">Записи ночного стража</h2>
         </div>
-        <button class="icon-btn close-btn" data-close="slots" aria-label="Close">×</button>
+        <button class="icon-btn close-btn" data-close="slots" aria-label="Закрыть" data-i18n-aria-label="close">×</button>
       </div>
       <div id="slot-list" class="slot-list"></div>
-      <p class="fineprint" data-i18n="save_hint">三个存档位自动保存；也可以导出存档码换设备继续。</p>
+      <p class="fineprint" data-i18n="save_hint">Три слота сохраняются автоматически. Можно выгрузить код сохранения и продолжить на другом устройстве.</p>
     </div>
   </div>
 
@@ -88,20 +88,20 @@
       <span id="hud-progress" class="hud-progress"></span>
     </div>
     <div class="hud-right">
-      <button id="btn-hint" class="icon-btn hud-btn" title="Hint (H)" aria-label="Hint">
-        <span class="ico">✦</span><span class="hud-btn-label" data-i18n="hint">提示</span>
+      <button id="btn-hint" class="icon-btn hud-btn" title="Подсказка" data-i18n-title="hint" aria-label="Подсказка" data-i18n-aria-label="hint">
+        <span class="ico">✦</span><span class="hud-btn-label" data-i18n="hint">Подсказка</span>
       </button>
-      <button id="btn-map" class="icon-btn hud-btn" title="Map (M)" aria-label="Map">
-        <span class="ico">☾</span><span class="hud-btn-label" data-i18n="map">星图</span>
+      <button id="btn-map" class="icon-btn hud-btn" title="Карта" data-i18n-title="map" aria-label="Карта" data-i18n-aria-label="map">
+        <span class="ico">☾</span><span class="hud-btn-label" data-i18n="map">Карта</span>
       </button>
-      <button id="btn-fullscreen" class="hud-btn" type="button" title="Fullscreen"><span aria-hidden="true">⛶</span><span class="sr-only" data-i18n="fullscreen">Fullscreen</span></button>
-      <button id="btn-pause" class="icon-btn hud-btn" title="Pause (Esc)" aria-label="Pause">
-        <span class="ico">Ⅱ</span><span class="hud-btn-label" data-i18n="pause">暂停</span>
+      <button id="btn-fullscreen" class="hud-btn" type="button" title="Во весь экран" data-i18n-title="fullscreen"><span aria-hidden="true">⛶</span><span class="sr-only" data-i18n="fullscreen">Во весь экран</span></button>
+      <button id="btn-pause" class="icon-btn hud-btn" title="Пауза" data-i18n-title="pause" aria-label="Пауза" data-i18n-aria-label="pause">
+        <span class="ico">Ⅱ</span><span class="hud-btn-label" data-i18n="pause">Пауза</span>
       </button>
     </div>
     <div id="route-reward" class="route-reward hidden" role="status"></div>
     <div id="hud-objective" class="hud-objective"></div>
-    <div id="autosave" class="autosave hidden"><span class="crescent">☾</span><span data-i18n="saved">已保存</span></div>
+    <div id="autosave" class="autosave hidden"><span class="crescent">☾</span><span data-i18n="saved">Сохранено</span></div>
   </div>
 
   <!-- Hint panel -->
@@ -109,14 +109,14 @@
     <div class="panel-head">
       <div>
         <div class="eyebrow" data-i18n="conductor">THE CONDUCTOR</div>
-        <h3 data-i18n="hint_title">指挥家的记忆</h3>
+        <h3 data-i18n="hint_title">Память Дирижёра</h3>
       </div>
-      <button class="icon-btn close-btn" data-close="hint-panel" aria-label="Close">×</button>
+      <button class="icon-btn close-btn" data-close="hint-panel" aria-label="Закрыть" data-i18n-aria-label="close">×</button>
     </div>
     <div id="hint-body" class="hint-body"></div>
     <div class="hint-actions">
-      <button id="btn-hint-more" class="btn small" data-i18n="hint_more">再想一点</button>
-      <button id="btn-hint-show" class="btn small ghost" data-i18n="hint_show">指给我看</button>
+      <button id="btn-hint-more" class="btn small" data-i18n="hint_more">Ещё немного</button>
+      <button id="btn-hint-show" class="btn small ghost" data-i18n="hint_show">Покажи</button>
     </div>
   </div>
 
@@ -124,15 +124,15 @@
   <div id="pause" class="screen pause-screen hidden">
     <div class="panel glass narrow">
       <div class="eyebrow" data-i18n="intermission">INTERMISSION</div>
-      <h2 data-i18n="paused">暂停</h2>
+      <h2 data-i18n="paused">Пауза</h2>
       <div class="stack">
-        <button id="btn-resume" class="btn primary" data-i18n="resume">继续游戏</button>
-        <button id="btn-pause-hint" class="btn" data-i18n="hint">提示</button>
-        <button id="btn-pause-map" class="btn" data-i18n="map">星图</button>
-        <button id="btn-pause-settings" class="btn" data-i18n="settings">设置</button>
-        <button id="btn-save-export" class="btn ghost" data-i18n="export_save">导出存档</button>
-        <button id="btn-room-reset" class="btn ghost" data-i18n="reset_room">Restart room</button>
-        <button id="btn-title" class="btn ghost" data-i18n="return_title">返回标题</button>
+        <button id="btn-resume" class="btn primary" data-i18n="resume">Продолжить</button>
+        <button id="btn-pause-hint" class="btn" data-i18n="hint">Подсказка</button>
+        <button id="btn-pause-map" class="btn" data-i18n="map">Карта</button>
+        <button id="btn-pause-settings" class="btn" data-i18n="settings">Настройки</button>
+        <button id="btn-save-export" class="btn ghost" data-i18n="export_save">Выгрузить сохранение</button>
+        <button id="btn-room-reset" class="btn ghost" data-i18n="reset_room">Начать комнату заново</button>
+        <button id="btn-title" class="btn ghost" data-i18n="return_title">В меню</button>
       </div>
     </div>
   </div>
@@ -143,77 +143,77 @@
       <div class="panel-head">
         <div>
           <div class="eyebrow" data-i18n="calibration">CALIBRATION</div>
-          <h2 data-i18n="settings">设置</h2>
+          <h2 data-i18n="settings">Настройки</h2>
         </div>
-        <button class="icon-btn close-btn" data-close="settings-screen" aria-label="Close">×</button>
+        <button class="icon-btn close-btn" data-close="settings-screen" aria-label="Закрыть" data-i18n-aria-label="close">×</button>
       </div>
       <div class="settings-grid">
         <label class="setting">
-          <span data-i18n="language">语言</span>
+          <span data-i18n="language">Язык</span>
           <select id="set-language"></select>
         </label>
         <label class="setting">
-          <span data-i18n="music">音乐</span>
+          <span data-i18n="music">Музыка</span>
           <input id="set-music" type="range" min="0" max="100" value="65">
           <output id="out-music">65</output>
         </label>
         <label class="setting">
-          <span data-i18n="sfx">音效</span>
+          <span data-i18n="sfx">Звуки</span>
           <input id="set-sfx" type="range" min="0" max="100" value="80">
           <output id="out-sfx">80</output>
         </label>
         <label class="setting">
-          <span data-i18n="ambient">环境音</span>
+          <span data-i18n="ambient">Атмосфера</span>
           <input id="set-ambient" type="range" min="0" max="100" value="55">
           <output id="out-ambient">55</output>
         </label>
         <label class="setting">
-          <span data-i18n="screen_shake">屏幕震动</span>
+          <span data-i18n="screen_shake">Тряска экрана</span>
           <input id="set-shake" type="range" min="0" max="100" value="60">
           <output id="out-shake">60</output>
         </label>
         <label class="setting toggle">
-          <span data-i18n="reduce_motion">减弱动态</span>
+          <span data-i18n="reduce_motion">Меньше анимации</span>
           <input id="set-reduce" type="checkbox">
           <span class="switch"></span>
         </label>
         <label class="setting toggle">
-          <span data-i18n="high_contrast">高对比</span>
+          <span data-i18n="high_contrast">Высокий контраст</span>
           <input id="set-contrast" type="checkbox">
           <span class="switch"></span>
         </label>
         <label class="setting toggle">
-          <span data-i18n="sound_subtitles">声音字幕</span>
+          <span data-i18n="sound_subtitles">Субтитры звука</span>
           <input id="set-subtitles" type="checkbox" checked>
           <span class="switch"></span>
         </label>
         <label class="setting toggle">
-          <span data-i18n="hints_enabled">分层提示</span>
+          <span data-i18n="hints_enabled">Подсказки</span>
           <input id="set-hints" type="checkbox" checked>
           <span class="switch"></span>
         </label>
         <label class="setting">
-          <span data-i18n="control_side">触屏方向</span>
+          <span data-i18n="control_side">Сторона касания</span>
           <select id="set-side">
-            <option value="right" data-i18n="right_hand">右手跳跃</option>
-            <option value="left" data-i18n="left_hand">左手跳跃</option>
+            <option value="right" data-i18n="right_hand">Прыжок справа</option>
+            <option value="left" data-i18n="left_hand">Прыжок слева</option>
           </select>
         </label>
         <label class="setting">
-          <span data-i18n="button_size">按钮大小</span>
+          <span data-i18n="button_size">Размер кнопок</span>
           <input id="set-buttons" type="range" min="80" max="140" value="100">
           <output id="out-buttons">100%</output>
         </label>
       </div>
       <div class="settings-footer">
         <div class="save-code-row">
-          <label for="save-code" data-i18n="save_code">Save code</label>
+          <label for="save-code" data-i18n="save_code">Код сохранения</label>
           <textarea id="save-code" rows="2" spellcheck="false" maxlength="64000"></textarea>
-          <button id="btn-import-code" class="btn ghost small" data-i18n="import_code">Import code</button>
-          <button id="btn-import" class="btn ghost small" data-i18n="import_save">Import save</button>
+          <button id="btn-import-code" class="btn ghost small" data-i18n="import_code">Ввести код</button>
+          <button id="btn-import" class="btn ghost small" data-i18n="import_save">Загрузить сохранение</button>
         </div>
-        <button id="btn-reset" class="btn danger small" data-i18n="reset_progress">清空进度</button>
-        <button id="btn-settings-done" class="btn primary small" data-i18n="done">完成</button>
+        <button id="btn-reset" class="btn danger small" data-i18n="reset_progress">Сбросить прогресс</button>
+        <button id="btn-settings-done" class="btn primary small" data-i18n="done">Готово</button>
       </div>
     </div>
   </div>
@@ -223,13 +223,13 @@
     <div class="panel glass map-panel">
       <div class="panel-head">
         <div>
-          <div class="eyebrow" data-i18n="star_chart">STAR CHART</div>
-          <h2 data-i18n="map">星图</h2>
+          <div class="eyebrow" data-i18n="star_chart">ЗВЁЗДНАЯ КАРТА</div>
+          <h2 data-i18n="map">Карта</h2>
         </div>
-        <button class="icon-btn close-btn" data-close="map-screen" aria-label="Close">×</button>
+        <button class="icon-btn close-btn" data-close="map-screen" aria-label="Закрыть" data-i18n-aria-label="close">×</button>
       </div>
       <div id="map-body" class="map-body"></div>
-      <p class="fineprint" data-i18n="map_hint">已探索的房间会亮起。没有目标箭头，只有你走过的路。</p>
+      <p class="fineprint" data-i18n="map_hint">Исследованные комнаты светятся. Без стрелок — только пройденный путь.</p>
     </div>
   </div>
 
@@ -240,7 +240,7 @@
       <div id="dialogue-text" class="dialogue-text"></div>
       <div class="dialogue-foot">
         <span class="dialogue-dots" id="dialogue-dots"></span>
-        <button id="dialogue-next" class="btn small" data-i18n="next">继续</button>
+        <button id="dialogue-next" class="btn small" data-i18n="next">Далее</button>
       </div>
     </div>
   </div>
@@ -249,10 +249,10 @@
   <div id="opening" class="screen opening-screen hidden">
     <div class="opening-stars" aria-hidden="true"></div>
     <div class="opening-content">
-      <div class="opening-line" data-i18n="opening_1">海面停在半空，像一张没有翻页的星图。</div>
-      <div class="opening-line dim" data-i18n="opening_2">最后一位守夜人回到了天文台。</div>
-      <div class="opening-line dim" data-i18n="opening_3">航标灯已经熄灭很久了。</div>
-      <button id="btn-skip-opening" class="btn ghost small" data-i18n="skip">跳过</button>
+      <div class="opening-line" data-i18n="opening_1">Море замерло на полпути, как звёздная карта, которую так и не перевернули.</div>
+      <div class="opening-line dim" data-i18n="opening_2">Последний ночной страж вернулся в обсерваторию.</div>
+      <div class="opening-line dim" data-i18n="opening_3">Маяк погас очень давно.</div>
+      <button id="btn-skip-opening" class="btn ghost small" data-i18n="skip">Пропустить</button>
     </div>
   </div>
 
@@ -260,13 +260,13 @@
   <div id="ending" class="screen ending-screen hidden">
     <div class="ending-vignette" aria-hidden="true"></div>
     <div class="ending-content">
-      <div class="eyebrow" data-i18n="ending_eyebrow">AN ENDING</div>
+      <div class="eyebrow" data-i18n="ending_eyebrow">ФИНАЛ</div>
       <h2 id="ending-title">夜航</h2>
       <div id="ending-text" class="ending-text"></div>
       <div id="ending-stats" class="ending-stats"></div>
       <div class="ending-actions">
-        <button id="btn-ending-title" class="btn" data-i18n="return_title">返回标题</button>
-        <button id="btn-ending-continue" class="btn ghost" data-i18n="continue_explore">继续探索</button>
+        <button id="btn-ending-title" class="btn" data-i18n="return_title">В меню</button>
+        <button id="btn-ending-continue" class="btn ghost" data-i18n="continue_explore">Продолжить путь</button>
       </div>
     </div>
   </div>
@@ -274,8 +274,8 @@
   <!-- Orientation -->
   <div id="orientation" class="screen orientation-screen hidden">
     <div class="phone-rotate">▭</div>
-    <h2 data-i18n="rotate_title">请横屏游玩</h2>
-    <p data-i18n="rotate_text">把设备转成横向，天文台会看得更清楚。</p>
+    <h2 data-i18n="rotate_title">Поверните устройство</h2>
+    <p data-i18n="rotate_text">Горизонтальный экран покажет обсерваторию лучше.</p>
   </div>
 
   <!-- Touch controls -->
@@ -285,9 +285,9 @@
       <div id="joystick-knob" class="joystick-knob"></div>
     </div>
     <div class="touch-right">
-      <button id="btn-touch-interact" class="touch-btn interact" aria-label="Interact">✋</button>
-      <button id="btn-touch-jump" class="touch-btn jump" aria-label="Jump">↑</button>
-      <button id="btn-touch-brace" class="touch-btn brace" aria-label="Brace">↓</button>
+      <button id="btn-touch-interact" class="touch-btn interact" aria-label="Действие" data-i18n-aria-label="control_interact">✋</button>
+      <button id="btn-touch-jump" class="touch-btn jump" aria-label="Прыжок" data-i18n-aria-label="control_jump">↑</button>
+      <button id="btn-touch-brace" class="touch-btn brace" aria-label="Торможение" data-i18n-aria-label="control_brace">↓</button>
     </div>
   </div>
 
@@ -300,12 +300,12 @@
   <pre id="test-results" class="test-results hidden"></pre>
 </div>
 
-<script defer src="/assets/night-observatory/js/i18n.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/data.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/campaign.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/audio.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/engine.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/ui.js?v=001e2dc4b28e"></script>
-<script defer src="/assets/night-observatory/js/main.js?v=001e2dc4b28e"></script>
+<script defer src="/assets/night-observatory/js/i18n.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/data.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/campaign.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/audio.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/engine.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/ui.js?v=257467a7bc0e"></script>
+<script defer src="/assets/night-observatory/js/main.js?v=257467a7bc0e"></script>
 </body>
 </html>

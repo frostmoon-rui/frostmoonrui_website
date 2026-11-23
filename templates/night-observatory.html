@@ -16,7 +16,7 @@
 </head>
 <body>
 <div id="app">
-  <canvas id="game" width="1280" height="720" aria-label="夜间天文台游戏画面"></canvas>
+  <canvas id="game" width="1280" height="720" data-i18n-aria-label="game_canvas" aria-label="夜间天文台游戏画面"></canvas>
   <div id="grain" aria-hidden="true"></div>
   <div id="vignette" aria-hidden="true"></div>
 
@@ -28,7 +28,7 @@
         <div class="brand" data-i18n="title">星坠天文台</div>
         <div class="brand-sub" data-i18n="subtitle">ASTROFALL OBSERVATORY</div>
       </div>
-      <div id="load-step" class="load-step">正在校准星图</div>
+      <div id="load-step" class="load-step" data-i18n="loading">正在校准星图</div>
       <div class="load-track"><div id="load-bar"></div></div>
       <div class="load-row">
         <span id="load-pct">0%</span>
@@ -72,7 +72,7 @@
           <div class="eyebrow" data-i18n="archive">ARCHIVE</div>
           <h2 data-i18n="save_slots">守夜人的记录</h2>
         </div>
-        <button class="icon-btn close-btn" data-close="slots" aria-label="Close">×</button>
+        <button class="icon-btn close-btn" data-close="slots" aria-label="Close" data-i18n-aria-label="close">×</button>
       </div>
       <div id="slot-list" class="slot-list"></div>
       <p class="fineprint" data-i18n="save_hint">三个存档位自动保存；也可以导出存档码换设备继续。</p>
@@ -88,14 +88,14 @@
       <span id="hud-progress" class="hud-progress"></span>
     </div>
     <div class="hud-right">
-      <button id="btn-hint" class="icon-btn hud-btn" title="Hint (H)" aria-label="Hint">
+      <button id="btn-hint" class="icon-btn hud-btn" title="Hint (H)" data-i18n-title="hint" aria-label="Hint" data-i18n-aria-label="hint">
         <span class="ico">✦</span><span class="hud-btn-label" data-i18n="hint">提示</span>
       </button>
-      <button id="btn-map" class="icon-btn hud-btn" title="Map (M)" aria-label="Map">
+      <button id="btn-map" class="icon-btn hud-btn" title="Map (M)" data-i18n-title="map" aria-label="Map" data-i18n-aria-label="map">
         <span class="ico">☾</span><span class="hud-btn-label" data-i18n="map">星图</span>
       </button>
-      <button id="btn-fullscreen" class="hud-btn" type="button" title="Fullscreen"><span aria-hidden="true">⛶</span><span class="sr-only" data-i18n="fullscreen">Fullscreen</span></button>
-      <button id="btn-pause" class="icon-btn hud-btn" title="Pause (Esc)" aria-label="Pause">
+      <button id="btn-fullscreen" class="hud-btn" type="button" title="Fullscreen" data-i18n-title="fullscreen"><span aria-hidden="true">⛶</span><span class="sr-only" data-i18n="fullscreen">Fullscreen</span></button>
+      <button id="btn-pause" class="icon-btn hud-btn" title="Pause (Esc)" data-i18n-title="pause" aria-label="Pause" data-i18n-aria-label="pause">
         <span class="ico">Ⅱ</span><span class="hud-btn-label" data-i18n="pause">暂停</span>
       </button>
     </div>
@@ -111,7 +111,7 @@
         <div class="eyebrow" data-i18n="conductor">THE CONDUCTOR</div>
         <h3 data-i18n="hint_title">指挥家的记忆</h3>
       </div>
-      <button class="icon-btn close-btn" data-close="hint-panel" aria-label="Close">×</button>
+      <button class="icon-btn close-btn" data-close="hint-panel" aria-label="Close" data-i18n-aria-label="close">×</button>
     </div>
     <div id="hint-body" class="hint-body"></div>
     <div class="hint-actions">
@@ -145,7 +145,7 @@
           <div class="eyebrow" data-i18n="calibration">CALIBRATION</div>
           <h2 data-i18n="settings">设置</h2>
         </div>
-        <button class="icon-btn close-btn" data-close="settings-screen" aria-label="Close">×</button>
+        <button class="icon-btn close-btn" data-close="settings-screen" aria-label="Close" data-i18n-aria-label="close">×</button>
       </div>
       <div class="settings-grid">
         <label class="setting">
@@ -226,7 +226,7 @@
           <div class="eyebrow" data-i18n="star_chart">STAR CHART</div>
           <h2 data-i18n="map">星图</h2>
         </div>
-        <button class="icon-btn close-btn" data-close="map-screen" aria-label="Close">×</button>
+        <button class="icon-btn close-btn" data-close="map-screen" aria-label="Close" data-i18n-aria-label="close">×</button>
       </div>
       <div id="map-body" class="map-body"></div>
       <p class="fineprint" data-i18n="map_hint">已探索的房间会亮起。没有目标箭头，只有你走过的路。</p>
@@ -285,9 +285,9 @@
       <div id="joystick-knob" class="joystick-knob"></div>
     </div>
     <div class="touch-right">
-      <button id="btn-touch-interact" class="touch-btn interact" aria-label="Interact">✋</button>
-      <button id="btn-touch-jump" class="touch-btn jump" aria-label="Jump">↑</button>
-      <button id="btn-touch-brace" class="touch-btn brace" aria-label="Brace">↓</button>
+      <button id="btn-touch-interact" class="touch-btn interact" aria-label="Interact" data-i18n-aria-label="control_interact">✋</button>
+      <button id="btn-touch-jump" class="touch-btn jump" aria-label="Jump" data-i18n-aria-label="control_jump">↑</button>
+      <button id="btn-touch-brace" class="touch-btn brace" aria-label="Brace" data-i18n-aria-label="control_brace">↓</button>
     </div>
   </div>
 

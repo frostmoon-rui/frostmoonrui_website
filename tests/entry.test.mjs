@@ -30,7 +30,11 @@ test('the article and legacy bookmarks lead to a single playable game in every l
   const classic=sitePath('play/astrofall/classic');
   assert.equal(article.split(`href="/${locale}/play/astrofall/"`).length,2);
   assert.ok(game.includes(`data-locale="${locale}"`));
+  assert.ok(game.includes('data-locale-routing="path"'));
   assert.ok(game.includes(`href="/${locale}/notes/astrofall-playtest/"`));
+  const label={en:'About the game',zh:'游戏介绍',ru:'Об игре',ja:'ゲーム紹介'}[locale];
+  assert.ok(game.includes(`href="/${locale}/notes/astrofall-playtest/">${label}</a>`));
+  if(locale!=='en')assert.doesNotMatch(game,/A NIGHT IN THREE MOTIONS/);
   assert.ok(!game.includes(`href="/${locale}/play/astrofall/classic/"`));
   assert.match(game,/<script defer src="\/assets\/night-observatory\/js\/main\.js\?v=[a-f0-9]+"><\/script>/);
   assert.ok(classic.includes(`content="0;url=/${locale}/play/astrofall/"`));
