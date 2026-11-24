@@ -35,7 +35,9 @@
         hints: true,
         controlSide: 'right',
         buttonSize: 100,
-        showTouch: 'auto'
+        showTouch: 'auto',
+        tutorialMode: 'auto',
+        tutorialCompleted: {}
       };
     }
     loadSettings() {
@@ -217,6 +219,12 @@
   NO.state = NO.save.newState(NO.save.getActive() || 1);
   NO.game = new NO.Game(canvas, NO.state);
   NO.ui = new NO.UI();
+  NO.lesson = new NO.ControlLesson(NO.game, NO.settings, {
+    defaultDevice: NO.ui.shouldShowTouch() ? 'touch' : 'keyboard',
+    save: () => NO.save.saveSettings(NO.settings),
+    show: step => NO.ui.renderControlLesson(step),
+    reward: message => NO.ui.showReward(message),
+  });
   NO.boot = { progress: 0, done: false, startedAt: performance.now() };
   NO.testMode = params.get('test') === '1';
   NO.debugMode = params.get('dev') === '1';
@@ -246,6 +254,7 @@
   };
   NO.onRoomChange = (room, firstVisit) => {
     if (NO.ui) NO.ui.onRoomChange(room);
+    NO.lesson.roomChanged();
     if (NO.audio) NO.audio.setMode(room.bg || 'hub');
     if (firstVisit && room.chapter && !NO.testMode) {
       NO.ui.showDialogue([{ speaker: 'conductor', text: room.chapter }], () => {});

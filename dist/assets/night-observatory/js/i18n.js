@@ -627,6 +627,49 @@
     Object.assign(NO.I18N[locale], { title, rooms_found, restorations, restore_reward, reset_room });
   }
 
+
+  const lessonText = {
+    mechanism: ['机关练习','Mechanism practice','Знакомство с механизмом','仕掛けの練習'],
+    landing_0: ['落地 · 轻落','Landing · Soft','Приземление · мягкое','着地 · 軽い'],
+    landing_1: ['落地 · 中落','Landing · Firm','Приземление · среднее','着地 · 中'],
+    landing_2: ['落地 · 重落','Landing · Heavy','Приземление · тяжёлое','着地 · 重い'],
+    setting: ['操作教学','Control tutorial','Обучение управлению','操作チュートリアル'],
+    auto: ['自动识别','Detect input','Определять автоматически','自動判定'],
+    keyboard: ['键盘','Keyboard','Клавиатура','キーボード'],
+    touch: ['触屏','Touch','Сенсорный экран','タッチ'],
+    gamepad: ['手柄','Gamepad','Геймпад','ゲームパッド'],
+    off: ['关闭教学','Tutorial off','Выключить обучение','チュートリアルを無効にする'],
+    replay: ['重练当前操作方式','Replay for current input','Повторить для текущего управления','現在の操作方法でもう一度練習'],
+    skip: ['暂时隐藏','Hide for now','Скрыть пока','いったん隠す'],
+    progress: ['{device}练习 {number}/{total}','{device} practice {number}/{total}','{device} · урок {number}/{total}','{device}の練習 {number}/{total}'],
+    done: ['操作练习完成','Control practice complete','Урок управления завершён','操作の練習完了'],
+    step_move: ['用 {move} 往左或右走几步。', 'Use {move} to walk a few steps left or right.', 'Сделай несколько шагов влево или вправо: {move}.', '{move}で左右どちらかへ数歩進もう。'],
+    step_jump: ['在平地按一下 {jump}，让角色自然落地。看见中落或重落就完成了。', 'On flat ground, tap {jump} and let yourself land. Watch for a firm or heavy landing.', 'На ровном месте нажми {jump} и приземлись. Следи за средним или тяжёлым приземлением.', '平らな所で{jump}を一度押し、そのまま着地。中か重の表示を見よう。'],
+    step_brace: ['再按一次 {jump}。下落时按住 {brace}，碰地再松开。看力度变成「轻落」。', 'Tap {jump} again. While falling, hold {brace} until you touch down. Watch the impact change to Soft.', 'Снова нажми {jump}. На спуске держи {brace} до касания земли. Удар станет мягким.', 'もう一度{jump}を押そう。落ち始めたら接地まで{brace}を押し続け、「軽い着地」を確認しよう。'],
+    step_interact: ['走到门框或机关旁，等附近出现提示，再按 {interact}。', 'Walk up to a door or device. When its prompt appears, press {interact}.', 'Подойди к двери или механизму. Когда появится подсказка, нажми {interact}.', '扉や仕掛けに近づき、表示が出たら{interact}を押そう。'],
+    key_keyboard_move: ['A / D 或 ← / →','A / D or ← / →','A / D или ← / →','A / D または ← / →'],
+    key_keyboard_jump: ['空格键','Space','пробел','スペース'],
+    key_keyboard_brace: ['S 或 ↓','S or ↓','S или ↓','S または ↓'],
+    key_keyboard_interact: ['E','E','E','E'],
+    key_touch_move: ['屏幕摇杆','the on-screen stick','экранный стик','画面のスティック'],
+    key_touch_jump: ['↑ 跳跃键','↑ Jump','↑ Прыжок','↑ ジャンプ'],
+    key_touch_brace: ['↓ 缓冲键','↓ Brace','↓ Торможение','↓ ブレーキ'],
+    key_touch_interact: ['✋ 互动键','✋ Interact','✋ Действие','✋ 調べる'],
+    key_gamepad_move: ['左摇杆','the left stick','левый стик','左スティック'],
+    key_gamepad_jump: ['A / ×（下方键）','A / × (bottom button)','A / × (нижняя кнопка)','A / ×（下のボタン）'],
+    key_gamepad_brace: ['B / ○（右侧键）','B / ○ (right button)','B / ○ (правая кнопка)','B / ○（右のボタン）'],
+    key_gamepad_interact: ['Y / △（上方键）','Y / △ (top button)','Y / △ (верхняя кнопка)','Y / △（上のボタン）'],
+    hint_portal: ['走到门框旁，看到目标房间的名称后按 {interact}。','Walk up to the frame. When the destination name appears, press {interact}.','Подойди к раме. Когда появится название комнаты, нажми {interact}.','枠のそばまで進み、行き先が表示されたら{interact}を押す。'],
+    hint_soft: ['按 {jump} 起跳，再按住 {brace} 直到碰到冰面。力度显示「轻落」才算成功。','Press {jump}, then hold {brace} until you touch the ice. A Soft landing is the goal.','Нажми {jump}, затем держи {brace} до касания льда. Нужно мягкое приземление.','{jump}で跳び、氷に触れるまで{brace}を押し続ける。「軽い着地」が目印。'],
+    hint_heavy: ['用 {jump} 上高台。对准下方目标走下边缘，落地前松开 {brace}。力度要显示「重落」。','Use {jump} to climb. Step off above the target and release {brace} before landing. Look for Heavy.', 'Поднимись с помощью {jump}. Шагни с края над целью и отпусти {brace} до касания. Нужен тяжёлый удар.','{jump}で高台へ。目標の真上から端を踏み出し、着地前に{brace}を離す。「重い着地」が目印。'],
+    hint_mirror: ['靠近镜子，出现提示后按 {interact} 转动一次，再看光束是否照到感应器。','Approach the mirror. Press {interact} when prompted and check where the beam lands.','Подойди к зеркалу. Нажми {interact} при подсказке и проследи, куда попал луч.','鏡に近づき、表示が出たら{interact}で回す。光が受光器に届くか見よう。'],
+    hint_gravity: ['先走进有箭头的区域，看角色落向哪边。站稳后按 {jump}，会朝落下方向的反面跳。','Enter the arrow field and see which way you fall. Once settled, press {jump} to jump the other way.','Войди в поле со стрелками и посмотри, куда тебя тянет. После посадки нажми {jump}, чтобы прыгнуть обратно.','矢印の領域に入り、どちらへ落ちるかを見る。足がついたら{jump}で反対方向へ跳べる。'],
+    hint_spring: ['用 {jump} 跳上弹板。它会自动反弹，升空后用 {move} 对准出口平台。','Use {jump} to land on the spring. It launches you automatically. Steer towards the exit ledge with {move}.','С помощью {jump} приземлись на пружину. Она подбросит автоматически. Направь полёт к выходу: {move}.','{jump}で跳ね台に乗ると自動で弾かれる。浮いたら{move}で出口の足場へ向かおう。'],
+  };
+  for (const [key, labels] of Object.entries(lessonText)) {
+    NO.LANGS.forEach((locale, index) => { NO.I18N[locale]['lesson_' + key] = labels[index]; });
+  }
+
   NO.detectLang = function () {
     const raw = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
     if (raw.indexOf('zh') === 0) return 'zh';

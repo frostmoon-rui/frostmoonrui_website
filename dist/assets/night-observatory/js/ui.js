@@ -48,6 +48,8 @@
       }
       document.title = NO.t('title');
       NO.syncGameLocale?.();
+      NO.lesson?.render();
+      if (this.landingRank != null) this.showLanding(this.landingRank);
     }
 
     renderLanguagePills() {
@@ -271,9 +273,42 @@
       const blocked = overlays.some(id => !$(id).classList.contains('hidden'));
       const playing = $('app').classList.contains('playing');
       $('touch').classList.toggle('hidden', !playing || blocked || !this.shouldShowTouch());
+      NO.lesson?.render();
+    }
+
+    renderControlLesson(step) {
+      const app = $('app');
+      const panel = $('control-lesson');
+      const show = !!step && app.classList.contains('playing');
+      panel.classList.toggle('hidden', !show);
+      if (show) {
+        app.dataset.lessonStep = step.step;
+        app.dataset.lessonDevice = step.device;
+        $('lesson-step').textContent = step.number ? NO.t('lesson_progress', {
+          number: step.number, total: step.total, device: NO.t('lesson_' + step.device),
+        }) : NO.t('lesson_mechanism');
+        $('lesson-message').textContent = step.message;
+      } else {
+        delete app.dataset.lessonStep;
+        delete app.dataset.lessonDevice;
+      }
+      this.measureControlLesson();
+    }
+
+    measureControlLesson() {
+      $('app').style.setProperty('--lesson-space', Math.ceil($('control-lesson').getBoundingClientRect().height) + 'px');
+    }
+
+    showLanding(rank) {
+      this.landingRank = rank;
+      const meter = $('landing-rank');
+      meter.textContent = NO.t('lesson_landing_' + rank);
+      meter.dataset.rank = rank;
     }
 
     onRoomChange(room) {
+      this.landingRank = null;
+      $('landing-rank').textContent = '';
       this.setInteractAvailable(false);
       this.setPlaying(true);
       this.refreshHud();
@@ -400,6 +435,15 @@
       const item = this.currentHint[layer];
       const body = $('hint-body');
       body.innerHTML = `<div class="hint-layer">${this.esc(['观察', '原理', '步骤'][layer] ? NO.L({ zh: ['观察', '原理', '步骤'][layer], en: ['OBSERVE', 'PRINCIPLE', 'STEPS'][layer], ru: ['НАБЛЮДЕНИЕ', 'ПРИНЦИП', 'ШАГИ'][layer], ja: ['観察', '原理', '手順'][layer] }) : '')} · ${layer + 1}/3</div>${this.esc(NO.L(item))}`;
+      const controls = $('hint-control');
+      const room = NO.DATA.rooms[NO.state.room];
+      const topics = { arrival: 'portal', soft: 'soft', hard: 'heavy', bell: 'heavy', fragile: 'heavy',
+        crack: 'heavy', mirror: 'mirror', anchor: 'heavy', gravity: 'gravity', spring: 'spring' };
+      const topic = topics[room?.hintKey];
+      controls.classList.toggle('hidden', !topic || layer === 0);
+      if (topic && NO.lesson) {
+        controls.textContent = NO.lesson.hint(topic);
+      }
       $('btn-hint-more').textContent = layer >= this.currentHint.length - 1 ? NO.t('done') : NO.t('hint_more');
       $('btn-hint-more').disabled = layer >= this.currentHint.length - 1;
       $('btn-hint-more').style.opacity = layer >= this.currentHint.length - 1 ? '.4' : '';
@@ -495,6 +539,7 @@
       const s = NO.settings || {};
       const set = (id, v) => { const el = $(id); if (el) el.value = v; };
       const out = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+      set('set-tutorial-mode', s.tutorialMode || 'auto');
       set('set-music', s.music == null ? 65 : s.music); out('out-music', s.music == null ? 65 : s.music);
       set('set-sfx', s.sfx == null ? 80 : s.sfx); out('out-sfx', s.sfx == null ? 80 : s.sfx);
       set('set-ambient', s.ambient == null ? 55 : s.ambient); out('out-ambient', s.ambient == null ? 55 : s.ambient);
@@ -518,7 +563,7 @@
       const touch = $('touch');
       if (touch) {
         touch.classList.toggle('left-handed', (s.controlSide || 'right') === 'left');
-        touch.classList.toggle('hidden', !this.shouldShowTouch());
+        this.updateTouchVisibility();
       }
     }
 
@@ -534,6 +579,7 @@
       s.subtitles = $('set-subtitles').checked;
       s.hints = $('set-hints').checked;
       s.controlSide = $('set-side').value;
+      s.tutorialMode = $('set-tutorial-mode').value;
       const out = (id, v) => { const el = $(id); if (el) el.textContent = v; };
       out('out-music', s.music);
       out('out-sfx', s.sfx);
@@ -553,6 +599,8 @@
       if (NO.audio) NO.audio.setSettings(s);
       this.applySettingsClasses();
       if (NO.game) NO.game.settings = s;
+      NO.lesson?.refresh();
+      this.checkOrientation();
     }
 
     // ---------- map ----------
@@ -720,8 +768,9 @@
 
     // ---------- touch/orientation ----------
     shouldShowTouch() {
-      if (NO.settings && NO.settings.showTouch === 'off') return false;
-      if (NO.settings && NO.settings.showTouch === 'on') return true;
+      if (NO.settings?.tutorialMode === 'touch') return true;
+      if (NO.settings?.showTouch === 'off') return false;
+      if (NO.settings?.showTouch === 'on' || NO.game?.input.device === 'touch') return true;
       return !!(NO.isTouch || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches));
     }
 
@@ -807,6 +856,12 @@
       $('btn-title').addEventListener('click', () => { if (NO.actions) NO.actions.returnToTitle(); });
 
       $('btn-settings-done').addEventListener('click', () => this.closeSettings());
+      $('btn-lesson-skip').addEventListener('click', () => NO.lesson.skip());
+      $('btn-lesson-replay').addEventListener('click', () => {
+        NO.lesson.replay();
+        this.applySettingsUI();
+        this.checkOrientation();
+      });
       $('btn-import').addEventListener('click', () => NO.actions?.importSave());
       $('btn-import-code').addEventListener('click', () => NO.actions?.restoreSave($('save-code').value));
       $('btn-reset').addEventListener('click', () => {
@@ -817,7 +872,7 @@
       for (const id of ['set-music', 'set-sfx', 'set-ambient', 'set-shake', 'set-buttons']) {
         const el = $(id); if (el) el.addEventListener('input', () => this.readSettingsFromUI());
       }
-      for (const id of ['set-reduce', 'set-contrast', 'set-subtitles', 'set-hints', 'set-side', 'set-language']) {
+      for (const id of ['set-reduce', 'set-contrast', 'set-subtitles', 'set-hints', 'set-side', 'set-language', 'set-tutorial-mode']) {
         const el = $(id); if (el) el.addEventListener('change', () => this.readSettingsFromUI());
       }
 
@@ -842,6 +897,9 @@
       $('btn-ending-continue').addEventListener('click', () => { if (NO.actions) NO.actions.continueExplore(); });
 
       this._bindTouch();
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(() => this.measureControlLesson()).observe($('control-lesson'));
+      }
       window.addEventListener('resize', () => this.checkOrientation());
       window.addEventListener('orientationchange', () => setTimeout(() => this.checkOrientation(), 200));
     }
@@ -886,6 +944,7 @@
         el.addEventListener('pointerdown', event => {
           event.preventDefault();
           if (event.button !== 0 || NO.game?.paused || [...pointers.values()].some(c => c.el === el)) return;
+          input()?.useDevice('touch');
           pointers.set(event.pointerId, { el, action });
           try { el.setPointerCapture(event.pointerId); } catch (_) {}
           el.classList.add('held');
@@ -908,6 +967,9 @@
       document.addEventListener('visibilitychange', () => { if (document.hidden) clear(); });
       document.addEventListener('fullscreenchange', clear);
       $('touch').addEventListener('contextmenu', event => event.preventDefault());
+      $('game').addEventListener('pointerdown', event => {
+        if (event.pointerType === 'touch' && NO.game?.mode === 'play' && !NO.game.paused) input()?.useDevice('touch');
+      });
       $('game').addEventListener('contextmenu', event => event.preventDefault());
       this.releaseControls = clear;
     }

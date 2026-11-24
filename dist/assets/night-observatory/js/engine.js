@@ -54,6 +54,7 @@
   // ---------------------------------------------------------------- Input
   class Input {
     constructor() {
+      this.device = null;
       this.keys = new Set();
       this.just = new Set();
       this.released = new Set();
@@ -72,6 +73,9 @@
         if (e.repeat || e.target?.matches?.('input, select, textarea, [contenteditable]')) return;
         if (prevent.indexOf(e.key) >= 0) e.preventDefault();
         const k = e.key.toLowerCase();
+        if (['a','d','w','s','e','shift','enter',' ','space','arrowleft','arrowright','arrowup','arrowdown'].includes(k)) {
+          this.useDevice('keyboard');
+        }
         this.keys.add(k);
         this.just.add(k);
       }, { passive: false });
@@ -92,6 +96,12 @@
       this.touch.jump = this.touch.brace = this.touch.interact = false;
       this.joyX = this.joyY = 0;
     }
+    useDevice(device) {
+      if (this.device === device) return;
+      this.device = device;
+      NO.ui?.checkOrientation?.();
+      NO.lesson?.refresh();
+    }
     pollGamepad() {
       const pads = navigator.getGamepads ? navigator.getGamepads() : null;
       const p = pads ? Array.from(pads).find(Boolean) : null;
@@ -109,6 +119,7 @@
       if (jump && !this.padPrev.jump) this.padJust.add('jump');
       if (brace && !this.padPrev.brace) this.padJust.add('brace');
       if (interact && !this.padPrev.interact) this.padJust.add('interact');
+      if ((axis && !this.pad.axis) || this.padJust.size) this.useDevice('gamepad');
       this.pad = { axis, jump, brace, interact };
       this.padPrev = { jump, brace, interact };
     }
@@ -224,11 +235,14 @@
         this.squash = 0.86;
         this.game.sfx('jump');
         this.game.emitJump(this);
+        NO.lesson?.jumped();
       }
       this.vy += GRAVITY * this.gravitySign * dt;
       if (this.vy * this.gravitySign > TERMINAL) this.vy = TERMINAL * this.gravitySign;
       const fallBefore = Math.abs(this.vy);
+      const before = this.x;
       this.moveX(this.vx * dt);
+      NO.lesson?.moved(this.x - before);
       this.moveY(this.vy * dt, fallBefore);
       this.anim += dt * (this.onGround ? Math.abs(this.vx) / 90 : 1.4);
       this.landSquash = Math.max(0, this.landSquash - dt * 5);
@@ -627,6 +641,8 @@
       let v = impact * (braced ? BRACE_MULT : 1);
       const rank = tierRank(v);
       player.lastTier = rank;
+      if (impact >= 250) NO.ui?.showLanding?.(rank);
+      NO.lesson?.landed(braced, rank);
       player.landSquash = rank === 2 ? 1 : rank === 1 ? 0.65 : 0.35;
       player.squash = rank === 2 ? 1.24 : rank === 1 ? 1.12 : 0.94;
       this.sfx(rank === 2 ? 'landHard' : rank === 1 ? 'landFirm' : 'landSoft');
@@ -752,6 +768,7 @@
 
     interact(target) {
       if (!target) return;
+      if (target.kind !== 'exit' || this.isRequiresMet(target.obj.requires)) NO.lesson?.interacted();
       if (target.kind === 'mirror') {
         const m = target.obj;
         m.ori = m.ori === '/' ? '\\' : '/';

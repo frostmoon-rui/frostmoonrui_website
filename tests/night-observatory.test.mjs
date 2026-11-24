@@ -174,3 +174,43 @@ test('the player contacts the nearest surface and cannot interact through stone'
  assert.equal(player.clearEmbedding(),true);
  assert.ok(!game.solidRects().some(rect=>NO.util.overlap(player.rect,rect)));
 });
+
+
+test('control lessons require a demonstrated soft landing and track input devices separately', () => {
+ const window = {NO:{t:(label)=>label}};
+ vm.runInNewContext(readFileSync(new URL('tutorial.js',asset),'utf8'),{window});
+ const settings = {tutorialMode:'auto',tutorialCompleted:{}};
+ const game = {mode:'play',paused:false,room:{id:'arrival'},input:{device:'touch',axis:()=>1}};
+ let visible, saves=0;
+ const lesson = new window.NO.ControlLesson(game,settings,{
+  defaultDevice:'keyboard',save:()=>saves++,show:step=>{visible=step;},reward:()=>{}
+ });
+ lesson.roomChanged();
+ assert.equal(visible.device,'touch');
+ lesson.moved(46);
+ assert.equal(visible.step,'jump');
+ lesson.landed(false,1);
+ assert.equal(visible.step,'jump');
+ lesson.jumped();
+ lesson.landed(false,1);
+ assert.equal(visible.step,'brace');
+ lesson.jumped();
+ lesson.landed(false,1);
+ assert.equal(visible.step,'brace');
+ lesson.jumped();
+ lesson.landed(true,0);
+ assert.equal(visible.step,'interact');
+ lesson.interacted();
+ assert.equal(visible,null);
+ assert.ok(settings.tutorialCompleted.touch);
+ assert.equal(saves,1);
+ game.input.device='keyboard';
+ lesson.refresh();
+ assert.equal(visible.step,'move');
+ assert.equal(visible.device,'keyboard');
+ settings.tutorialMode='off';
+ lesson.refresh();
+ assert.equal(visible,null);
+ lesson.replay();
+ assert.equal(visible.device,'keyboard');
+});
