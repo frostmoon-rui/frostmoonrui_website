@@ -1,8 +1,8 @@
 /* Offline cache isolated to this game and locale. */
 const scope = self.registration.scope;
 const prefix = 'night-observatory:' + scope + ':';
-const cacheName = prefix + '57772d9fec71';
-const assetPaths = ["/assets/night-observatory/icons/favicon-32.png?v=57772d9fec71","/assets/night-observatory/icons/apple-touch-icon.png?v=57772d9fec71","/assets/night-observatory/style.css?v=57772d9fec71","/assets/night-observatory/js/i18n.js?v=57772d9fec71","/assets/night-observatory/js/data.js?v=57772d9fec71","/assets/night-observatory/js/campaign.js?v=57772d9fec71","/assets/night-observatory/js/room-layouts.js?v=57772d9fec71","/assets/night-observatory/js/audio.js?v=57772d9fec71","/assets/night-observatory/js/engine.js?v=57772d9fec71","/assets/night-observatory/js/tutorial.js?v=57772d9fec71","/assets/night-observatory/js/ui.js?v=57772d9fec71","/assets/night-observatory/js/main.js?v=57772d9fec71"];
+const cacheName = prefix + 'abf3b10aebc2';
+const assetPaths = ["/assets/night-observatory/icons/favicon-32.png?v=abf3b10aebc2","/assets/night-observatory/icons/apple-touch-icon.png?v=abf3b10aebc2","/assets/night-observatory/style.css?v=abf3b10aebc2","/assets/night-observatory/js/i18n.js?v=abf3b10aebc2","/assets/night-observatory/js/data.js?v=abf3b10aebc2","/assets/night-observatory/js/campaign.js?v=abf3b10aebc2","/assets/night-observatory/js/room-layouts.js?v=abf3b10aebc2","/assets/night-observatory/js/audio.js?v=abf3b10aebc2","/assets/night-observatory/js/engine.js?v=abf3b10aebc2","/assets/night-observatory/js/tutorial.js?v=abf3b10aebc2","/assets/night-observatory/js/ui.js?v=abf3b10aebc2","/assets/night-observatory/js/main.js?v=abf3b10aebc2"];
 const assetURLs = new Set(assetPaths.map(asset => new URL(asset, scope).href));
 const shell = new URL('./', scope).href;
 const manifest = new URL('./manifest.webmanifest', scope).href;

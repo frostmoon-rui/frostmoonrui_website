@@ -9,8 +9,8 @@
   const AIR_CONTROL = 0.72;
   const JUMP_SPEED = 770;
   const TERMINAL = 1280;
-  const COYOTE = 0.105;
-  const JUMP_BUFFER = 0.12;
+  const COYOTE = 0.135;
+  const JUMP_BUFFER = 0.15;
   const BRACE_MULT = 0.40;
   const HARD = 820;
   const FIRM = 470;

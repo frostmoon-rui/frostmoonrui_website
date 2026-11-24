@@ -233,3 +233,42 @@ test('each room uses its rebuilt layout and inversion stays in a separate experi
  assert.equal(gallery.objects.filter(o=>o.type==='sensor').length,1);
  assert.ok(gallery.objects.filter(o=>o.type==='mirror').every(o=>o.y>=580));
 });
+
+test('late edge jumps and early landing taps get extra time without granting air jumps', () => {
+ const NO=loadGameEngine();
+ const game=new NO.Game({getContext:()=>({})},{sigils:{},flags:{},echoes:{},visited:{}});
+ const setup=()=>{
+  game.loadRoom('arrival');
+  game.fading=null;
+  game.room.platforms=[NO.DATA.P(100,530,120,20),NO.DATA.P(0,680,1280,40)];
+  game._solidCache=null;
+  game.input.clear();
+  return game.player;
+ };
+ const frame=()=>game.update(1/60);
+ const edgeJump=wait=>{
+  const p=setup();
+  p.x=200;
+  p.y=530-p.h;
+  p.onGround=true;
+  game.input.setJoystick(1,0);
+  for(let i=0;i<30&&p.onGround;i++)frame();
+  assert.equal(p.onGround,false);
+  game.input.setJoystick(0,0);
+  for(let i=0;i<wait;i++)frame();
+  game.input.pressVirtual('jump');
+  frame();
+  return p.vy;
+ };
+ assert.ok(edgeJump(7)<0);
+ assert.ok(edgeJump(9)>0);
+ const p=setup();
+ p.x=410;
+ p.y=680-p.h-21;
+ p.vy=0;
+ game.input.pressVirtual('jump');
+ for(let i=0;i<8;i++)frame();
+ assert.equal(p.onGround,true);
+ frame();
+ assert.ok(p.vy<0);
+});
