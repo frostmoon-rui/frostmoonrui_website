@@ -35,7 +35,7 @@ function loadGameEngine() {
  const sandbox = {document:{addEventListener(){}},navigator:{},addEventListener(){}};
  sandbox.window = sandbox;
  vm.createContext(sandbox);
- for (const file of ['i18n','data','campaign','engine']) {
+ for (const file of ['i18n','data','campaign','room-layouts','engine']) {
   const url = new URL(file+'.js',asset);
   vm.runInContext(readFileSync(url,'utf8'),sandbox,{filename:fileURLToPath(url)});
  }
@@ -49,6 +49,11 @@ function play(route) {
  assert.ok(Object.values(NO.DATA.classicRooms).every(id=>Object.hasOwn(NO.DATA.rooms,id)));
  const state = {sigils:{},flags:{},echoes:{},visited:{}};
  const game = new NO.Game({getContext:()=>({})},state);
+ const emitJump=game.emitJump.bind(game);
+ game.emitJump=player=>{
+  assert.notEqual(player.gravitySign,-1,game.room.id+' replay requires an inverted jump');
+  emitJump(player);
+ };
  let axis = 0, jump = false, brace = false, interact = false;
  NO.ui = {
   showEnding(ending) { state.ending = ending; game.paused = true; },
@@ -141,9 +146,10 @@ test('a locked threshold remains walkable while travel and its echo stay gated',
  game.useExit(exit);
  assert.equal(game.pendingRoom,null);
  assert.equal(game.echoAvailable(echo),false);
- game.seals.e2_s.active = true;
+ const [firstSeal, secondSeal] = exit.requires.seals;
+ game.seals[firstSeal].active = true;
  assert.equal(game.echoAvailable(echo),false);
- game.seals.e2_h.active = true;
+ game.seals[secondSeal].active = true;
  assert.equal(game.echoAvailable(echo),true);
  game.useExit(exit);
  assert.equal(game.pendingRoom.to,'tide7');
@@ -213,4 +219,17 @@ test('control lessons require a demonstrated soft landing and track input device
  assert.equal(visible,null);
  lesson.replay();
  assert.equal(visible.device,'keyboard');
+});
+
+
+test('each room uses its rebuilt layout and inversion stays in a separate experiment', () => {
+ const NO = loadGameEngine();
+ assert.equal(NO.DATA.layoutVersion,3);
+ const layouts = Object.values(NO.DATA.rooms);
+ assert.ok(layouts.every(room=>room.course && room.h===720));
+ assert.deepEqual(layouts.filter(room=>room.objects.some(o=>o.type==='zone'&&o.dir===-1)).map(room=>room.id),['grav1']);
+ const gallery=NO.DATA.rooms.light6;
+ assert.equal(gallery.objects.filter(o=>o.type==='mirror').length,2);
+ assert.equal(gallery.objects.filter(o=>o.type==='sensor').length,1);
+ assert.ok(gallery.objects.filter(o=>o.type==='mirror').every(o=>o.y>=580));
 });

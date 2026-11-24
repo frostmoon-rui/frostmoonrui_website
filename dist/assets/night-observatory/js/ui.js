@@ -363,8 +363,8 @@
         const room = NO.DATA.rooms[st.room];
         if (room.wing === 'final') text = NO.L({ zh: '把光、方向、力度叠在一起。', en: 'Layer light, direction and impact.', ru: 'Сложи свет, направление и импульс.', ja: '光、向き、衝撃を重ねる。' });
         else if (room.wing === 'tide') text = NO.L({ zh: '重落给封印供能；缓冲让薄冰活下来。', en: 'Heavy landings power seals; brace keeps thin ice alive.', ru: 'Тяжёлые приземления питают печати; торможение спасает тонкий лёд.', ja: '重い着地は封印を灯し、ブレーキは薄氷を守る。' });
-        else if (room.wing === 'light') text = NO.L({ zh: '光让星玻璃变实；影子让它消失。', en: 'Light solidifies star glass; shadow dissolves it.', ru: 'Свет уплотняет звёздное стекло; тень растворяет его.', ja: '光は星ガラスを実体にし、影はそれを溶かす。' });
-        else if (room.wing === 'gravity') text = NO.L({ zh: '箭头指向“下”。跳跃永远朝反方向。', en: 'The arrow is “down”. Jump the other way.', ru: 'Стрелка — это «низ». Прыжок — в обратную сторону.', ja: '矢印が「下」。ジャンプは逆方向。' });
+        else if (room.wing === 'light') text = NO.L({ zh: '看接收器需要光还是影，再转动镜子。', en: 'Check whether the receiver needs light or shadow, then turn the mirror.', ru: 'Проверь, нужен приёмнику свет или тень, и поверни зеркало.', ja: '受光器に光が必要か影が必要かを見てから鏡を回す。' });
+        else if (room.wing === 'gravity') text = NO.L({ zh: '看准摆渡板的停靠处，站稳后再跳。', en: 'Watch where the ferry docks, then jump from a stable surface.', ru: 'Стрелка — это «низ». Прыжок — в обратную сторону.', ja: '移動床の停車位置を見て、足場に立ってから跳ぼう。' });
       }
       el.textContent = text;
     }
@@ -439,7 +439,7 @@
       const room = NO.DATA.rooms[NO.state.room];
       const topics = { arrival: 'portal', soft: 'soft', hard: 'heavy', bell: 'heavy', fragile: 'heavy',
         crack: 'heavy', mirror: 'mirror', anchor: 'heavy', gravity: 'gravity', spring: 'spring' };
-      const topic = topics[room?.hintKey];
+      const topic = room?.course?.topic || topics[room?.hintKey];
       controls.classList.toggle('hidden', !topic || layer === 0);
       if (topic && NO.lesson) {
         controls.textContent = NO.lesson.hint(topic);

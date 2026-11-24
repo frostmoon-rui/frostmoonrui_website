@@ -3,7 +3,7 @@
   const NO = window.NO;
   const devices = ['keyboard', 'touch', 'gamepad'];
   const steps = ['move', 'jump', 'brace', 'interact'];
-  const guidedRooms = { archive_porch: 'heavy', tide2: 'soft', light3: 'mirror', grav1: 'gravity', archive_vault: 'spring' };
+  const guidedRooms = { archive_porch: 'firm', tide2: 'soft', light1: 'mirror', light6: 'chain', grav1: 'gravity_free', archive_vault: 'spring' };
 
   class ControlLesson {
     constructor(game, settings, { defaultDevice, save, show, reward }) {

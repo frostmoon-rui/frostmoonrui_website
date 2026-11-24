@@ -727,6 +727,7 @@
     }
 
     echoAvailable(e) {
+      if (e.requires && !this.isRequiresMet(e.requires)) return false;
       if (!e.gate) return true;
       const portal = this.exits.find(exit => exit.to === e.gate && exit.requires);
       return !!portal && this.isRequiresMet(portal.requires);
@@ -1775,7 +1776,8 @@
 
     drawSeal(ctx, s) {
       const active = s.active;
-      const col = s.bell ? '#f2b56b' : s.req === 'soft' ? '#63e2d0' : s.req === 'firm' ? '#ece7da' : '#f2b56b';
+      const medium = s.req === 'firm' || s.req === 'notSoft';
+      const col = s.req === 'soft' ? '#63e2d0' : medium ? '#ece7da' : s.req === 'any' ? '#9e8cf4' : '#f2b56b';
       const cx = s.x + s.w / 2, cy = s.y + s.h / 2;
       const pulse = s.pulse || 0;
       ctx.save();
@@ -1794,17 +1796,17 @@
       // plate
       ctx.fillStyle = active ? 'rgba(242,181,107,.26)' : 'rgba(10,20,32,.94)';
       roundRect(ctx, s.x, s.y, s.w, s.h, 6); ctx.fill();
-      ctx.strokeStyle = active ? col : 'rgba(236,231,218,.38)';
+      ctx.strokeStyle = col;
       ctx.lineWidth = active ? 1.8 : 1.2;
       ctx.stroke();
       // floating ring / three crescents
       ctx.strokeStyle = active ? col : 'rgba(236,231,218,.30)';
       ctx.lineWidth = active ? 2 : 1.2;
       ctx.beginPath(); ctx.arc(cx, cy - 14, 22, 0, Math.PI * 2); ctx.stroke();
-      const n = s.req === 'soft' ? 1 : s.req === 'firm' ? 2 : 3;
+      const n = s.req === 'any' ? 0 : s.req === 'soft' ? 1 : medium ? 2 : 3;
       for (let i = 0; i < 3; i++) {
         const a = -Math.PI / 2 + i * (Math.PI * 2 / 3);
-        ctx.fillStyle = i < n ? (active ? col : 'rgba(236,231,218,.55)') : 'rgba(236,231,218,.12)';
+        ctx.fillStyle = i < n ? col : 'rgba(236,231,218,.12)';
         ctx.beginPath();
         ctx.arc(cx + Math.cos(a) * 15, cy - 14 + Math.sin(a) * 9, 2.8, 0, Math.PI * 2);
         ctx.fill();

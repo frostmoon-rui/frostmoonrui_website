@@ -58,6 +58,7 @@
       const room = NO.DATA.firstRoom;
       return {
         version: 2,
+        layoutVersion: NO.DATA.layoutVersion,
         slot,
         room,
         spawn: null,
@@ -97,7 +98,7 @@
       }
       const room = NO.DATA.rooms[s.room];
       for (const key of ['spawn', 'lastSpawn']) {
-        const pt = s[key];
+        const pt = s.layoutVersion === NO.DATA.layoutVersion ? s[key] : null;
         if (pt && Number.isFinite(pt.x) && Number.isFinite(pt.y) &&
             pt.x >= 40 && pt.x <= room.w - 40 && pt.y >= 40 && pt.y <= room.h - 40) {
           out[key] = { x: pt.x, y: pt.y };
