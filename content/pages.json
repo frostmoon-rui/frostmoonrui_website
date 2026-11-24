@@ -1,5 +1,13 @@
 [
   {
+    "path": "notes/active-suspension-research",
+    "title": "Active suspension research · 01",
+    "label": "CONTROL THEORY · RESEARCH LOG",
+    "description": "A quarter-car model, a nominal backstepping baseline, and two reinforcement-learning designs.",
+    "body": "<p class=\"lead\">I am studying reinforcement learning for adaptive control of a quarter-car active suspension. The first milestone is a checked plant model and a nominal backstepping baseline.</p><h2>Two designs on the same plant</h2><p>The first design uses actor–critic learning for the virtual and actual inputs in backstepping. The second investigates simplified reinforcement learning on the same plant. Body displacement has relative degree two in a four-state model, so the second design must account for wheel dynamics and check the conditions for a high-order fully actuated form.</p><h2>First simulation</h2><p>With a healthy actuator and a 5 Hz road input of 0.02 m amplitude, body acceleration RMS over 20 seconds fell from 1.966 with zero commanded force to 0.564 m/s² with nominal backstepping. Dynamic tire force RMS rose from 1393 to 1420 N. At the 0.02 cm amplitude also stated in the source, acceleration RMS rose from 0.357 to 0.564 m/s². These figures include the initial transient. The intended road amplitude remains open.</p><p>The simulation checks force balance and the actuator fault transitions. The next milestone is to establish the costs, states and stability conditions for both designs before implementing the learning controllers.</p><p><a href=\"https://doi.org/10.1109/TIE.2019.2937037\">Suspension model and parameters</a> · <a href=\"https://doi.org/10.1109/TCYB.2026.3650813\">Simplified reinforcement learning</a></p>",
+    "date": "2026-11-24"
+  },
+  {
     "path": "notes/a-quieter-bot",
     "title": "A quieter bot is a better bot",
     "label": "SOFTWARE · FIELD NOTE 01",
