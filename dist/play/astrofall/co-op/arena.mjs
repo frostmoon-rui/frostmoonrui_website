@@ -1,6 +1,7 @@
 export const MAX_PLAYERS = 6;
 export const HEIGHT = 540;
 export const SPAN = 840;
+export const TICK = 1 / 30;
 const GROUND = 476;
 const WIDTH = 26;
 const BODY = 34;
@@ -35,22 +36,35 @@ export function segment(index, mode) {
   return {platforms, obstacle, x:offset, gap:[offset+from,offset+to], gate:c.gate};
 }
 
+export function cacheSegments() {
+  const cache = new Map();
+  return (index, mode) => {
+    const key=mode+':'+index;
+    if (!cache.has(key)) {
+      if (cache.size>=16) cache.delete(cache.keys().next().value);
+      cache.set(key,segment(index,mode));
+    }
+    return cache.get(key);
+  };
+}
+
 export function gatePads(index, count) {
   return Array.from({length:count}, (_, slot) => pad(index*SPAN + 536 + slot*41,GROUND,32));
 }
 
 export function createArena(mode, resume = {}) {
   const players = new Map();
+  const courseAt = cacheSegments();
   let clock = 0, checkpoint = clamp(Number.isInteger(resume.checkpoint) ? resume.checkpoint : 0,0,LENGTH-1);
   let hold = 0, relayTime = 0, relayStep = 0, serial = 0, complete = resume.complete === true;
   const spawn = (player, level) => {
     Object.assign(player,{x:level*SPAN+42,y:GROUND-BODY,vx:0,vy:0,ground:true,coyote:.12,
-      pushed:false,support:null,buffer:0,runCheckpoint:level});
+      pushed:false,support:null,buffer:0,runCheckpoint:level,spawnId:(player.spawnId || 0)+1});
   };
   function join(id) {
     if (players.size >= MAX_PLAYERS || players.has(id)) return false;
     const leader = Math.max(0, ...Array.from(players.values(), player => player.runCheckpoint));
-    const player = {id, role:serial++ % 2, input:neutral(), jumpQueued:false, actQueued:false, best:0, cooldown:0};
+    const player = {id, role:serial++ % 2, input:neutral(), lastInput:clock, jumpQueued:false, actQueued:false, best:0, cooldown:0};
     spawn(player,mode === 'runner' ? leader : Math.min(checkpoint,LENGTH-1));
     players.set(id,player);
     hold=0; relayStep=0; relayTime=0;
@@ -62,23 +76,23 @@ export function createArena(mode, resume = {}) {
   function input(id, value) {
     const player = players.get(id);
     if (!player) return;
+    player.lastInput=clock;
     player.jumpQueued ||= value.jump === true && !player.input.jump;
     player.actQueued ||= value.act === true && !player.input.act;
     player.input = {axis:[-1,0,1].includes(value.axis) ? value.axis : 0,
       jump:value.jump === true, link:value.link === true, act:value.act === true};
   }
-  function activePlatforms(index, player) {
-    const course = segment(index,mode);
+  function activePlatforms(index, player, party) {
+    const course = courseAt(index,mode);
     if (!course) return [];
-    const list = [...course.platforms];
     if (mode === 'relay' && index > 0 && players.size > 1) {
       const [from,to] = course.gap;
-      const supported = Array.from(players.values()).some(other =>
+      const supported = party.some(other =>
         other.id !== player.id && other.role !== player.role && other.input.link &&
         other.ground && other.x >= from - 130 && other.x < from + 10);
-      if (supported) list.push(pad(from,GROUND-16,to-from));
+      if (supported) return [...course.platforms,pad(from,GROUND-16,to-from)];
     }
-    return list;
+    return course.platforms;
   }
   function move(p, dt, party) {
     p.cooldown=Math.max(0,p.cooldown-dt);
@@ -102,12 +116,14 @@ export function createArena(mode, resume = {}) {
       p.x=Math.min(p.x,wall-WIDTH);
     }
     const index=Math.floor((p.x+WIDTH/2)/SPAN);
-    const floor=activePlatforms(index,p).concat(index ? activePlatforms(index-1,p) : []);
+    p.vx=(p.x-before)/dt;
+    const floor=activePlatforms(index,p,party);
+    const platforms=index ? floor.concat(activePlatforms(index-1,p,party)) : floor;
     const bottom = p.y+BODY;
     p.vy=Math.min(850,p.vy+1350*dt);
     let landing = null;
     if (p.vy >= 0) {
-      for (const platform of floor) {
+      for (const platform of platforms) {
         if (overlaps(p.x,WIDTH,platform.x,platform.x+platform.w) &&
             bottom <= platform.y+1 && bottom+p.vy*dt >= platform.y &&
             (!landing || platform.y < landing.y)) landing=platform;
@@ -116,7 +132,7 @@ export function createArena(mode, resume = {}) {
     p.ground=!!landing;
     if (landing) {p.y=landing.y-BODY;p.vy=0;}
     else p.y+=p.vy*dt;
-    const obstacle=segment(index,mode)?.obstacle;
+    const obstacle=courseAt(index,mode)?.obstacle;
     const hazardLive = Math.sin(clock*2.3+index) > .12;
     const hit = obstacle && hazardLive && overlaps(p.x,WIDTH,obstacle.x,obstacle.x+obstacle.w) &&
       p.y+BODY > obstacle.y && p.y < obstacle.y+obstacle.h;
@@ -154,13 +170,18 @@ export function createArena(mode, resume = {}) {
   function step(dt) {
     clock+=dt;
     const party=[...players.values()];
+    for (const p of party) {
+      if (clock-p.lastInput>.7 && (p.input.axis || p.input.jump || p.input.link || p.input.act)) {
+        p.input=neutral();
+      }
+    }
     for (const p of party) move(p,dt,party);
     if (mode === 'relay') advanceGate(party,dt);
     for (const p of party) {p.jumpQueued=false;p.actQueued=false;}
   }
   function snapshot() {
     return {mode,clock,checkpoint,hold,relayStep,relayTime,complete,
-      players:[...players.values()].map(({id,role,x,y,best,input}) => ({id,role,x,y,best,link:input.link}))};
+      players:[...players.values()].map(({id,role,x,y,vx,best,spawnId,input}) => ({id,role,x,y,vx,best,spawnId,link:input.link}))};
   }
-  return {join,leave,input,step,snapshot,get size(){return players.size;}};
+  return {join,leave,input,step,snapshot,get size(){return players.size;},get checkpoint(){return checkpoint;},get complete(){return complete;}};
 }

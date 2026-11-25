@@ -1,4 +1,5 @@
-import {segment, gatePads, SPAN, LENGTH} from './arena.mjs';
+import {cacheSegments, gatePads, SPAN, LENGTH} from './arena.mjs';
+import {createMotion} from './motion.mjs';
 
 const $ = id => document.getElementById(id);
 const params=new URLSearchParams(location.search);
@@ -31,7 +32,9 @@ const copy = {
 const requestedLocale=params.get('lang') || document.documentElement.dataset.locale;
 let lang=Object.hasOwn(copy,requestedLocale)?requestedLocale:'en';
 let socket,id,state;
-const canvas=$('game'), ctx=canvas.getContext('2d');
+const canvas=$('game'), ctx=canvas.getContext('2d',{alpha:false});
+const motion=createMotion(), courseAt=cacheSegments();
+let paintFrame=0, lastPulse=-Infinity, inputActiveUntil=0, statusUpdate=0;
 const input={left:false,right:false,jump:false,link:false,act:false};
 const colors=['#ffe4a9','#96eadc','#f3a6c3','#9abdf4','#c4a5ec','#ebad84'];
 const text=index=>copy[lang][index];
@@ -52,16 +55,32 @@ function applyLanguage(){
   $('language').value=lang; document.title=text(0);
 }
 applyLanguage();
-$('language').addEventListener('change',()=>{lang=$('language').value;applyLanguage();});
+$('language').addEventListener('change',()=>{
+  lang=$('language').value;
+  applyLanguage();
+  nextHud=0;
+  scheduleDraw();
+});
 
 function publish() {
-  if(socket?.readyState===WebSocket.OPEN) socket.send(JSON.stringify({
-    axis:Number(input.right)-Number(input.left),jump:input.jump,link:input.link,act:input.act,
-  }));
+  if(socket?.readyState!==WebSocket.OPEN || socket.bufferedAmount>2048) return;
+  socket.send(JSON.stringify({axis:axis(),jump:input.jump,link:input.link,act:input.act}));
+  lastPulse=performance.now();
 }
-// The hosted server advances while clients are active. Idle background tabs
-// resume from the next bounded tick without fast-forwarding the room.
-setInterval(()=>{if(!document.hidden) publish();},120);
+const axis=()=>Number(input.right)-Number(input.left);
+function pulse(){
+  if(document.hidden || socket?.readyState!==WebSocket.OPEN) return;
+  const now=performance.now();
+  const driving=state?.mode==='runner' || state?.players[0]?.id===id ||
+    now<inputActiveUntil || Object.values(input).some(Boolean);
+  if(now-lastPulse >= (driving ? 57 : 155)) publish();
+}
+// Only visible players keep the room running. Non-driving peers send fewer idle packets.
+setInterval(pulse,30);
+function changedInput(){
+  inputActiveUntil=performance.now()+750;
+  publish();
+}
 function clear(){
   Object.keys(input).forEach(name=>{input[name]=false;});
   publish();
@@ -71,12 +90,23 @@ function key(event, down){
   const name=controls[event.code];
   if(!name || socket?.readyState!==WebSocket.OPEN) return;
   event.preventDefault();
-  if(input[name]!==down){input[name]=down;publish();}
+  if(input[name]!==down){input[name]=down;changedInput();}
 }
 window.addEventListener('keydown',event=>key(event,true));
 window.addEventListener('keyup',event=>key(event,false));
 window.addEventListener('blur',clear);
-document.addEventListener('visibilitychange',()=>{if(document.hidden) clear();});
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){
+    clear();
+    cancelAnimationFrame(paintFrame);
+    paintFrame=0;
+    motion.reset();
+  } else {
+    if(state) motion.push(state,performance.now());
+    publish();
+    scheduleDraw();
+  }
+});
 for(const button of document.querySelectorAll('[data-input]')){
   const name=button.dataset.input;
   let owner=null;
@@ -85,11 +115,11 @@ for(const button of document.querySelectorAll('[data-input]')){
     if(owner!==null) return;
     owner=event.pointerId;
     button.setPointerCapture(owner);
-    input[name]=true;publish();
+    input[name]=true;changedInput();
   });
   for(const type of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(type,event=>{
     if(owner!==event.pointerId) return;
-    owner=null;input[name]=false;publish();
+    owner=null;input[name]=false;changedInput();
   });
   button.addEventListener('contextmenu',event=>event.preventDefault());
 }
@@ -98,7 +128,9 @@ $('lobby').addEventListener('submit',event=>{
   event.preventDefault(); clear(); socket?.close();
   const mode=$('mode').value, room=$('room').value.trim().toLowerCase();
   if(!/^[a-z0-9-]{3,24}$/.test(room)) return;
-  status=10;state=null;id=null;
+  status=10;state=null;id=null;lastPulse=-Infinity;
+  motion.reset();
+  scheduleDraw();
   $('invite').hidden=true;
   const target=new URL(relativePath+'socket/'+mode+'/'+room,location.origin);
   target.protocol=location.protocol==='https:'?'wss:':'ws:';
@@ -109,16 +141,23 @@ $('lobby').addEventListener('submit',event=>{
     params.set('room',room);params.set('mode',mode);params.set('lang',lang);
     history.replaceState(null,'','?'+params);
     $('invite').hidden=false;document.activeElement?.blur();
+    publish();
   });
   connection.addEventListener('message',event=>{
     if(socket!==connection) return;
     const message=JSON.parse(event.data);
     if(message.type==='welcome') id=message.id;
-    else state=message;
+    else if(Array.isArray(message.players)){
+      state=message;
+      if(!document.hidden) motion.push(state,performance.now());
+    }
+    scheduleDraw();
   });
   connection.addEventListener('close',()=>{
     if(socket!==connection) return;
     status=11;state=null;id=null;$('invite').hidden=true;
+    motion.reset();
+    scheduleDraw();
   });
 });
 $('invite').addEventListener('click',async ()=>{
@@ -128,25 +167,39 @@ $('invite').addEventListener('click',async ()=>{
   setTimeout(()=>{$('invite').textContent=text(6);},1300);
 });
 
-let prevStatus='',prevHint='';
-function draw(){
-  const me=state?.players.find(p=>p.id===id);
-  const camera=Math.max(0,(me?.x||0)-365);
-  const players=state?.players||[];
-  const layout=state?.mode||'relay';
-  const gradient=ctx.createLinearGradient(0,0,0,540);
+function makeSky(){
+  const sky=document.createElement('canvas');
+  sky.width=960;sky.height=540;
+  const layer=sky.getContext('2d',{alpha:false});
+  const gradient=layer.createLinearGradient(0,0,0,540);
   gradient.addColorStop(0,'#162241');gradient.addColorStop(1,'#0b1226');
-  ctx.fillStyle=gradient;ctx.fillRect(0,0,960,540);
+  layer.fillStyle=gradient;layer.fillRect(0,0,960,540);
   for(let i=0;i<64;i++){
-    const x=((i*151-camera*.13)%960+960)%960;
-    ctx.fillStyle=i%7===0?'#a3bbdc':'#516282';
-    ctx.fillRect(x,(i*61)%450,i%7===0?3:1,i%7===0?3:1);
+    layer.fillStyle=i%7===0?'#a3bbdc':'#516282';
+    layer.fillRect(i*151%960,i*61%450,i%7===0?3:1,i%7===0?3:1);
   }
+  return sky;
+}
+const sky=makeSky();
+let prevStatus='',prevHint='',nextHud=0;
+function scheduleDraw(){
+  if(!paintFrame && !document.hidden) paintFrame=requestAnimationFrame(draw);
+}
+function draw(now){
+  paintFrame=0;
+  const view=motion.sample(now,id,axis());
+  const players=view?.players||[];
+  const me=players.find(p=>p.id===id);
+  const camera=Math.max(0,(me?.x||0)-365);
+  const layout=state?.mode||'relay';
+  const parallax=Math.floor(camera*.13)%960;
+  ctx.drawImage(sky,-parallax,0);
+  if(parallax) ctx.drawImage(sky,960-parallax,0);
   ctx.save();ctx.translate(-camera,0);
   const first=Math.floor(camera/SPAN);
   const last=Math.floor((camera+960)/SPAN);
   for(let n=first;n<=last;n++){
-    const course=segment(n,layout);
+    const course=courseAt(n,layout);
     if(!course) continue;
     ctx.font='600 16px system-ui';ctx.fillStyle='#b7c6e4';
     ctx.fillText(String(n+1).padStart(2,'0'),course.x+40,405);
@@ -154,7 +207,7 @@ function draw(){
       ctx.fillStyle='#253f63';ctx.fillRect(platform.x,platform.y,platform.w,platform.h);
       ctx.fillStyle='#89a5c3';ctx.fillRect(platform.x,platform.y,platform.w,2);
     }
-    if(course.obstacle && Math.sin((state?.clock||0)*2.3+n)>.12){
+    if(course.obstacle && Math.sin((view?.clock||0)*2.3+n)>.12){
       const {x,y,w,h}=course.obstacle;ctx.fillStyle='#f879a4';ctx.fillRect(x,y,w,h);
     }
     if(layout==='relay' && n===state?.checkpoint){
@@ -172,6 +225,7 @@ function draw(){
     }
   }
   for(const [index,p] of players.entries()){
+    if(p.x < camera-60 || p.x > camera+1020) continue;
     if(p.link){ctx.strokeStyle=p.role?'#ad9dff':'#c0eade';ctx.beginPath();ctx.arc(p.x+13,p.y+17,25,0,Math.PI*2);ctx.stroke();}
     ctx.fillStyle=colors[index];ctx.beginPath();ctx.roundRect(p.x,p.y,26,34,8);ctx.fill();
     ctx.fillStyle='#14243b';ctx.fillRect(p.x+4,p.y+11,18,9);
@@ -179,7 +233,10 @@ function draw(){
     ctx.fillStyle='#f1f5fb';ctx.font='700 14px system-ui';ctx.fillText(String(index+1),p.x+9,p.y-12);
   }
   ctx.restore();
-  const type=state&&segment(state.checkpoint,'relay')?.gate;
+  if(state) scheduleDraw();
+  if(state?.mode==='runner' && now<nextHud && statusUpdate===players.length) return;
+  nextHud=now+180;statusUpdate=players.length;
+  const type=state&&courseAt(state.checkpoint,'relay')?.gate;
   const stats=state
     ? `${players.length}/6 ${text(12)} · ${layout==='runner' ? text(17)+' '+Math.floor((me?.best||0)/10)+' m' :
       `${state.checkpoint+1}/${LENGTH}`+(type==='relay' && state.relayTime ? ' · '+Math.ceil(state.relayTime)+' s · '+(state.relayStep+1) : '')}`
@@ -187,6 +244,5 @@ function draw(){
   const hint=state?text(state.complete?16:layout==='runner'?15:type==='relay'?14:13):'';
   if(stats!==prevStatus){$('status').textContent=stats;prevStatus=stats;}
   if(hint!==prevHint){$('hint').textContent=hint;prevHint=hint;}
-  requestAnimationFrame(draw);
 }
-requestAnimationFrame(draw);
+scheduleDraw();

@@ -27,6 +27,11 @@ for(const locale of locales.filter(code=>code!=='en')){
 }
 const gameShell=read('templates/night-observatory.html');
 const coOpShell=read('dist/play/astrofall/co-op/index.html');
+const coOpHash=createHash('sha256');
+for(const file of ['client.mjs','motion.mjs','arena.mjs','style.css']){
+ coOpHash.update(read('dist/play/astrofall/co-op/'+file).replace(/\r\n/g,'\n'));
+}
+const coOpRevision=coOpHash.digest('hex').slice(0,12);
 const gameWorker=read('templates/night-observatory-sw.js');
 const gameManifest=JSON.parse(read('templates/night-observatory.webmanifest'));
 const gameAssetPattern=/(href|src)="assets\/((?:exploration|icons)\/[^"]+)"/g;
@@ -110,8 +115,8 @@ for(const locale of locales){
  writeNightGame(locale+'/',locale);
  write(locale+'/play/astrofall/co-op/index.html',coOpShell
   .replace('<html lang="en">','<html lang="'+htmlLanguages[locale]+'" data-locale="'+locale+'">')
-  .replace('href="./style.css"','href="/play/astrofall/co-op/style.css"')
-  .replace('src="./client.mjs"','src="/play/astrofall/co-op/client.mjs"'));
+  .replace('href="./style.css"','href="/play/astrofall/co-op/style.css?v='+coOpRevision+'"')
+  .replace('src="./client.mjs"','src="/play/astrofall/co-op/client.mjs?v='+coOpRevision+'"'));
  if(locale==='en')writeNightGame('',locale);
  const roomHtml=secretPage(room,site,locale,catalog);
  write(`${locale}/about-secret/index.html`,roomHtml);

@@ -1,4 +1,4 @@
-import {createArena, MAX_PLAYERS} from '../dist/play/astrofall/co-op/arena.mjs';
+import {createArena, MAX_PLAYERS, TICK} from '../dist/play/astrofall/co-op/arena.mjs';
 
 const socketPath = /^\/play\/astrofall\/co-op\/socket\/(relay|runner)\/([a-z0-9-]{3,24})$/;
 
@@ -64,7 +64,7 @@ export class ObservatoryRoom {
   this.lastBroadcast=Date.now();
   const data=JSON.stringify(snapshot);
   for(const peer of this.ctx.getWebSockets()){
-   if(peer.readyState===1) peer.send(data);
+   if(peer.readyState===1 && !(peer.bufferedAmount>32768)) peer.send(data);
   }
  }
 
@@ -79,16 +79,20 @@ export class ObservatoryRoom {
   let input;
   try{input=JSON.parse(message);}catch{return;}
   if(!input || typeof input!=='object') return;
-  const before=this.arena.snapshot();
-  this.remainder+=Math.min(.16,Math.max(0,(now-this.lastTick)/1000));
+  const before=this.arena.checkpoint, wasComplete=this.arena.complete;
+  this.remainder+=Math.min(.2,Math.max(0,(now-this.lastTick)/1000));
   this.lastTick=now;
-  while(this.remainder>=1/30){this.arena.step(1/30);this.remainder-=1/30;}
-  this.arena.input(player.id,input);
-  const after=this.arena.snapshot();
-  if(after.checkpoint!==before.checkpoint || after.complete!==before.complete){
-   await this.ctx.storage.put('progress',{checkpoint:after.checkpoint,complete:after.complete});
+  let stepped=false;
+  while(this.remainder>=TICK){
+   this.arena.step(TICK);
+   this.remainder-=TICK;
+   stepped=true;
   }
-  if(now-this.lastBroadcast>=55) this.broadcast();
+  this.arena.input(player.id,input);
+  const checkpoint=this.arena.checkpoint, complete=this.arena.complete;
+  const progressed=checkpoint!==before || complete!==wasComplete;
+  if(progressed || (stepped && now-this.lastBroadcast>=47)) this.broadcast();
+  if(progressed) await this.ctx.storage.put('progress',{checkpoint,complete});
  }
 
  async webSocketClose(socket) {

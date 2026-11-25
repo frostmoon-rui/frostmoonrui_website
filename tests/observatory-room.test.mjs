@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {handle} from '../src/worker.js';
+import {handle,ObservatoryRoom} from '../src/worker.js';
 
 const origin='https://frostmoonrui.com';
 const path='/play/astrofall/co-op/socket/relay/crew-01';
@@ -18,4 +18,29 @@ test('Observatory WebSocket requests stay on the site and are isolated by mode a
  assert.equal((await handle(new Request(origin+path,{headers:upgrade}),env)).status,200);
  assert.equal((await handle(new Request(origin+path.replace('/relay/','/runner/'),{headers:upgrade}),env)).status,200);
  assert.deepEqual(keys,['relay/crew-01','runner/crew-01']);
+});
+
+test('a visible driver advances the room with one snapshot per pulse and ignores backed-up recipients',async context=>{
+ const snapshots=[];
+ const blocked=[];
+ const id='player-one';
+ const peers=[
+  {readyState:1,deserializeAttachment:()=>({id,mode:'runner'}),send:data=>snapshots.push(JSON.parse(data))},
+  {readyState:1,bufferedAmount:40000,deserializeAttachment:()=>null,send:data=>blocked.push(data)},
+ ];
+ let time=1000, initialized;
+ context.mock.method(Date,'now',()=>time);
+ const room=new ObservatoryRoom({
+  getWebSockets:()=>peers,
+  blockConcurrencyWhile(callback){initialized=callback();},
+  storage:{async get(){return undefined;}},
+ });
+ await initialized;
+ for(let i=0;i<12;i++){
+  time+=60;
+  await room.webSocketMessage(peers[0],'{"axis":0}');
+ }
+ assert.equal(snapshots.length,12);
+ assert.ok(snapshots[11].players[0].x>170);
+ assert.equal(blocked.length,0);
 });

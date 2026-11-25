@@ -6,3 +6,5 @@
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; upgrade-insecure-requests
 /data/food.json
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+/play/astrofall/co-op/*
+  Cache-Control: no-cache
