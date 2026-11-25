@@ -5,7 +5,7 @@ import {loadGame} from './exploration-harness.mjs';
 
 const routes = JSON.parse(readFileSync(new URL('fixtures/exploration-routes.json', import.meta.url), 'utf8'));
 function replay(route) {
-  const game = loadGame();
+  const game = loadGame(undefined,{expanded:false});
   game.start();
   for (const {name,id,to,warp,moves} of route) {
     assert.equal(game.state.roomId, id, name);
@@ -21,7 +21,7 @@ function replay(route) {
 }
 
 test('the four wings and optional detours are connected through playable passages', () => {
-  const {rooms} = loadGame();
+  const {rooms} = loadGame(undefined,{expanded:false});
   assert.equal(Object.keys(rooms).length, 25);
   assert.equal(new Set(Object.values(rooms).map(({gx,gy}) => gy + ':' + gx)).size, 25);
   for (const room of Object.values(rooms)) {

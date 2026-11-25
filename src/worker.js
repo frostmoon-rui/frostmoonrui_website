@@ -2,6 +2,8 @@ import {handleStudio} from './studio.js';
 import {handleCommunity} from './community.js';
 import {themePreference,stampTheme} from './theme-hint.js';
 import {localizedAsset} from './language-hint.js';
+import {handleObservatorySocket} from './observatory-room.js';
+export {ObservatoryRoom} from './observatory-room.js';
 const paths=new Set(['/v4/map/styles','/v3/config/district','/v3/place/text','/v3/place/around','/v3/geocode/geo','/v3/geocode/regeo']);
 const publishedData=new Set(['/food-map/index.json','/data/bot-site.json','/data/site.json']);
 const resourcesPage=/^\/(?:zh\/|en\/|ru\/|ja\/)?resources(?:\/(?:index\.html)?)?$/;
@@ -18,6 +20,7 @@ export function proxyTarget(url,env){
 }
 export async function handle(request,env,fetcher=fetch){
  const url=new URL(request.url);
+ if (url.pathname.startsWith('/play/astrofall/co-op/socket/')) return handleObservatorySocket(request,env);
  let assetPath=url.pathname;try{for(let i=0;i<4;i++){const decoded=decodeURIComponent(assetPath);if(decoded===assetPath)break;assetPath=decoded;}}catch{return new Response('Not found',{status:404});}
  if(assetPath.toLowerCase().includes('__studio'))return new Response('Not found',{status:404,headers:{'Cache-Control':'no-store','X-Robots-Tag':'noindex, nofollow'}});
 

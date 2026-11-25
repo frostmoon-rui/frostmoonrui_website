@@ -2,13 +2,13 @@
     zh: {
       gameArticle: '游戏介绍', touchControls: '← / → 移动 · ▲ 跳跃 · ✦ 互动', keyboardControls: 'A / D 或方向键移动 · 空格跳跃 · E 互动',
       title: '夜间天文台',
-      badge: '知识锁探索解谜 · 25 间互通星室',
+      badge: '知识锁探索解谜 · 80 间互通星室',
       sub: '在安全的前厅领悟「坠落势能与共振」的法则，再用同一条规则改写光影、震碎秘道、放大弹射，揭开早已摆在眼前的隐秘捷径。',
       start: '开始探索', cont: '继续存档', settings: '设置与存档',
       cores: '星核', shards: '碎片', lunarPhase: '月光相位', starPhase: '星影相位',
       hint: '提示', map: '星图',
       kbMove: 'A/D 移动', kbJump: 'Space 跳跃', kbAct: 'E 互动', kbReset: 'R 重置房间', kbMap: 'M 星图',
-      mapTitle: '天文台星图 (25 房间)', mapSub: '金色边框为当前位置 · ★ 星核 · ✦ 隐藏星尘碎片',
+      mapTitle: '天文台星图 (80 房间)', mapSub: '金色边框为当前位置 · ★ 星核 · ✦ 隐藏星尘碎片',
       warpHub: '返回大厅 (Hub)', close: '关闭',
       hintTitle: '分层观察提示', tier1: '第一层 · 观察什么', tier2: '第二层 · 规则联想', tier3: '第三层 · 具体做法',
       unlockHint: '点击展开',
@@ -31,13 +31,13 @@
       endTrueTitle: '完美的星穹共鸣',
       endTrueDesc: '你不仅修复了四枚星核，更凭借对坠落、光影与动量的彻底领悟，找回了全部 4 枚隐藏星尘碎片。整座天文台化作一座悬于夜空的共振琴弦，向深空奏出清晰的回音。',
       keepExploring: '继续自由探索', backTitle: '返回标题',
-      loadSteps: ['初始化星图拓扑与 25 间星室...', '校准重力势能与共振引擎...', '合成深空 Web Audio 声场...', '预缓存邻近星室完成！']
+      loadSteps: ['初始化星图拓扑与 80 间星室...', '校准重力势能与共振引擎...', '合成深空 Web Audio 声场...', '预缓存邻近星室完成！']
     },
     en: {
       gameArticle: 'About the game', touchControls: '← / → move · ▲ jump · ✦ interact', keyboardControls: 'A / D or arrows to move · Space to jump · E to interact',
       title: 'Astrofall Observatory',
-      badge: 'KNOWLEDGE-GATED PLATFORMER · 25 ROOMS',
-      sub: 'Discover the rule of falling resonance in a safe room, then bend the same rule to flip lunar light, shatter secret floors, and amplify momentum across 25 interconnected chambers.',
+      badge: 'KNOWLEDGE-GATED PLATFORMER · 80 ROOMS',
+      sub: 'Discover the rule of falling resonance in a safe room, then bend the same rule to flip lunar light, shatter secret floors, and amplify momentum across 80 interconnected chambers.',
       start: 'Begin Journey', cont: 'Continue', settings: 'Settings & Save',
       cores: 'Cores', shards: 'Shards', lunarPhase: 'Lunar Phase', starPhase: 'Star Phase',
       hint: 'Hints', map: 'Map',
@@ -65,18 +65,18 @@
       endTrueTitle: 'Perfect Celestial Resonance',
       endTrueDesc: 'With all 4 Star Cores and all 4 hidden Stardust Shards recovered, the entire observatory rings like a glass harp across the cosmos.',
       keepExploring: 'Keep Exploring', backTitle: 'Title Screen',
-      loadSteps: ['Mapping 25 interconnected chambers...', 'Calibrating impact resonance physics...', 'Synthesizing Web Audio soundscape...', 'Pre-caching neighboring rooms...']
+      loadSteps: ['Mapping 80 interconnected chambers...', 'Calibrating impact resonance physics...', 'Synthesizing Web Audio soundscape...', 'Pre-caching neighboring rooms...']
     },
     ru: {
       gameArticle: 'Об игре', touchControls: '← / → движение · ▲ прыжок · ✦ действие', keyboardControls: 'A / D или стрелки — движение · Пробел — прыжок · E — действие',
       title: 'Обсерватория Звездопада',
-      badge: 'ПЛАТФОРМЕР-ГОЛОВОЛОМКА · 25 КОМНАТ',
+      badge: 'ПЛАТФОРМЕР-ГОЛОВОЛОМКА · 80 КОМНАТ',
       sub: 'Откройте правило силы падения в безопасном зале, а затем используйте его, чтобы менять свет, ломать скрытые полы и усиливать прыжки в 16 связанных комнатах.',
       start: 'Начать', cont: 'Продолжить', settings: 'Настройки',
       cores: 'Ядра', shards: 'Осколки', lunarPhase: 'Лунная фаза', starPhase: 'Звёздная фаза',
       hint: 'Подсказка', map: 'Карта',
       kbMove: 'A/D Ходьба', kbJump: 'Space Прыжок', kbAct: 'E Действие', kbReset: 'R Сброс', kbMap: 'M Карта',
-      mapTitle: 'Карта обсерватории (25 комнат)', mapSub: 'Золотая рамка: вы · ★ Ядро · ✦ Скрытый осколок',
+      mapTitle: 'Карта обсерватории (80 комнат)', mapSub: 'Золотая рамка: вы · ★ Ядро · ✦ Скрытый осколок',
       warpHub: 'В главный зал', close: 'Закрыть',
       hintTitle: 'Пошаговые подсказки', tier1: 'Уровень 1 · Что заметить', tier2: 'Уровень 2 · Связь правил', tier3: 'Уровень 3 · Решение',
       unlockHint: 'Открыть',
@@ -99,18 +99,18 @@
       endTrueTitle: 'Идеальный звёздный резонанс',
       endTrueDesc: 'Собрав все 4 ядра и все 4 скрытых осколка, вы превратили обсерваторию в единый хрустальный инструмент, поющий в космос.',
       keepExploring: 'Продолжить', backTitle: 'В меню',
-      loadSteps: ['Загрузка карты 25 комнат...', 'Калибровка физики падения...', 'Синтез звука Web Audio...', 'Кэширование соседних комнат...']
+      loadSteps: ['Загрузка карты 80 комнат...', 'Калибровка физики падения...', 'Синтез звука Web Audio...', 'Кэширование соседних комнат...']
     },
     ja: {
       gameArticle: 'ゲーム紹介', touchControls: '← / → 移動 · ▲ ジャンプ · ✦ 調べる', keyboardControls: 'A / D または矢印で移動 · Space でジャンプ · E で調べる',
       title: '星墜ちの天文台',
-      badge: '知識ロック探索アクション · 全25室',
+      badge: '知識ロック探索アクション · 全80室',
       sub: '安全な前室で「落下の衝撃と共鳴」の法則に気づき、同じ法則で光影を反転させ、隠し床を砕き、16の繋がった星室の謎を解き明かしましょう。',
       start: '探索を始める', cont: '続きから', settings: '設定・セーブ',
       cores: '星核', shards: '欠片', lunarPhase: '月光位相', starPhase: '星影位相',
       hint: 'ヒント', map: '星図',
       kbMove: 'A/D 移動', kbJump: 'Space ジャンプ', kbAct: 'E 調べる', kbReset: 'R 部屋リセット', kbMap: 'M 星図',
-      mapTitle: '天文台星図 (全25室)', mapSub: '金枠：現在地 · ★ 星核 · ✦ 隠し星屑',
+      mapTitle: '天文台星図 (全80室)', mapSub: '金枠：現在地 · ★ 星核 · ✦ 隠し星屑',
       warpHub: '大広間へ戻る', close: '閉じる',
       hintTitle: '段階ヒント', tier1: '第1段階 · 観察ポイント', tier2: '第2段階 · 法則の応用', tier3: '第3段階 · 具体的な解法',
       unlockHint: '表示する',
@@ -133,7 +133,7 @@
       endTrueTitle: '完全なる星穹共鳴',
       endTrueDesc: '4つの星核とすべての隠し星屑を集め切った天文台は、夜空へ澄んだ和音を響かせた。',
       keepExploring: '探索を続ける', backTitle: 'タイトルへ',
-      loadSteps: ['25室の星図トポロジーを構築中...', '落下共鳴エンジンを校正中...', 'Web Audio環境音を合成中...', '隣接ルームを事前キャッシュ中...']
+      loadSteps: ['80室の星図トポロジーを構築中...', '落下共鳴エンジンを校正中...', 'Web Audio環境音を合成中...', '隣接ルームを事前キャッシュ中...']
     }
   };
 

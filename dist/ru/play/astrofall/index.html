@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Обсерватория Звездопада</title>
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" href="/assets/night-observatory/icons/favicon-32.png?v=cc234d1d0a6a">
-<link rel="apple-touch-icon" href="/assets/night-observatory/icons/apple-touch-icon.png?v=cc234d1d0a6a">
-<meta name="description" content="Исследуйте 25 связанных комнат и восстановите четыре звёздных ядра.">
-<link rel="stylesheet" href="/assets/night-observatory/exploration/game.css?v=cc234d1d0a6a">
+<link rel="icon" href="/assets/night-observatory/icons/favicon-32.png?v=2c6147719f8f">
+<link rel="apple-touch-icon" href="/assets/night-observatory/icons/apple-touch-icon.png?v=2c6147719f8f">
+<meta name="description" content="Исследуйте 80 связанных комнат или сыграйте с друзьями в эстафету и бесконечный забег.">
+<link rel="stylesheet" href="/assets/night-observatory/exploration/game.css?v=2c6147719f8f">
 </head>
 <body>
 <div id="app">
@@ -21,18 +21,19 @@
     </div>
     <div class="loader-title" id="loader-title">Обсерватория Звездопада</div>
     <div class="loader-bar-wrap" id="loader-progress" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="loader-bar-fill" id="loader-bar"></div></div>
-    <div class="loader-status" id="loader-status">Загрузка карты 25 комнат...</div>
+    <div class="loader-status" id="loader-status">Загрузка карты 80 комнат...</div>
   </div>
 
   <!-- Title Screen -->
   <div id="title-screen" class="hidden">
-    <div class="title-badge" id="t-badge">ПЛАТФОРМЕР-ГОЛОВОЛОМКА · 25 КОМНАТ</div>
+    <div class="title-badge" id="t-badge">ПЛАТФОРМЕР-ГОЛОВОЛОМКА · 80 КОМНАТ</div>
     <h1 class="title-main" id="t-main">Обсерватория Звездопада</h1>
     <p class="title-sub" id="t-sub">Откройте правило силы падения в безопасном зале, а затем используйте его, чтобы менять свет, ломать скрытые полы и усиливать прыжки в 16 связанных комнатах.</p>
     <nav class="title-links"><a id="game-article" href="/ru/notes/astrofall-playtest/">Об игре</a></nav>
     <div class="title-actions">
       <button class="btn-primary" id="btn-start">Начать</button>
       <button class="btn-glass" id="btn-continue" style="display:none;">Продолжить</button>
+      <a class="btn-glass" id="online-link" href="/ru/play/astrofall/co-op/">Online co-op</a>
       <button class="btn-glass" id="btn-title-settings">Настройки</button>
     </div>
     <p id="controls-tip" class="controls-tip"></p>
@@ -205,8 +206,8 @@
   </div>
 </div>
 
-<script defer src="/assets/night-observatory/exploration/labels.js?v=cc234d1d0a6a"></script>
-<script defer src="/assets/night-observatory/exploration/world.js?v=cc234d1d0a6a"></script>
-<script defer src="/assets/night-observatory/exploration/game.js?v=cc234d1d0a6a"></script>
+<script defer src="/assets/night-observatory/exploration/labels.js?v=2c6147719f8f"></script>
+<script defer src="/assets/night-observatory/exploration/world.js?v=2c6147719f8f"></script>
+<script defer src="/assets/night-observatory/exploration/game.js?v=2c6147719f8f"></script>
 </body>
 </html>

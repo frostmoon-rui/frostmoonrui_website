@@ -26,6 +26,7 @@ for(const locale of locales.filter(code=>code!=='en')){
  if(JSON.stringify(source[locale].map(p=>p.path))!==JSON.stringify(english.map(p=>p.path)))throw new Error(`Incomplete ${locale} article catalog`);
 }
 const gameShell=read('templates/night-observatory.html');
+const coOpShell=read('dist/play/astrofall/co-op/index.html');
 const gameWorker=read('templates/night-observatory-sw.js');
 const gameManifest=JSON.parse(read('templates/night-observatory.webmanifest'));
 const gameAssetPattern=/(href|src)="assets\/((?:exploration|icons)\/[^"]+)"/g;
@@ -35,10 +36,10 @@ const localeRuntime={window:{}};
 runInNewContext(read(gameAssetRoot+'exploration/labels.js'),localeRuntime);
 const gameLabels=localeRuntime.window.ObservatoryLabels;
 const gameDescriptions={
- zh:'在 25 间互通星室中探索坠落、共振与光影，找回四枚星核。',
- en:'Explore 25 interconnected rooms and recover four star cores through impact, light, and momentum.',
- ru:'Исследуйте 25 связанных комнат и восстановите четыре звёздных ядра.',
- ja:'25の部屋を探索し、着地の衝撃や光を使って四つの星核を集めよう。',
+ zh:'探索 80 间互通星室，也可以与伙伴体验星座接力和无限跑酷。',
+ en:'Explore 80 connected rooms or play Constellation Relay and Endless Run with friends.',
+ ru:'Исследуйте 80 связанных комнат или сыграйте с друзьями в эстафету и бесконечный забег.',
+ ja:'80室を探索し、仲間と星座リレーやエンドレスランに挑もう。',
 };
 const revisionHash=createHash('sha256');
 for(const text of [gameShell,gameWorker,JSON.stringify(gameManifest),JSON.stringify(gameDescriptions)]){
@@ -62,6 +63,7 @@ function writeNightGame(prefix,locale){
   .replace(/<title>[^<]*<\/title>/,'<title>'+escape(labels.title)+'</title>')
   .replace(/(<meta name="description" content=")[^"]*/,(_,start)=>start+escape(description))
   .replace(gameAssetPattern,(_,attribute,asset)=>attribute+'="'+gameAsset(asset)+'"')
+  .replace('href="/play/astrofall/co-op/"','href="/'+locale+'/play/astrofall/co-op/"')
   .replace('href="/en/notes/astrofall-playtest/"','href="'+article+'"');
  const firstPaint={
   'loader-title':labels.title,'loader-status':labels.loadSteps[0],'t-badge':labels.badge,
@@ -106,6 +108,10 @@ for(const prefix of ['',...locales.map(locale=>`${locale}/`)]){
 }
 for(const locale of locales){
  writeNightGame(locale+'/',locale);
+ write(locale+'/play/astrofall/co-op/index.html',coOpShell
+  .replace('<html lang="en">','<html lang="'+htmlLanguages[locale]+'" data-locale="'+locale+'">')
+  .replace('href="./style.css"','href="/play/astrofall/co-op/style.css"')
+  .replace('src="./client.mjs"','src="/play/astrofall/co-op/client.mjs"'));
  if(locale==='en')writeNightGame('',locale);
  const roomHtml=secretPage(room,site,locale,catalog);
  write(`${locale}/about-secret/index.html`,roomHtml);

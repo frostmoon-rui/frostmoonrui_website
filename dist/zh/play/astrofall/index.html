@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>夜间天文台</title>
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" href="/assets/night-observatory/icons/favicon-32.png?v=cc234d1d0a6a">
-<link rel="apple-touch-icon" href="/assets/night-observatory/icons/apple-touch-icon.png?v=cc234d1d0a6a">
-<meta name="description" content="在 25 间互通星室中探索坠落、共振与光影，找回四枚星核。">
-<link rel="stylesheet" href="/assets/night-observatory/exploration/game.css?v=cc234d1d0a6a">
+<link rel="icon" href="/assets/night-observatory/icons/favicon-32.png?v=2c6147719f8f">
+<link rel="apple-touch-icon" href="/assets/night-observatory/icons/apple-touch-icon.png?v=2c6147719f8f">
+<meta name="description" content="探索 80 间互通星室，也可以与伙伴体验星座接力和无限跑酷。">
+<link rel="stylesheet" href="/assets/night-observatory/exploration/game.css?v=2c6147719f8f">
 </head>
 <body>
 <div id="app">
@@ -21,18 +21,19 @@
     </div>
     <div class="loader-title" id="loader-title">夜间天文台</div>
     <div class="loader-bar-wrap" id="loader-progress" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="loader-bar-fill" id="loader-bar"></div></div>
-    <div class="loader-status" id="loader-status">初始化星图拓扑与 25 间星室...</div>
+    <div class="loader-status" id="loader-status">初始化星图拓扑与 80 间星室...</div>
   </div>
 
   <!-- Title Screen -->
   <div id="title-screen" class="hidden">
-    <div class="title-badge" id="t-badge">知识锁探索解谜 · 25 间互通星室</div>
+    <div class="title-badge" id="t-badge">知识锁探索解谜 · 80 间互通星室</div>
     <h1 class="title-main" id="t-main">夜间天文台</h1>
     <p class="title-sub" id="t-sub">在安全的前厅领悟「坠落势能与共振」的法则，再用同一条规则改写光影、震碎秘道、放大弹射，揭开早已摆在眼前的隐秘捷径。</p>
     <nav class="title-links"><a id="game-article" href="/zh/notes/astrofall-playtest/">游戏介绍</a></nav>
     <div class="title-actions">
       <button class="btn-primary" id="btn-start">开始探索</button>
       <button class="btn-glass" id="btn-continue" style="display:none;">继续存档</button>
+      <a class="btn-glass" id="online-link" href="/zh/play/astrofall/co-op/">Online co-op</a>
       <button class="btn-glass" id="btn-title-settings">设置与存档</button>
     </div>
     <p id="controls-tip" class="controls-tip"></p>
@@ -205,8 +206,8 @@
   </div>
 </div>
 
-<script defer src="/assets/night-observatory/exploration/labels.js?v=cc234d1d0a6a"></script>
-<script defer src="/assets/night-observatory/exploration/world.js?v=cc234d1d0a6a"></script>
-<script defer src="/assets/night-observatory/exploration/game.js?v=cc234d1d0a6a"></script>
+<script defer src="/assets/night-observatory/exploration/labels.js?v=2c6147719f8f"></script>
+<script defer src="/assets/night-observatory/exploration/world.js?v=2c6147719f8f"></script>
+<script defer src="/assets/night-observatory/exploration/game.js?v=2c6147719f8f"></script>
 </body>
 </html>

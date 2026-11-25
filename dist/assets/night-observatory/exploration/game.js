@@ -110,13 +110,24 @@
 
   const W = 960, H = 540;
   const ROOMS = ObservatoryWorld.makeRooms();
+  const mainSeals = ['A2-5','A4-5','A6-5','A8-5'].filter(id => ROOMS[id]);
+  const seals = Object.values(ROOMS).filter(room => room.seal).map(room => room.id);
+  const campaignWords = {
+    zh: ['机关顺序','相位不符','顺序重置','机关已解锁','封印','还需工坊、月镜、钟楼与井底的封印','互动','门未解锁','月','星','重落','顺序刻在入口的铭牌上'],
+    en: ['Circuit','Change phase','Sequence reset','Circuit restored','Seals','Restore the Foundry, Mirror, Viaduct and Cavern seals','Interact','Sealed','Moon','Star','Heavy landing','The sequence is etched beside the entrance'],
+    ru: ['Цепь','Смените фазу','Цепь сброшена','Цепь восстановлена','Печати','Нужны печати литейной, зеркал, виадука и пещер','Действие','Закрыто','Луна','Звезда','Сильный удар','Порядок выгравирован у входа'],
+    ja: ['回路','位相を切り替える','順序をリセット','回路を復旧','封印','鋳造所・月鏡殿・高架橋・洞窟の封印が必要','調べる','未開通','月','星','強い着地','順番は入口の銘板に刻まれている'],
+  };
+  const campaignText = index => campaignWords[state.lang][index];
+  const hasMainSeals = () => mainSeals.every(id => state.puzzles.includes(id));
+  const portalOpen = portal => portal.needs.every(id => state.puzzles.includes(id));
   const languages = ['zh','en','ru','ja'];
   const routeLocale = document.documentElement.dataset.locale;
   const previewText = {
-    zh: {impact:'落地', grades:['轻落','中落','重落'], fullscreen:'横屏全屏', exitFullscreen:'退出全屏', rotate:'横过手机可获得更大的操作空间', glassLocked:'玻璃的铜扣连着工坊悬锤。', copied:'已复制存档码', copyManual:'存档码已生成，可从输入框复制。', confirm:'开始新探索会清空当前进度。确定继续？', saveCode:'存档码', preview:'25 间互通星室', reset:'返回本房间入口', audio:'切换机关音效', left:'向左', right:'向右', jump:'跳跃', act:'互动'},
-    en: {impact:'Landing', grades:['Light','Medium','Heavy'], fullscreen:'Enter fullscreen', exitFullscreen:'Exit fullscreen', rotate:'Rotate your phone for more room to play', glassLocked:'The glass latch is wired to the Workshop counterweight.', copied:'Save code copied', copyManual:'Save code generated. Copy it from the field.', confirm:'Start over and clear your current exploration?', saveCode:'Save code', preview:'25 connected rooms', reset:'Return to room entrance', audio:'Toggle sound effects', left:'Left', right:'Right', jump:'Jump', act:'Interact'},
-    ru: {impact:'Удар', grades:['Лёгкий','Средний','Тяжёлый'], fullscreen:'Во весь экран', exitFullscreen:'Выйти из полноэкранного режима', rotate:'Поверните телефон для удобной игры', glassLocked:'Защёлка стекла соединена с противовесом мастерской.', copied:'Код сохранения скопирован', copyManual:'Код создан. Скопируйте его из поля.', confirm:'Начать заново и стереть текущий прогресс?', saveCode:'Код сохранения', preview:'25 связанных комнат', reset:'Вернуться ко входу в комнату', audio:'Переключить звуковые эффекты', left:'Влево', right:'Вправо', jump:'Прыжок', act:'Действие'},
-    ja: {impact:'着地', grades:['軽','中','重'], fullscreen:'全画面', exitFullscreen:'全画面を終了', rotate:'端末を横向きにすると操作しやすくなります', glassLocked:'ガラスの留め具は工房の重りにつながっています。', copied:'セーブコードをコピーしました', copyManual:'セーブコードを生成しました。入力欄からコピーできます。', confirm:'現在の進行状況を消して最初から遊びますか？', saveCode:'セーブコード', preview:'全25室', reset:'部屋の入口に戻る', audio:'効果音の切り替え', left:'左', right:'右', jump:'ジャンプ', act:'調べる'}
+    zh: {impact:'落地', grades:['轻落','中落','重落'], fullscreen:'横屏全屏', exitFullscreen:'退出全屏', rotate:'横过手机可获得更大的操作空间', glassLocked:'玻璃的铜扣连着工坊悬锤。', copied:'已复制存档码', copyManual:'存档码已生成，可从输入框复制。', confirm:'开始新探索会清空当前进度。确定继续？', saveCode:'存档码', preview:'80 间互通星室', reset:'返回本房间入口', audio:'切换机关音效', left:'向左', right:'向右', jump:'跳跃', act:'互动'},
+    en: {impact:'Landing', grades:['Light','Medium','Heavy'], fullscreen:'Enter fullscreen', exitFullscreen:'Exit fullscreen', rotate:'Rotate your phone for more room to play', glassLocked:'The glass latch is wired to the Workshop counterweight.', copied:'Save code copied', copyManual:'Save code generated. Copy it from the field.', confirm:'Start over and clear your current exploration?', saveCode:'Save code', preview:'80 connected rooms', reset:'Return to room entrance', audio:'Toggle sound effects', left:'Left', right:'Right', jump:'Jump', act:'Interact'},
+    ru: {impact:'Удар', grades:['Лёгкий','Средний','Тяжёлый'], fullscreen:'Во весь экран', exitFullscreen:'Выйти из полноэкранного режима', rotate:'Поверните телефон для удобной игры', glassLocked:'Защёлка стекла соединена с противовесом мастерской.', copied:'Код сохранения скопирован', copyManual:'Код создан. Скопируйте его из поля.', confirm:'Начать заново и стереть текущий прогресс?', saveCode:'Код сохранения', preview:'80 связанных комнат', reset:'Вернуться ко входу в комнату', audio:'Переключить звуковые эффекты', left:'Влево', right:'Вправо', jump:'Прыжок', act:'Действие'},
+    ja: {impact:'着地', grades:['軽','中','重'], fullscreen:'全画面', exitFullscreen:'全画面を終了', rotate:'端末を横向きにすると操作しやすくなります', glassLocked:'ガラスの留め具は工房の重りにつながっています。', copied:'セーブコードをコピーしました', copyManual:'セーブコードを生成しました。入力欄からコピーできます。', confirm:'現在の進行状況を消して最初から遊びますか？', saveCode:'セーブコード', preview:'全80室', reset:'部屋の入口に戻る', audio:'効果音の切り替え', left:'左', right:'右', jump:'ジャンプ', act:'調べる'}
   };
 
   /* =========================================================
@@ -125,6 +136,7 @@
   const SAVE_KEY = 'astrofall_observatory_exploration_v3';
   const savedLists = {
     visited: new Set(Object.keys(ROOMS)),
+    puzzles: new Set(Object.values(ROOMS).filter(room => room.puzzle).map(room => room.id)),
     openedDoors: allowedIds('doors'), brokenGlass: allowedIds('glass'),
     droppedWeights: allowedIds('weights'), cores: allowedIds('cores'), shards: allowedIds('shards')
   };
@@ -135,6 +147,7 @@
     version: 3, started: false, roomId: 'H0', phases: {},
     visited: ['H0'],
     openedDoors: [],
+    puzzles: [],
     brokenGlass: [],
     droppedWeights: [],
     cores: [],
@@ -246,6 +259,9 @@
   let shakeMag = 0;
   let toastTimer = null;
   let roomFade = 0;
+  let circuitStep = 0;
+  let circuitTime = 0;
+  let roomClock = 0;
   let resetConfirmArm = false;
 
   // Input
@@ -279,13 +295,17 @@
       setTimeout(() => sp.classList.remove('active'), 160);
     }
     currentRoom = r;
+    circuitStep = 0;
+    circuitTime = 0;
+    roomClock = 0;
     currentCourse = prepareRoom(roomId);
     lastImpact = null;
     state.roomId = roomId;
     if (!state.visited.includes(roomId)) state.visited.push(roomId);
     preCacheNeighbors(roomId);
+    for (const portal of r.portals || []) prepareRoom(portal.to);
 
-    roomPhase = state.phases[roomId] ?? r.initialPhase ?? 0;
+    roomPhase = (r.puzzle && !state.puzzles.includes(roomId) ? r.initialPhase : state.phases[roomId]) ?? r.initialPhase ?? 0;
     roomBrokenGlass = new Set(state.brokenGlass);
     plateStates = {};
     (r.plates || []).forEach(pl => {
@@ -381,6 +401,18 @@
   coarsePointer.addEventListener('change', applyLanguage);
 
   function applyLanguage() {
+    const online = document.getElementById('online-link');
+    if (online?.getAttribute?.('href')) {
+      const links = {zh:'联机试玩',en:'Online co-op',ru:'Совместная игра',ja:'マルチプレイ'};
+      online.textContent = links[state.lang];
+      const target = new URL(online.href, window.location.href);
+      target.searchParams.set('lang',state.lang);
+      if (/^\/(zh|en|ru|ja)\/play\/astrofall\/$/.test(window.location.pathname)) {
+        target.searchParams.set('home',window.location.pathname);
+      }
+      online.href=target.href;
+    }
+
     const extra = previewText[state.lang];
     const article = document.getElementById('game-article');
     article.href = `/${state.lang}/notes/astrofall-playtest/`;
@@ -450,7 +482,7 @@
     document.getElementById('hud-room').textContent = currentRoom.name[state.lang] || currentRoom.name.zh;
     showImpact();
     document.getElementById('hud-cores-txt').textContent = `${t('cores')} ${state.cores.length}/4`;
-    document.getElementById('hud-shards-txt').textContent = `${t('shards')} ${state.shards.length}/4`;
+    document.getElementById('hud-shards-txt').textContent = `${t('shards')} ${state.shards.length}/4` + (seals.length ? ` · ${campaignText(4)} ${seals.filter(id => state.puzzles.includes(id)).length}/${seals.length}` : '');
     const pDot = document.getElementById('hud-phase-dot');
     const pTxt = document.getElementById('hud-phase-txt');
     if (roomPhase === 0) {
@@ -539,6 +571,9 @@
               icons.appendChild(s);
             });
           }
+          if (vis && r.puzzle) icons.textContent += state.puzzles.includes(r.id) ? ' ✓' : ' ◈';
+          if (vis && r.portals?.length) title.title = r.portals.filter(portalOpen)
+            .map(portal => ROOMS[portal.to].name[state.lang]).join(' · ');
           cell.appendChild(title);
           cell.appendChild(icons);
         }
@@ -609,10 +644,15 @@
   }
 
   function triggerEnding() {
+    if (!hasMainSeals()) {
+      showToast(campaignText(5));
+      enterRoom('H1');
+      return;
+    }
     paused = true;
     state.endingSeen = true;
     persistSave();
-    const isTrue = state.shards.length >= 4;
+    const isTrue = state.shards.length >= 4 && seals.every(id => state.puzzles.includes(id));
     document.getElementById('end-badge').textContent = isTrue ? t('endTrueBadge') : t('endNormalBadge');
     document.getElementById('end-title').textContent = isTrue ? t('endTrueTitle') : t('endNormalTitle');
     document.getElementById('end-desc').textContent = isTrue ? t('endTrueDesc') : t('endNormalDesc');
@@ -721,7 +761,7 @@
       const box = { x: pl.x - 6, y: pl.y - 10, w: pl.w + 12, h: pl.h + 14 };
       if (aabb(P, box)) {
         const ps = plateStates[pl.id] || { charge: 0, pulse: 0 };
-        if (level >= pl.req && (ps.charge !== 2 || pl.action === 'togglePhase' || pl.action === 'finale')) {
+        if (level >= pl.req && (ps.charge !== 2 || pl.action === 'togglePhase' || pl.action === 'finale' || pl.action === 'campaign')) {
           ps.charge = 2; ps.pulse = 1;
           plateStates[pl.id] = ps;
           triggerPlateAction(pl);
@@ -757,6 +797,8 @@
       });
     } else if (pl.action === 'togglePhase') {
       flipRoomPhase();
+    } else if (pl.action === 'campaign') {
+      energize(currentRoom.puzzle.switches.find(part => part.id === pl.target));
     } else if (pl.action === 'finale') {
       triggerEnding();
     }
@@ -780,8 +822,45 @@
     });
   }
 
+  function energize(part) {
+    const puzzle = currentRoom.puzzle;
+    if (state.puzzles.includes(currentRoom.id)) return;
+    if (part.phase !== undefined && roomPhase !== part.phase) {
+      showToast(campaignText(1));
+      return;
+    }
+    if (puzzle.sequence[circuitStep] !== part.id) {
+      circuitStep = 0;
+      circuitTime = 0;
+      showToast(campaignText(2));
+      return;
+    }
+    if (circuitStep === 0) circuitTime = puzzle.seconds;
+    circuitStep++;
+    sound.playPlateFull();
+    addShockwave(part.x, part.y, '#5eead4', 85);
+    if (circuitStep === puzzle.sequence.length) {
+      state.puzzles.push(currentRoom.id);
+      persistSave();
+      showToast(campaignText(3));
+      updateHUD();
+    }
+  }
+
+  const nearPoint = (x, y, dx, dy) =>
+    Math.abs(P.x + P.w / 2 - x) <= dx && Math.abs(P.y + P.h / 2 - y) <= dy;
+  const beamLive = beam => roomClock % beam.period >= beam.period * .58;
+
   function updatePhysics(dt) {
     if (!currentRoom) return;
+    roomClock += dt;
+    if (circuitTime > 0 && !state.puzzles.includes(currentRoom.id)) {
+      circuitTime -= dt;
+      if (circuitTime <= 0) {
+        circuitStep = 0;
+        showToast(campaignText(2));
+      }
+    }
     if (roomFade > 0) roomFade = Math.max(0, roomFade - dt * 2.4);
     if (shakeTime > 0) shakeTime = Math.max(0, shakeTime - dt);
 
@@ -910,6 +989,12 @@
       }
     });
 
+    const beam = currentRoom.puzzle?.beam;
+    if (beam && beamLive(beam) && aabb(P, beam)) {
+      enterRoom(currentRoom.id);
+      return;
+    }
+
     // Each contact can switch the prism once. Standing inside one is safe.
     const prism = currentRoom.prisms.find(pr =>
       !pr.remoteOnly && aabb(P, {x:pr.x - 16, y:pr.y - 16, w:32, h:32}));
@@ -949,6 +1034,15 @@
     // Interact (E / Stele / Astrolabe)
     if (keys.actJust) {
       keys.actJust = false;
+      const portal = currentRoom.portals?.find(part => nearPoint(part.x, part.y, 28, 100));
+      const part = currentRoom.puzzle?.switches.find(part => !part.impact && nearPoint(part.x, part.y, 44, 37));
+      const distance = part => Math.hypot(P.x + P.w / 2 - part.x, P.y + P.h / 2 - part.y);
+      if (portal && (!part || state.puzzles.includes(currentRoom.id) || distance(portal) < distance(part))) {
+        if (portalOpen(portal)) enterRoom(portal.to, portal.tx, undefined, true);
+        else showToast(campaignText(7));
+        return;
+      }
+      if (part) energize(part);
       if (currentRoom.stele) {
         const dx = Math.abs((P.x + P.w / 2) - currentRoom.stele.x);
         const dy = Math.abs((P.y + P.h / 2) - currentRoom.stele.y);
@@ -960,11 +1054,11 @@
         const dx = Math.abs((P.x + P.w / 2) - currentRoom.astrolabe.x);
         const dy = Math.abs((P.y + P.h / 2) - currentRoom.astrolabe.y);
         if (dx < 90 && dy < 120) {
-          if (state.cores.length >= 4) {
+          if (state.cores.length >= 4 && hasMainSeals()) {
             enterRoom('H2', undefined, undefined, true);
             return;
           } else {
-            showToast(t('needCores'), 3200);
+            showToast(state.cores.length < 4 ? t('needCores') : campaignText(5), 3200);
           }
         }
       }
@@ -1167,6 +1261,63 @@
       }
       ctx.restore();
     });
+
+    const puzzle = currentRoom.puzzle;
+    if (puzzle) {
+      const solved = state.puzzles.includes(currentRoom.id);
+      const recipe = puzzle.sequence.map(id => {
+        const part = puzzle.switches[id - 1];
+        const qualifiers = [part.phase === 0 ? campaignText(8) : part.phase === 1 ? campaignText(9) : '',
+          part.impact ? campaignText(10) : 'E'].filter(Boolean);
+        return part.mark + ' ' + qualifiers.join(' + ');
+      });
+      ctx.textAlign = 'left';
+      ctx.font = '700 19px system-ui';
+      ctx.fillStyle = solved ? '#70ebce' : '#f4deb3';
+      const inscription = puzzle.kind === 'memory' && !nearPoint(112,480,102,82);
+      ctx.fillText(solved ? '✓ ' + campaignText(3) : inscription ? campaignText(11) :
+        campaignText(0) + ' · ' + recipe.join('  →  '), 52, 72, 850);
+      if (puzzle.kind === 'memory') {
+        ctx.fillStyle='#9d7856'; ctx.fillRect(105,459,14,28);
+        ctx.strokeStyle='#e7c492'; ctx.strokeRect(105,459,14,28);
+      }
+      if (puzzle.seconds && !solved) {
+        ctx.font = '700 16px system-ui';
+        ctx.fillText('⏱ ' + (circuitStep ? Math.ceil(circuitTime) : puzzle.seconds.toFixed(1)) + ' s', 52, 101);
+      }
+      for (const part of puzzle.switches) {
+        const done = solved || puzzle.sequence.slice(0,circuitStep).includes(part.id);
+        ctx.fillStyle = done ? '#5eead4' : '#17243c';
+        ctx.strokeStyle = part.phase === 1 ? '#c084fc' : '#9dd4ea';
+        ctx.beginPath();
+        ctx.arc(part.x,part.y,17,0,Math.PI*2);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = done ? '#081a20' : '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText(String(part.mark),part.x,part.y+6);
+      }
+      if (puzzle.beam) {
+        const beam = puzzle.beam;
+        ctx.fillStyle = beamLive(beam) ? '#ff759c' : '#632853';
+        ctx.fillRect(beam.x,beam.y,beam.w,beam.h);
+      }
+    }
+    for (const portal of currentRoom.portals || []) {
+      const open = portalOpen(portal);
+      ctx.strokeStyle = open ? '#79d9c8' : '#aa8972';
+      ctx.fillStyle = open ? 'rgba(54,190,167,.2)' : 'rgba(118,82,67,.22)';
+      ctx.beginPath();
+      ctx.roundRect(portal.x-17,portal.y-26,34,53,[14,14,2,2]);
+      ctx.fill(); ctx.stroke();
+      ctx.font = '700 18px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#e7efe9';
+      ctx.fillText(open ? 'E' : '·',portal.x,portal.y+6);
+      if (nearPoint(portal.x,portal.y,70,100)) {
+        ctx.font = '700 15px system-ui';
+        ctx.fillText(ROOMS[portal.to].name[state.lang],Math.max(135,Math.min(W-135,portal.x)),portal.y-36,270);
+      }
+    }
 
     // Cracked Glass Floors
     (currentRoom.glass || []).forEach(g => {

@@ -37,7 +37,7 @@ window.ObservatoryWorld = (() => {
       ['天球儀には空のソケットが四つある。','別々の出口から星核を探そう。','四つの星核を集めたら、天球儀のそばで調べよう。']),
   };
 
-  function makeRooms() {
+  function makeRooms({expanded = true} = {}) {
     const rooms = {};
     const exits = {
       left: ['right', 890, 482], right: ['left', 48, 482],
@@ -257,6 +257,8 @@ window.ObservatoryWorld = (() => {
     ascent(dome, 252);
     plate(dome, 593, null, 'finale');
 
+    if (expanded) extendCampaign({rooms, room, names, rect, prism, plate});
+
     for (const r of Object.values(rooms)) {
       const cut = (span, limit, makeRect) => {
         if (!span) return [makeRect(0, limit)];
@@ -271,6 +273,131 @@ window.ObservatoryWorld = (() => {
       );
     }
     return rooms;
+  }
+
+  // A spoke forks after its entry and recombines before its seal. Each row
+  // records the theme, parent room, puzzle order and geometry tuning.
+  function extendCampaign({rooms, room, names, rect, prism, plate}) {
+    const sectors = [
+      ['H1', names('折返回廊','Return Galleries','Обратные галереи','帰還回廊'), ['memory','leap','relay','hammer','phase'], 0, 60],
+      ['E1', names('余温熔炉','Ember Foundry','Угасшая литейная','余熱鋳造所'), ['hammer','phase','relay','beam','cross'], 1, 84],
+      ['E3', names('摆锤档案','Pendulum Archive','Архив маятников','振り子の書庫'), ['beam','memory','spring','phase','relay'], 2, 92],
+      ['W1', names('折月镜宫','Mirror of Moons','Лунные зеркала','月鏡殿'), ['phase','spring','memory','cross','beam'], 3, 88],
+      ['W4', names('褪光花苑','Dusk Conservatory','Сумеречная оранжерея','薄暮の温室'), ['leap','relay','beam','hammer','memory'], 4, 96],
+      ['N1', names('逆风飞桥','Headwind Viaduct','Виадук ветров','向かい風の高架橋'), ['spring','beam','phase','relay','cross'], 5, 88],
+      ['N4', names('流星仪轨','Meteor Transit','Метеорная линия','流星の軌道'), ['leap','spring','relay','beam','hammer'], 6, 102],
+      ['S1', names('潮汐空洞','Tidal Caverns','Пещеры прилива','潮汐洞窟'), ['relay','cross','hammer','memory','phase'], 7, 96],
+      ['S4', names('晶盐深库','Crystal Vaults','Кристальный склад','結晶の奥倉'), ['hammer','beam','memory','leap','cross'], 8, 106],
+      ['X1', names('无光抄本','Lightless Manuscripts','Рукописи без света','無光の写本庫'), ['memory','phase','spring','beam','cross'], 9, 99],
+      ['H2', names('远日冠环','Aphelion Ring','Кольцо афелия','遠日点の環'), ['cross','hammer','phase','spring','relay'], 10, 110],
+    ];
+    const titles = {
+      memory: names('循序','Inscription','Надпись','銘文'),
+      leap: names('悬阶','Escarpment','Уступы','断崖'),
+      relay: names('余响','Relay','Эстафета','継電器'),
+      hammer: names('重锤','Hammer','Молот','重槌'),
+      phase: names('相位','Refraction','Преломление','屈折'),
+      beam: names('明灭','Eclipse','Затмение','蝕'),
+      spring: names('弹道','Launch','Запуск','発射'),
+      cross: names('合流','Confluence','Слияние','合流'),
+    };
+    const localized = (label, title) =>
+      Object.fromEntries(Object.keys(label).map(lang => [lang, label[lang] + ' · ' + title[lang]]));
+    const portal = (source, x, to, tx, needs = [], y = 480) => {
+      (source.portals ??= []).push({x, y, to: to.id, tx, needs});
+    };
+
+    for (const [parent, label, courses, sector, gap] of sectors) {
+      const ids = courses.map((_, stage) => 'A' + (sector + 1) + '-' + (stage + 1));
+      const wing = courses.map((style, stage) => {
+        const r = room(ids[stage], 2 + stage, 5 + sector, rooms[parent].zone,
+          localized(label, titles[style]), 'hub');
+        r.puzzle = {kind:style, switches:[], sequence:[], seconds:0};
+        r.spawn.x = 63;
+        designCourse(r, style, gap, sector, stage);
+        return r;
+      });
+      const [entry, upper, lower, merge, seal] = wing;
+      const parentX = {H1:183,E1:91,E3:752,W1:840,W4:475,N1:168,N4:142,S1:215,S4:805,X1:518,H2:791}[parent];
+      portal(rooms[parent], parentX, entry, 63, parent === 'H2' ? ['A2-5','A4-5','A6-5','A8-5'] : []);
+      for (const [i, r] of wing.entries()) {
+        const back = [rooms[parent], entry, entry, upper, merge][i];
+        portal(r, 76, back, i === 0 ? parentX - 30 : 62);
+      }
+      portal(entry, 760, upper, 63, [entry.id]);
+      portal(entry, 874, lower, 63, [entry.id]);
+      portal(upper, 874, merge, 63, [upper.id]);
+      portal(lower, 874, merge, 63, [lower.id]);
+      portal(merge, 226, lower, 63);
+      portal(merge, 874, seal, 63, [upper.id, lower.id, merge.id]);
+      portal(seal, 874, rooms.H1, 355, [seal.id]);
+      seal.seal = true;
+    }
+
+    function designCourse(r, style, gap, sector, stage) {
+      const puzzle = r.puzzle;
+      const add = (x, y, rule, mark) => {
+        const id = puzzle.switches.length + 1;
+        puzzle.switches.push({id, x, y, ...rule, mark:mark ?? id});
+        return id;
+      };
+      const platform = (x, y, w) => r.solids.push(rect(x,y,w));
+      const stairs = (x, direction = 1) => {
+        for (let i = 0; i < 3; i++) platform(x + i * 96 * direction, 443 - i * 64, 86 + (stage % 2) * 10);
+      };
+      const b = 280 + (sector % 4) * 24;
+      if (style === 'memory') {
+        stairs(b - 32);
+        add(191,480); add(b + 235,286); add(718,480);
+        puzzle.sequence = [[2,1,3],[3,2,1],[1,3,2]][sector === 7 ? 2 : (sector + stage) % 3];
+        return;
+      }
+      if (style === 'leap' || style === 'beam') {
+        r.pit = [b, b + gap * 3 + 48];
+        const bridge = [b + gap - 58, b + gap * 2 - 30, b + gap * 3 - 16];
+        for (const [index,x] of bridge.entries()) platform(x, index === 1 ? 401 : 458, 68);
+        add(bridge[1] + 34,373);
+        add(827,480);
+        puzzle.sequence = [1,2];
+        if (style === 'beam') puzzle.beam = {x:bridge[1] + 48,y:320,w:13,h:81,period:2.8 - sector * .065};
+        return;
+      }
+      if (style === 'spring') {
+        r.springs.push({...rect(b-91,496,65,14),minimum:825});
+        platform(b + 6,327,96); platform(b + 203,412,91);
+        platform(b + 321,358,72); platform(b + 431,414,83);
+        add(b + 58,298); add(b + 355,330);
+        puzzle.sequence = [1,2];
+        return;
+      }
+      if (style === 'hammer' || style === 'cross') {
+        stairs(b - 108);
+        platform(b + 312,432,95);
+        const center = b + 225;
+        const id = add(center,480,{impact:true,phase:style === 'cross' ? 1 : undefined});
+        plate(r, center - 44, id, 'campaign');
+        add(b + 358,403,{phase:style === 'cross' ? 0 : undefined});
+        if (style === 'cross') {
+          prism(r,212,482);
+          puzzle.sequence = [2,1];
+        } else puzzle.sequence = [1,2];
+        return;
+      }
+      if (style === 'phase') {
+        prism(r,195,484); prism(r,709,484);
+        platform(b - 53,440,96);
+        r.phaseSolids.push({phase:1,...rect(b+54,370,133)});
+        platform(b+193,432,115);
+        add(b + 112,342,{phase:1});
+        add(b + 241,402,{phase:0});
+        puzzle.sequence = [1,2];
+        return;
+      }
+      platform(b - 38,443,114); platform(b + 95,380,104); platform(b + 253,434,106);
+      add(159,480); add(b + 142,352); add(802,480);
+      puzzle.sequence = sector % 2 ? [1,2,3] : [3,2,1];
+      puzzle.seconds = Math.max(8, 14 - sector * .4);
+    }
   }
 
   return {makeRooms};

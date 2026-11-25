@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
-export function loadGame(asset = new URL('../dist/assets/night-observatory/exploration/', import.meta.url)) {
+export function loadGame(asset = new URL('../dist/assets/night-observatory/exploration/', import.meta.url), {expanded = true} = {}) {
   const elements = new Map();
   const events = {};
   const element = id => {
@@ -28,8 +28,11 @@ export function loadGame(asset = new URL('../dist/assets/night-observatory/explo
     let source = readFileSync(new URL(name+'.js',asset),'utf8');
     if (name === 'game') source = source.replace(/\}\)\(\);\s*$/, `
       window.replay = {
-        rooms:ROOMS, events: window.testEvents, start: () => startGame(true),
+        rooms:ROOMS, events: window.testEvents, enter: enterRoom,
+        get player() { return P; },
+        start: () => startGame(true),
         get state() { return state; },
+        get ending() { return document.getElementById('end-badge').textContent; },
         step(axis, jump = false, act = false) {
           Object.assign(keys,{left:axis < 0, right:axis > 0, jump, jumpJust:jump, actJust:act});
           if (!paused) updatePhysics(1/120);
@@ -38,6 +41,10 @@ export function loadGame(asset = new URL('../dist/assets/night-observatory/explo
     })();`);
     sandbox.testEvents = events;
     vm.runInContext(source,sandbox,{filename:name+'.js'});
+    if (name === 'world' && !expanded) {
+      const world = sandbox.ObservatoryWorld;
+      sandbox.ObservatoryWorld = {makeRooms:()=>world.makeRooms({expanded:false})};
+    }
   }
   return sandbox.replay;
 }

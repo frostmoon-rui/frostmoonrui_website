@@ -11,6 +11,12 @@ The atlas uses a quiet card layout with numbered, category-specific SVG pins. Th
 - [Projects](https://frostmoonrui.com/en/projects/) links the QQ bot, Observatory game, audio and image tools, historical hardware projects, and public suspension research notes.
 - [Project updates](https://frostmoonrui.com/en/notes/project-updates/) covers music previews, background-job notices, and the current Observatory release. Both pages have complete Chinese, English, Russian, and Japanese editions.
 
+## Observatory playtest
+
+The solo game has 80 connected rooms and uses the same save format as the earlier version. The separate co-op page offers Constellation Relay and Endless Run for up to six players in a room. The room server uses a SQLite-backed Durable Object and same-origin WebSockets. Its initial Wrangler migration creates only the new room class. Co-op state and input are independent of the site's D1 data and of solo saves.
+
+Use `npx wrangler dev --local` to test the room server. Static preview servers can serve the solo build. WebSocket joins require the Worker runtime.
+
 ## Local development
 
 No framework or package installation is required. Use Node.js 20+ and Python 3.10+:

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>Observatory Co-op</title>
+<link rel="stylesheet" href="./style.css">
+<main>
+  <header>
+    <div><a id="home" href="../">Astrofall Observatory</a><h1 id="title">Observatory Co-op</h1></div>
+    <select id="language" aria-label="Language"><option value="zh">中文</option><option value="en">English</option><option value="ru">Русский</option><option value="ja">日本語</option></select>
+  </header>
+  <form id="lobby">
+    <label><span id="room-label">Room code</span><input id="room" pattern="[a-z0-9\-]{3,24}" maxlength="24" value="starlight" required autocomplete="off"></label>
+    <label><span id="mode-label">Mode</span><select id="mode"><option value="relay">Constellation Relay</option><option value="runner">Endless Run</option></select></label>
+    <button id="join">Join</button><button id="invite" type="button" hidden>Copy invite</button>
+  </form>
+  <section aria-label="Game">
+    <div id="status" role="status"></div>
+    <canvas id="game" width="960" height="540" aria-label="Observatory multiplayer stage"></canvas>
+    <p id="hint"></p>
+    <div id="controls">
+      <div><button data-input="left" aria-label="Left">◀</button><button data-input="right" aria-label="Right">▶</button></div>
+      <div><button data-input="link" id="touch-link">Link</button><button data-input="act" id="touch-act">Act</button><button data-input="jump" aria-label="Jump">▲</button></div>
+    </div>
+  </section>
+</main>
+<script type="module" src="./client.mjs"></script>
+</html>
