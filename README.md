@@ -6,6 +6,11 @@ An independent technical notebook and public food atlas for **frostmoonrui.com**
 
 The atlas uses a quiet card layout with numbered, category-specific SVG pins. The list and map share stable venue numbers and selection state. Amap vector maps follow the site's light/dark theme using the official `whitesmoke` / `darkblue` styles; satellite imagery is not recolored. Marker chrome and information cards use the site's CSS colors, including in the optional OpenStreetMap view. Theme switching reuses the loaded map, and reduced-motion preferences are respected. Maps still load only on request, without geolocation access.
 
+## Project catalog and updates
+
+- [Projects](https://frostmoonrui.com/en/projects/) links the QQ bot, Observatory game, audio and image tools, historical hardware projects, and public suspension research notes.
+- [Project updates](https://frostmoonrui.com/en/notes/project-updates/) covers music previews, background-job notices, and the current Observatory release. Both pages have complete Chinese, English, Russian, and Japanese editions.
+
 ## Local development
 
 No framework or package installation is required. Use Node.js 20+ and Python 3.10+:
@@ -29,7 +34,7 @@ Every page includes **ZH / EN / RU / JA** links, with native accessible labels *
 - `/<locale>/projects/`, `/<locale>/privacy/`, `/<locale>/notes/.../`: translated full content, not just navigation.
 - `/<locale>/food-map/`: localized filtering, statuses, result counts, dates and map controls. Original business names and public addresses remain unchanged.
 
-The root `/` remains the default English entry. The build produces 35 indexable routes plus localized 404 documents, with language-specific `lang`, canonical and alternate-language links. No automatic model-based translation runs on visitors or deploys.
+The root `/` remains the default English entry. The build produces localized project, article and category routes, plus localized 404 documents, with language-specific `lang`, canonical and alternate-language links. No automatic model-based translation runs on visitors or deploys.
 
 ## Existing Cloudflare Worker
 

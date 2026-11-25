@@ -45,6 +45,27 @@
     ],
     "projects#magic-eraser": [
       "software"
+    ],
+    "notes/project-updates": [
+      "software",
+      "automation"
+    ],
+    "notes/gps-location-assistant": [
+      "software",
+      "hardware"
+    ],
+    "notes/active-suspension-research": [
+      "hardware"
+    ],
+    "projects#gps-location-assistant": [
+      "software",
+      "hardware"
+    ],
+    "projects#active-suspension": [
+      "hardware"
+    ],
+    "projects#website-source": [
+      "software"
     ]
   }
 }
