@@ -36,7 +36,7 @@ test('the article and legacy bookmarks lead to a single playable game in every l
   assert.ok(game.includes(`href="/${locale}/notes/astrofall-playtest/">${label}</a>`));
   if(locale!=='en')assert.doesNotMatch(game,/A NIGHT IN THREE MOTIONS/);
   assert.ok(!game.includes(`href="/${locale}/play/astrofall/classic/"`));
-  assert.match(game,/<script defer src="\/assets\/night-observatory\/js\/main\.js\?v=[a-f0-9]+"><\/script>/);
+  assert.match(game,/<script defer src="\/assets\/night-observatory\/exploration\/game\.js\?v=[a-f0-9]+"><\/script>/);
   assert.ok(classic.includes(`content="0;url=/${locale}/play/astrofall/"`));
   assert.doesNotMatch(classic,/<script|<canvas/);
   assert.doesNotMatch(game,/<script>|<style>/);

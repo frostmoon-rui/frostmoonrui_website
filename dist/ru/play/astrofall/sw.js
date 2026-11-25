@@ -1,8 +1,8 @@
 /* Offline cache isolated to this game and locale. */
 const scope = self.registration.scope;
 const prefix = 'night-observatory:' + scope + ':';
-const cacheName = prefix + 'abf3b10aebc2';
-const assetPaths = ["/assets/night-observatory/icons/favicon-32.png?v=abf3b10aebc2","/assets/night-observatory/icons/apple-touch-icon.png?v=abf3b10aebc2","/assets/night-observatory/style.css?v=abf3b10aebc2","/assets/night-observatory/js/i18n.js?v=abf3b10aebc2","/assets/night-observatory/js/data.js?v=abf3b10aebc2","/assets/night-observatory/js/campaign.js?v=abf3b10aebc2","/assets/night-observatory/js/room-layouts.js?v=abf3b10aebc2","/assets/night-observatory/js/audio.js?v=abf3b10aebc2","/assets/night-observatory/js/engine.js?v=abf3b10aebc2","/assets/night-observatory/js/tutorial.js?v=abf3b10aebc2","/assets/night-observatory/js/ui.js?v=abf3b10aebc2","/assets/night-observatory/js/main.js?v=abf3b10aebc2"];
+const cacheName = prefix + '3f5320b8422f';
+const assetPaths = ["/assets/night-observatory/icons/favicon-32.png?v=3f5320b8422f","/assets/night-observatory/icons/apple-touch-icon.png?v=3f5320b8422f","/assets/night-observatory/exploration/game.css?v=3f5320b8422f","/assets/night-observatory/exploration/labels.js?v=3f5320b8422f","/assets/night-observatory/exploration/world.js?v=3f5320b8422f","/assets/night-observatory/exploration/game.js?v=3f5320b8422f"];
 const assetURLs = new Set(assetPaths.map(asset => new URL(asset, scope).href));
 const shell = new URL('./', scope).href;
 const manifest = new URL('./manifest.webmanifest', scope).href;

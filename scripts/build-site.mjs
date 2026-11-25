@@ -25,60 +25,52 @@ for(const locale of locales.filter(code=>code!=='en')){
  source[locale]=JSON.parse(read(`content/pages.${locale}.json`));
  if(JSON.stringify(source[locale].map(p=>p.path))!==JSON.stringify(english.map(p=>p.path)))throw new Error(`Incomplete ${locale} article catalog`);
 }
-const nightGame=read('templates/night-observatory.html');
-const nightWorker=read('templates/night-observatory-sw.js');
-const nightManifest=JSON.parse(read('templates/night-observatory.webmanifest'));
-const nightAssets=[...nightGame.matchAll(/(?:href|src)="((?:js\/|icons\/)[^"]+|style\.css)"/g)]
- .map(match=>match[1]);
-const normalizeNewlines=text=>text.replace(/\r\n/g,'\n');
-const nightRevision=createHash('sha256').update(normalizeNewlines(nightGame)).update(normalizeNewlines(nightWorker))
- .update(JSON.stringify(nightManifest))
- .update(nightAssets.map(asset=>normalizeNewlines(read('dist/assets/night-observatory/'+asset))).join('')).digest('hex').slice(0,12);
-const nightAsset=asset=>'/assets/night-observatory/'+asset+'?v='+nightRevision;
-const gameRuntime={window:{}};
-runInNewContext(read('dist/assets/night-observatory/js/i18n.js'),gameRuntime);
-const nightLabels=gameRuntime.window.NO.I18N;
-const nightDescriptions={
- zh:'穿过 60 间房，重启云海上方的航标。',
- en:'Cross 60 rooms to restore a beacon above the cloud sea.',
- ru:'Пройдите 60 комнат и восстановите маяк над облачным морем.',
- ja:'60の部屋をめぐり、雲海の航路標識を復旧する。',
+const gameShell=read('templates/night-observatory.html');
+const gameWorker=read('templates/night-observatory-sw.js');
+const gameManifest=JSON.parse(read('templates/night-observatory.webmanifest'));
+const gameAssetPattern=/(href|src)="assets\/((?:exploration|icons)\/[^"]+)"/g;
+const gameAssets=[...gameShell.matchAll(gameAssetPattern)].map(match=>match[2]);
+const gameAssetRoot='dist/assets/night-observatory/';
+const localeRuntime={window:{}};
+runInNewContext(read(gameAssetRoot+'exploration/labels.js'),localeRuntime);
+const gameLabels=localeRuntime.window.ObservatoryLabels;
+const gameDescriptions={
+ zh:'在 25 间互通星室中探索坠落、共振与光影，找回四枚星核。',
+ en:'Explore 25 interconnected rooms and recover four star cores through impact, light, and momentum.',
+ ru:'Исследуйте 25 связанных комнат и восстановите четыре звёздных ядра.',
+ ja:'25の部屋を探索し、着地の衝撃や光を使って四つの星核を集めよう。',
 };
-function localizeNightMarkup(html,locale){
- const translate=key=>{
-  const label=nightLabels[locale][key];
-  if(typeof label!=='string')throw new Error('Missing '+locale+' game label: '+key);
-  return escape(label);
- };
- return html
-  .replace(/(<([a-z][a-z0-9]*)\b[^>]*\bdata-i18n="([^"]+)"[^>]*>)[^<]*(<\/\2>)/g,
-   (_,open,tag,key,close)=>open+translate(key)+close)
-  .replace(/<[a-z][^>]*\bdata-i18n-(?:aria-label|title)="[^"]+"[^>]*>/g,tag=>{
-   for(const attr of ['aria-label','title']){
-    const key=tag.match(new RegExp('data-i18n-'+attr+'="([^"]+)"'))?.[1];
-    if(key)tag=tag.replace(new RegExp('(\\s'+attr+'=")[^"]*'),(_,open)=>open+translate(key));
-   }
-   return tag;
-  });
+const revisionHash=createHash('sha256');
+for(const text of [gameShell,gameWorker,JSON.stringify(gameManifest),JSON.stringify(gameDescriptions)]){
+ revisionHash.update(text.replace(/\r\n/g,'\n'));
 }
-function writeNightGame(prefix, locale) {
- const {title,game_article:notes}=nightLabels[locale];
- const description=nightDescriptions[locale];
+for(const asset of gameAssets)revisionHash.update(fs.readFileSync(path.join(root,gameAssetRoot,asset)));
+const gameRevision=revisionHash.digest('hex').slice(0,12);
+const gameAsset=asset=>'/assets/night-observatory/'+asset+'?v='+gameRevision;
+
+function writeNightGame(prefix,locale){
+ const labels=gameLabels[locale];
+ const description=gameDescriptions[locale];
  const route=prefix+'play/astrofall/';
- const hrefs='<nav class="title-links"><a id="game-article" data-i18n="game_article" hreflang="'+htmlLanguages[locale]+'" href="'+languagePath(locale,'notes/astrofall-playtest/')+'">'+escape(notes)+'</a></nav>';
  const destination='/'+route;
- write(route+'classic/index.html','<!doctype html><html lang="'+htmlLanguages[locale]+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url='+destination+'"><title>'+escape(title)+'</title></head><body><a href="'+destination+'">'+escape(title)+'</a></body></html>');
- const html=localizeNightMarkup(nightGame,locale)
-  .replace('<html lang="en" data-locale="en">','<html lang="'+htmlLanguages[locale]+'" data-locale="'+locale+'" data-locale-routing="path">')
-  .replace(/<title>[^<]*<\/title>/,'<title>'+escape(title)+'</title>')
+ const article=languagePath(locale,'notes/astrofall-playtest/');
+ const html=gameShell
+  .replace('<html lang="en" data-locale="">','<html lang="'+htmlLanguages[locale]+'" data-locale="'+locale+'" data-locale-routing="path">')
+  .replace(/<title>[^<]*<\/title>/,'<title>'+escape(labels.title)+'</title>')
   .replace(/(<meta name="description" content=")[^"]*/,(_,start)=>start+escape(description))
-  .replace('href="manifest.webmanifest"','href="./manifest.webmanifest"')
-  .replace(/(href|src)="((?:js\/|icons\/)[^"]+|style\.css)"/g,(_,attr,asset)=>attr+'="'+nightAsset(asset)+'"')
-  .replace('<!--OBSERVATORY_LINKS-->',hrefs);
- write(route+'index.html',html);
- write(route+'sw.js',nightWorker.replace('__REVISION__',nightRevision).replace('__PRECACHE__',JSON.stringify(nightAssets.map(nightAsset))));
- write(route+'manifest.webmanifest',JSON.stringify({...nightManifest,name:title,short_name:title,description,lang:htmlLanguages[locale],
-  start_url:'./',icons:nightManifest.icons.map(icon=>({...icon,src:nightAsset(icon.src)}))},null,2)+'\n');
+  .replace(gameAssetPattern,(_,attribute,asset)=>attribute+'="'+gameAsset(asset)+'"')
+  .replace('href="/en/notes/astrofall-playtest/"','href="'+article+'"');
+ const firstPaint={
+  'loader-title':labels.title,'loader-status':labels.loadSteps[0],'t-badge':labels.badge,
+  't-main':labels.title,'t-sub':labels.sub,'btn-start':labels.start,'btn-continue':labels.cont,
+  'btn-title-settings':labels.settings,'game-article':labels.gameArticle
+ };
+ write(route+'index.html',html.replace(/(id="([^"]+)"[^>]*>)[^<]*(?=<\/)/g,(text,open,id)=>
+  Object.hasOwn(firstPaint,id) ? open+escape(firstPaint[id]) : text));
+ write(route+'classic/index.html','<!doctype html><html lang="'+htmlLanguages[locale]+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url='+destination+'"><title>'+escape(labels.title)+'</title></head><body><a href="'+destination+'">'+escape(labels.title)+'</a></body></html>');
+ write(route+'sw.js',gameWorker.replace('__REVISION__',gameRevision).replace('__PRECACHE__',JSON.stringify(gameAssets.map(gameAsset))));
+ write(route+'manifest.webmanifest',JSON.stringify({...gameManifest,name:labels.title,short_name:labels.title,description,lang:htmlLanguages[locale],
+  start_url:'./',icons:gameManifest.icons.map(icon=>({...icon,src:gameAsset(icon.src)}))},null,2)+'\n');
 }
 const home=read('templates/home.html');
 const atlas=read('templates/food-map.html').replace('</head>','<link rel="stylesheet" href="/assets/map-tools.css"></head>');

@@ -1,9 +1,9 @@
 {
   "name": "Astrofall Observatory",
   "short_name": "Astrofall",
-  "description": "A hand-drawn H5 puzzle platformer about impact, light and gravity.",
+  "description": "Explore 25 connected rooms through landing impact, light, and momentum.",
   "lang": "en",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "landscape",
