@@ -33,6 +33,18 @@
     ],
     "projects#astrofall-observatory": [
       "software"
+    ],
+    "notes/spleeter-local": [
+      "software"
+    ],
+    "projects#spleeter-local": [
+      "software"
+    ],
+    "notes/magic-eraser": [
+      "software"
+    ],
+    "projects#magic-eraser": [
+      "software"
     ]
   }
 }
