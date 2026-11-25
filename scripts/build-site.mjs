@@ -44,7 +44,10 @@ const revisionHash=createHash('sha256');
 for(const text of [gameShell,gameWorker,JSON.stringify(gameManifest),JSON.stringify(gameDescriptions)]){
  revisionHash.update(text.replace(/\r\n/g,'\n'));
 }
-for(const asset of gameAssets)revisionHash.update(fs.readFileSync(path.join(root,gameAssetRoot,asset)));
+for(const asset of gameAssets){
+ const bytes=fs.readFileSync(path.join(root,gameAssetRoot,asset));
+ revisionHash.update(/\.(?:js|css)$/.test(asset) ? bytes.toString('utf8').replace(/\r\n/g,'\n') : bytes);
+}
 const gameRevision=revisionHash.digest('hex').slice(0,12);
 const gameAsset=asset=>'/assets/night-observatory/'+asset+'?v='+gameRevision;
 
