@@ -121,6 +121,21 @@
   const campaignText = index => campaignWords[state.lang][index];
   const hasMainSeals = () => mainSeals.every(id => state.puzzles.includes(id));
   const portalOpen = portal => portal.needs.every(id => state.puzzles.includes(id));
+  const portalWords = {
+    zh: ['先完成','走左侧标有这些房名的门','走右侧标有这些房名的门','机关已完成'],
+    en: ['Still needed','Use the doors to the left marked with these room names','Use the doors to the right marked with these room names','circuits restored'],
+    ru: ['Осталось пройти','Воспользуйтесь дверями слева с этими названиями','Воспользуйтесь дверями справа с этими названиями','цепей восстановлено'],
+    ja: ['先にクリア','左側にある該当する部屋名の扉へ','右側にある該当する部屋名の扉へ','回路復旧'],
+  };
+  function explainLockedPortal(portal) {
+    const words = portalWords[state.lang];
+    const missing = portal.needs.filter(id => !state.puzzles.includes(id));
+    const names = missing.map(id => ROOMS[id].name[state.lang]).join(' / ');
+    const back = missing.map(id => currentRoom.portals.find(exit => exit.to === id && portalOpen(exit)));
+    const left = back.every(exit => exit && exit.x < portal.x);
+    const right = back.every(exit => exit && exit.x > portal.x);
+    showToast(words[0] + ' · ' + names + (left || right ? ' · ' + words[left ? 1 : 2] : ''), 5500);
+  }
   const languages = ['zh','en','ru','ja'];
   const routeLocale = document.documentElement.dataset.locale;
   const previewText = {
@@ -1039,7 +1054,7 @@
       const distance = part => Math.hypot(P.x + P.w / 2 - part.x, P.y + P.h / 2 - part.y);
       if (portal && (!part || state.puzzles.includes(currentRoom.id) || distance(portal) < distance(part))) {
         if (portalOpen(portal)) enterRoom(portal.to, portal.tx, undefined, true);
-        else showToast(campaignText(7));
+        else explainLockedPortal(portal);
         return;
       }
       if (part) energize(part);
@@ -1315,7 +1330,15 @@
       ctx.fillText(open ? 'E' : '·',portal.x,portal.y+6);
       if (nearPoint(portal.x,portal.y,70,100)) {
         ctx.font = '700 15px system-ui';
-        ctx.fillText(ROOMS[portal.to].name[state.lang],Math.max(135,Math.min(W-135,portal.x)),portal.y-36,270);
+        const labelX = Math.max(135,Math.min(W-135,portal.x));
+        ctx.fillText(ROOMS[portal.to].name[state.lang],labelX,portal.y-36,270);
+        if (!open) {
+          const restored = portal.needs.filter(id => state.puzzles.includes(id)).length;
+          ctx.fillStyle = '#f4d4a1';
+          ctx.font = '600 12px system-ui';
+          ctx.fillText(restored + '/' + portal.needs.length + ' · ' + portalWords[state.lang][3],
+            labelX,portal.y-55,270);
+        }
       }
     }
 

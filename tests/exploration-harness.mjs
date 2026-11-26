@@ -32,6 +32,7 @@ export function loadGame(asset = new URL('../dist/assets/night-observatory/explo
         get player() { return P; },
         start: () => startGame(true),
         get state() { return state; },
+        get toast() { return document.getElementById('toast').textContent; },
         get ending() { return document.getElementById('end-badge').textContent; },
         step(axis, jump = false, act = false) {
           Object.assign(keys,{left:axis < 0, right:axis > 0, jump, jumpJust:jump, actJust:act});

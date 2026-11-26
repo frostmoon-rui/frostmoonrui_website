@@ -103,3 +103,27 @@ test('a completed fork returns to the rotunda once its seal is restored',()=>{
   game.step(0,false,true);
   assert.equal(game.state.roomId,'H1');
 });
+
+test('the Mirror gate names unfinished branches and opens after both are solved',()=>{
+  const game=loadGame();
+  game.start();
+  game.state.lang='zh';
+  game.enter('A4-4');
+  solve(game,'A4-4');
+  game.enter('A4-4',844);
+  game.step(0,false,true);
+  assert.equal(game.state.roomId,'A4-4');
+  assert.match(game.toast,/弹道.*循序.*走左侧/);
+  walkThrough(game,'A4-3');
+  solve(game,'A4-3');
+  walkThrough(game,'A4-4');
+  game.enter('A4-4',844);
+  game.step(0,false,true);
+  assert.match(game.toast,/弹道/);
+  assert.doesNotMatch(game.toast,/循序/);
+  walkThrough(game,'A4-2');
+  game.enter('A4-2');
+  solve(game,'A4-2');
+  walkThrough(game,'A4-4');
+  walkThrough(game,'A4-5');
+});
