@@ -77,6 +77,7 @@ export function createArena(mode, resume = {}) {
     const player = players.get(id);
     if (!player) return;
     player.lastInput=clock;
+    if (Number.isSafeInteger(value.seq) && value.seq>0) player.inputSeq=value.seq;
     player.jumpQueued ||= value.jump === true && !player.input.jump;
     player.actQueued ||= value.act === true && !player.input.act;
     player.input = {axis:[-1,0,1].includes(value.axis) ? value.axis : 0,
@@ -85,7 +86,7 @@ export function createArena(mode, resume = {}) {
   function activePlatforms(index, player, party) {
     const course = courseAt(index,mode);
     if (!course) return [];
-    if (mode === 'relay' && index > 0 && players.size > 1) {
+    if (mode === 'relay' && index > 0 && party.length > 1) {
       const [from,to] = course.gap;
       const supported = party.some(other =>
         other.id !== player.id && other.role !== player.role && other.input.link &&
@@ -175,13 +176,38 @@ export function createArena(mode, resume = {}) {
         p.input=neutral();
       }
     }
-    for (const p of party) move(p,dt,party);
+    for (const p of party) {
+      move(p,dt,party);
+      p.ack=p.inputSeq;
+      p.heldJump=p.input.jump;
+    }
     if (mode === 'relay') advanceGate(party,dt);
     for (const p of party) {p.jumpQueued=false;p.actQueued=false;}
   }
   function snapshot() {
     return {mode,clock,checkpoint,hold,relayStep,relayTime,complete,
-      players:[...players.values()].map(({id,role,x,y,vx,best,spawnId,input}) => ({id,role,x,y,vx,best,spawnId,link:input.link}))};
+      players:[...players.values()].map(({id,role,x,y,vx,vy,ground,coyote,buffer,cooldown,runCheckpoint,best,spawnId,input,ack,heldJump}) =>
+        ({id,role,x,y,vx,vy,ground,coyote,buffer,cooldown,runCheckpoint,best,spawnId,link:input.link,ack,heldJump}))};
   }
-  return {join,leave,input,step,snapshot,get size(){return players.size;},get checkpoint(){return checkpoint;},get complete(){return complete;}};
+  function predict(state,id) {
+    clock=state.clock;
+    const party=state.players.map(player=>({...player,input:{...neutral(),link:player.link,jump:player.heldJump===true}}));
+    const player=party.find(item=>item.id===id);
+    if(!player || typeof player.ground!=='boolean') return null;
+    const spawnId=player.spawnId;
+    return {
+      player,
+      advance(dt,controls,jumpEdge=false){
+        if(!dt || player.spawnId!==spawnId) return;
+        clock+=dt;
+        const was=player.input.jump;
+        player.input={axis:controls.axis,jump:controls.jump,link:controls.link,act:false};
+        player.jumpQueued=jumpEdge || (controls.jump && !was);
+        const before={x:player.x,y:player.y};
+        move(player,dt,party);
+        if(player.spawnId!==spawnId) Object.assign(player,before);
+      },
+    };
+  }
+  return {join,leave,input,step,snapshot,predict,get size(){return players.size;},get checkpoint(){return checkpoint;},get complete(){return complete;}};
 }

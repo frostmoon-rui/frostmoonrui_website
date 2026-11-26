@@ -31,7 +31,7 @@ const copy = {
 };
 const requestedLocale=params.get('lang') || document.documentElement.dataset.locale;
 let lang=Object.hasOwn(copy,requestedLocale)?requestedLocale:'en';
-let socket,id,state;
+let socket,id,state,sequence=0;
 const canvas=$('game'), ctx=canvas.getContext('2d',{alpha:false});
 const motion=createMotion(), courseAt=cacheSegments();
 let paintFrame=0, lastPulse=-Infinity, inputActiveUntil=0, statusUpdate=0;
@@ -64,8 +64,10 @@ $('language').addEventListener('change',()=>{
 
 function publish() {
   if(socket?.readyState!==WebSocket.OPEN || socket.bufferedAmount>2048) return;
-  socket.send(JSON.stringify({axis:axis(),jump:input.jump,link:input.link,act:input.act}));
+  const seq=++sequence;
   lastPulse=performance.now();
+  motion.track(seq,lastPulse);
+  socket.send(JSON.stringify({axis:axis(),jump:input.jump,link:input.link,act:input.act,seq}));
 }
 const axis=()=>Number(input.right)-Number(input.left);
 function pulse(){
@@ -78,12 +80,14 @@ function pulse(){
 // Only visible players keep the room running. Non-driving peers send fewer idle packets.
 setInterval(pulse,30);
 function changedInput(){
-  inputActiveUntil=performance.now()+750;
+  const now=performance.now();
+  inputActiveUntil=now+750;
+  motion.control({axis:axis(),jump:input.jump,link:input.link},now);
   publish();
 }
 function clear(){
   Object.keys(input).forEach(name=>{input[name]=false;});
-  publish();
+  changedInput();
 }
 function key(event, down){
   if(['INPUT','SELECT','BUTTON'].includes(event.target?.tagName) && down) return;
@@ -102,7 +106,7 @@ document.addEventListener('visibilitychange',()=>{
     paintFrame=0;
     motion.reset();
   } else {
-    if(state) motion.push(state,performance.now());
+    if(state) motion.push(state,performance.now(),id);
     publish();
     scheduleDraw();
   }
@@ -149,7 +153,7 @@ $('lobby').addEventListener('submit',event=>{
     if(message.type==='welcome') id=message.id;
     else if(Array.isArray(message.players)){
       state=message;
-      if(!document.hidden) motion.push(state,performance.now());
+      if(!document.hidden) motion.push(state,performance.now(),id);
     }
     scheduleDraw();
   });
@@ -187,7 +191,7 @@ function scheduleDraw(){
 }
 function draw(now){
   paintFrame=0;
-  const view=motion.sample(now,id,axis());
+  const view=motion.sample(now,id);
   const players=view?.players||[];
   const me=players.find(p=>p.id===id);
   const camera=Math.max(0,(me?.x||0)-365);
