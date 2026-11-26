@@ -22,7 +22,10 @@
   </nav>
   <section aria-label="Game">
     <div id="status" role="status"></div>
-    <canvas id="game" width="960" height="540" aria-label="Observatory multiplayer stage"></canvas>
+    <div class="stage">
+      <canvas id="game" width="960" height="540" aria-label="Observatory multiplayer stage"></canvas>
+      <div id="respawn" role="status" hidden></div>
+    </div>
     <p id="hint"></p>
     <div id="controls">
       <div><button data-input="left" aria-label="Left">◀</button><button data-input="right" aria-label="Right">▶</button></div>

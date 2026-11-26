@@ -7,6 +7,7 @@ export const TICK = 1 / 30;
 const GROUND = 476;
 const WIDTH = 26;
 const BODY = 34;
+const RUNNER_RESPAWN_DELAY = .9;
 const COURSE = [
   {gap:[245,352], shelves:[[368,395,83]], gate:'plates'},
   {gap:[180,350], shelves:[[250,438,54],[393,398,100]], gate:'roles'},
@@ -62,7 +63,7 @@ export function createArena(mode, resume = {}) {
   let hold = 0, relayTime = 0, relayStep = 0, serial = 0, complete = resume.complete === true;
   const spawn = (player, level) => {
     Object.assign(player,{x:level*SPAN+42,y:GROUND-BODY,vx:0,vy:0,ground:true,coyote:.12,
-      pushed:false,support:null,buffer:0,runCheckpoint:level,spawnId:(player.spawnId || 0)+1});
+      pushed:false,support:null,buffer:0,respawnAt:null,runCheckpoint:level,spawnId:(player.spawnId || 0)+1});
   };
   function join(id) {
     if (players.size >= MAX_PLAYERS || players.has(id)) return false;
@@ -99,6 +100,10 @@ export function createArena(mode, resume = {}) {
     return course.platforms;
   }
   function move(p, dt, party) {
+    if (p.respawnAt!=null) {
+      if (clock>=p.respawnAt) spawn(p,p.runCheckpoint);
+      return;
+    }
     p.cooldown=Math.max(0,p.cooldown-dt);
     p.buffer=p.jumpQueued ? .16 : Math.max(0,p.buffer-dt);
     p.coyote=p.ground ? .12 : Math.max(0,p.coyote-dt);
@@ -140,9 +145,15 @@ export function createArena(mode, resume = {}) {
     const hazardLive = Math.sin(clock*2.3+index) > .12;
     const hit = obstacle && hazardLive && overlaps(p.x,WIDTH,obstacle.x,obstacle.x+obstacle.w) &&
       p.y+BODY > obstacle.y && p.y < obstacle.y+obstacle.h;
-    if (p.y > HEIGHT+48 || hit) spawn(p,mode === 'runner' ? p.runCheckpoint : checkpoint);
-    else if (mode === 'runner' && Math.trunc(before/SPAN)<index && p.ground) p.runCheckpoint=index;
-    if (mode === 'runner' && p.ground && p.x % SPAN < 100) p.runCheckpoint=index;
+    if (p.y > HEIGHT+48 || hit) {
+      if (mode === 'runner') {
+        p.respawnAt=clock+RUNNER_RESPAWN_DELAY;
+        p.vx=p.vy=0;
+      } else spawn(p,checkpoint);
+    } else if (mode === 'runner' && landing && p.x % SPAN < 100 && landing.x===index*SPAN) {
+      // Save only once the runner actually lands on the next safe starting platform.
+      p.runCheckpoint=index;
+    }
     p.best=Math.max(p.best,Math.round(p.x));
   }
   function advanceGate(party,dt) {
@@ -189,8 +200,8 @@ export function createArena(mode, resume = {}) {
   }
   function snapshot() {
     return {mode,clock,checkpoint,hold,relayStep,relayTime,complete,
-      players:[...players.values()].map(({id,role,x,y,vx,vy,ground,coyote,buffer,cooldown,runCheckpoint,best,spawnId,input,ack,heldJump}) =>
-        ({id,role,x,y,vx,vy,ground,coyote,buffer,cooldown,runCheckpoint,best,spawnId,link:input.link,ack,heldJump}))};
+      players:[...players.values()].map(({id,role,x,y,vx,vy,ground,coyote,buffer,cooldown,runCheckpoint,best,spawnId,respawnAt,input,ack,heldJump}) =>
+        ({id,role,x,y,vx,vy,ground,coyote,buffer,cooldown,runCheckpoint,best,spawnId,respawnAt,link:input.link,ack,heldJump}))};
   }
   function predict(state,id) {
     clock=state.clock;
@@ -201,7 +212,7 @@ export function createArena(mode, resume = {}) {
     return {
       player,
       advance(dt,controls,jumpEdge=false){
-        if(!dt || player.spawnId!==spawnId) return;
+        if(!dt || player.spawnId!==spawnId || player.respawnAt!=null) return;
         clock+=dt;
         const was=player.input.jump;
         player.input={axis:controls.axis,jump:controls.jump,link:controls.link,act:false};

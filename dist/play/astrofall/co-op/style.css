@@ -31,3 +31,7 @@ main[data-mode="platform"] #controls [data-input="act"]{display:none}
  #controls{position:fixed;bottom:max(.45rem,env(safe-area-inset-bottom));left:0;right:0;pointer-events:none}
  #controls button{pointer-events:auto}
 }
+
+.stage{position:relative}
+#respawn:not([hidden]){position:absolute;inset:0;display:grid;place-items:center;background:#101931b3;color:#fff0d6;font-weight:700;pointer-events:none}
+#controls[inert]{opacity:.48}

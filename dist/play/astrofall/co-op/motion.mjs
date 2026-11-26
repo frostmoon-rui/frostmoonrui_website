@@ -77,10 +77,11 @@ export function createMotion() {
       oneWay=oneWay ? blend(oneWay,measured,.20) : measured;
     }
     const sameSpawn=local?.id===id && local.spawnId===player.spawnId;
-    if(prediction && sameSpawn && !newAck) return;
+    const confirmedFall=player.respawnAt!=null && local?.respawnAt==null;
+    if(prediction && sameSpawn && !newAck && !confirmedFall) return;
     prediction=createArena(state.mode,state).predict(state,id);
     // A confirmed respawn or room transition always wins over local prediction.
-    if(!sameSpawn || !newAck){
+    if(!sameSpawn || confirmedFall || !newAck){
       offsetX=offsetY=0;
       local={...player};
       return;
@@ -130,7 +131,8 @@ export function createMotion() {
           }
           const decay=Math.exp(-dt/85);
           offsetX*=decay;offsetY*=decay;
-          local={...player,x:prediction.player.x+offsetX,y:prediction.player.y+offsetY,link:controls.link};
+          local={...player,x:prediction.player.x+offsetX,y:prediction.player.y+offsetY,link:controls.link,
+            respawnAt:player.respawnAt ?? prediction.player.respawnAt};
         } else {
           const sameSpawn=local?.id===id && local.spawnId===player.spawnId;
           const vx=player.vx || 0;

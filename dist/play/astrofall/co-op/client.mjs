@@ -47,12 +47,20 @@ const legacyModes={
   ja:['ジャンプレース','協力アクション','二段ジャンプで共通の障害を避けます。全員が脱落すると次のラウンドが始まります。',
     '連携ジャンプや共有スイッチ、チェックポイントを使い、全員で旗にたどり着こう。','スコア','旗に到達','全8ステージクリア'],
 };
+const runnerCopy={
+  en:['Returning to checkpoint…','Pink blocks are hazards. Numbered blocks are players. The white outline marks you.'],
+  zh:['正在返回检查点…','粉色小方块是障碍，带编号的是玩家，白色外框标出自己。'],
+  ru:['Возврат к контрольной точке…','Розовые блоки — препятствия. Блоки с номерами — игроки. Ваш выделен белой рамкой.'],
+  ja:['チェックポイントに戻っています…','ピンクのブロックは障害物、番号付きはプレイヤーです。白い枠が自分です。'],
+};
 const requestedLocale=params.get('lang') || document.documentElement.dataset.locale;
 let lang=Object.hasOwn(copy,requestedLocale)?requestedLocale:'en';
 let socket,id,state,sequence=0;
 const canvas=$('game'), ctx=canvas.getContext('2d',{alpha:false});
 const motion=createMotion(), courseAt=cacheSegments();
+let runnerWaiting=false;
 let paintFrame=0, lastPulse=-Infinity, inputActiveUntil=0, statusUpdate=0;
+const touchPointers=new Map();
 const input={left:false,right:false,jump:false,link:false,act:false};
 const colors=['#ffe4a9','#96eadc','#f3a6c3','#9abdf4','#c4a5ec','#ebad84'];
 const text=index=>copy[lang][index];
@@ -114,12 +122,16 @@ function changedInput(){
 }
 function clear(){
   Object.keys(input).forEach(name=>{input[name]=false;});
+  for(const [button,pointer] of touchPointers){
+    touchPointers.delete(button);
+    if(button.hasPointerCapture(pointer)) button.releasePointerCapture(pointer);
+  }
   changedInput();
 }
 function key(event, down){
   if(['INPUT','SELECT','BUTTON'].includes(event.target?.tagName) && down) return;
   const name=controls[event.code];
-  if(!name || socket?.readyState!==WebSocket.OPEN) return;
+  if(!name || runnerWaiting || socket?.readyState!==WebSocket.OPEN) return;
   event.preventDefault();
   if(input[name]!==down){input[name]=down;changedInput();}
 }
@@ -140,17 +152,16 @@ document.addEventListener('visibilitychange',()=>{
 });
 for(const button of document.querySelectorAll('[data-input]')){
   const name=button.dataset.input;
-  let owner=null;
   button.addEventListener('pointerdown',event=>{
     event.preventDefault();
-    if(owner!==null) return;
-    owner=event.pointerId;
-    button.setPointerCapture(owner);
+    if(touchPointers.has(button) || runnerWaiting) return;
+    touchPointers.set(button,event.pointerId);
+    button.setPointerCapture(event.pointerId);
     input[name]=true;changedInput();
   });
   for(const type of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(type,event=>{
-    if(owner!==event.pointerId) return;
-    owner=null;input[name]=false;changedInput();
+    if(touchPointers.get(button)!==event.pointerId) return;
+    touchPointers.delete(button);input[name]=false;changedInput();
   });
   button.addEventListener('contextmenu',event=>event.preventDefault());
 }
@@ -225,8 +236,17 @@ function draw(now){
   const view=motion.sample(now,id);
   const players=view?.players||[];
   const me=players.find(p=>p.id===id);
-  const camera=Math.max(0,(me?.x||0)-365);
   const layout=state?.mode||'relay';
+  const waiting=layout==='runner' && me?.respawnAt!=null;
+  if(waiting!==runnerWaiting){
+    runnerWaiting=waiting;
+    if(waiting) clear();
+    if(!waiting && document.activeElement?.closest('#controls')) document.activeElement.blur();
+    $('respawn').hidden=!waiting;
+    $('controls').inert=waiting;
+  }
+  if(waiting && $('respawn').textContent!==runnerCopy[lang][0]) $('respawn').textContent=runnerCopy[lang][0];
+  const camera=Math.max(0,(me?.x||0)-365);
   const parallax=Math.floor(camera*.13)%960;
   ctx.drawImage(sky,-parallax,0);
   if(parallax) ctx.drawImage(sky,960-parallax,0);
@@ -262,7 +282,10 @@ function draw(now){
     }
   }
   for(const [index,p] of players.entries()){
-    if(p.x < camera-60 || p.x > camera+1020) continue;
+    if(p.respawnAt!=null || p.x < camera-60 || p.x > camera+1020) continue;
+    if(layout==='runner' && p.id===id){
+      ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(p.x-3,p.y-3,32,40,10);ctx.stroke();
+    }
     if(p.link){ctx.strokeStyle=p.role?'#ad9dff':'#c0eade';ctx.beginPath();ctx.arc(p.x+13,p.y+17,25,0,Math.PI*2);ctx.stroke();}
     ctx.fillStyle=colors[index];ctx.beginPath();ctx.roundRect(p.x,p.y,26,34,8);ctx.fill();
     ctx.fillStyle='#14243b';ctx.fillRect(p.x+4,p.y+11,18,9);
@@ -283,7 +306,7 @@ function draw(now){
       `${state.checkpoint+1}/${LENGTH}`+(type==='relay' && state.relayTime ? ' · '+Math.ceil(state.relayTime)+' s · '+(state.relayStep+1) : '')}`
     : text(status);
   const hint=layout==='jump'?legacy[2]:layout==='platform'?(state.complete?legacy[6]:legacy[3]):
-    state?text(state.complete?16:layout==='runner'?15:type==='relay'?14:13):'';
+    layout==='runner'?text(15)+' '+runnerCopy[lang][1]:state?text(state.complete?16:type==='relay'?14:13):'';
   if(stats!==prevStatus){$('status').textContent=stats;prevStatus=stats;}
   if(hint!==prevHint){$('hint').textContent=hint;prevHint=hint;}
 }
