@@ -53,12 +53,19 @@ const runnerCopy={
   ru:['Возврат к контрольной точке…','Розовые блоки — препятствия. Блоки с номерами — игроки. Ваш выделен белой рамкой.'],
   ja:['チェックポイントに戻っています…','ピンクのブロックは障害物、番号付きはプレイヤーです。白い枠が自分です。'],
 };
+const relayCopy={
+  en:['Stand on station {n}, then press F or select Act.','Waiting for station {n}.','Station {n} ready. Press F or select Act.'],
+  zh:['站上 {n} 号站，再按 F 或点「互动」。','等 {n} 号玩家先互动。','{n} 号站就绪，按 F 或点「互动」。'],
+  ru:['Встаньте на площадку {n} и нажмите F или кнопку «Действие».','Ожидаем игрока {n}.','Площадка {n} готова. Нажмите F или кнопку «Действие».'],
+  ja:['{n}番の台に立ち、Fキーか「操作」を押します。','{n}番の操作を待っています。','{n}番の台の準備完了。Fキーか「操作」を押します。'],
+};
 const requestedLocale=params.get('lang') || document.documentElement.dataset.locale;
 let lang=Object.hasOwn(copy,requestedLocale)?requestedLocale:'en';
 let socket,id,state,sequence=0;
 const canvas=$('game'), ctx=canvas.getContext('2d',{alpha:false});
 const motion=createMotion(), courseAt=cacheSegments();
-let runnerWaiting=false;
+let runnerWaiting=false, actRelease=0;
+let camera=0, previousCameraTime=0, cameraSpawn;
 let paintFrame=0, lastPulse=-Infinity, inputActiveUntil=0, statusUpdate=0;
 const touchPointers=new Map();
 const input={left:false,right:false,jump:false,link:false,act:false};
@@ -79,6 +86,7 @@ function applyLanguage(){
   }
   $('mode').options[0].textContent=text(3); $('mode').options[1].textContent=text(4);
   for(const [index,mode] of LEGACY_MODES.entries()) $('mode').querySelector('option[value="'+mode+'"]').textContent=legacyModes[lang][index];
+  $('relay-act').textContent=text(8);
   $('language').value=lang; document.title=text(0);
   const [label,jump,platform]=legacyLabels[lang];
   $('legacy-games').setAttribute('aria-label',label);
@@ -121,6 +129,7 @@ function changedInput(){
   publish();
 }
 function clear(){
+  clearTimeout(actRelease);
   Object.keys(input).forEach(name=>{input[name]=false;});
   for(const [button,pointer] of touchPointers){
     touchPointers.delete(button);
@@ -129,8 +138,9 @@ function clear(){
   changedInput();
 }
 function key(event, down){
-  if(['INPUT','SELECT','BUTTON'].includes(event.target?.tagName) && down) return;
+  if(['INPUT','SELECT'].includes(event.target?.tagName) && down) return;
   const name=controls[event.code];
+  if(name==='jump' && event.target?.closest('button') && down) return;
   if(!name || runnerWaiting || socket?.readyState!==WebSocket.OPEN) return;
   event.preventDefault();
   if(input[name]!==down){input[name]=down;changedInput();}
@@ -149,6 +159,12 @@ document.addEventListener('visibilitychange',()=>{
     publish();
     scheduleDraw();
   }
+});
+$('relay-act').addEventListener('click',()=>{
+  if(socket?.readyState!==WebSocket.OPEN || input.act) return;
+  input.act=true;
+  changedInput();
+  actRelease=setTimeout(()=>{input.act=false;changedInput();},120);
 });
 for(const button of document.querySelectorAll('[data-input]')){
   const name=button.dataset.input;
@@ -171,7 +187,7 @@ $('lobby').addEventListener('submit',event=>{
   const mode=$('mode').value, room=$('room').value.trim().toLowerCase();
   document.querySelector('main').dataset.mode=mode;
   if(!/^[a-z0-9-]{3,24}$/.test(room)) return;
-  status=10;state=null;id=null;lastPulse=-Infinity;
+  status=10;state=null;id=null;lastPulse=-Infinity;previousCameraTime=0;
   motion.reset();
   scheduleDraw();
   $('invite').hidden=true;
@@ -246,8 +262,13 @@ function draw(now){
     $('controls').inert=waiting;
   }
   if(waiting && $('respawn').textContent!==runnerCopy[lang][0]) $('respawn').textContent=runnerCopy[lang][0];
-  const camera=Math.max(0,(me?.x||0)-365);
-  const parallax=Math.floor(camera*.13)%960;
+  const targetCamera=Math.max(0,(me?.x||0)-365);
+  const elapsed=now-previousCameraTime;
+  if(!previousCameraTime || cameraSpawn!==me?.spawnId) camera=targetCamera;
+  else if(elapsed>0) camera+=(targetCamera-camera)*(1-Math.exp(-Math.min(elapsed,50)/82));
+  previousCameraTime=now;
+  cameraSpawn=me?.spawnId;
+  const parallax=camera*.13%960;
   ctx.drawImage(sky,-parallax,0);
   if(parallax) ctx.drawImage(sky,960-parallax,0);
   if(view && LEGACY_MODES.includes(layout)) drawLegacy(ctx,view,me,colors);
@@ -273,8 +294,13 @@ function draw(now){
         ctx.fillStyle='#72d5d2';ctx.fillRect(from,460,to-from,6);
       }
       for(const [i,plate] of gatePads(n,players.length).entries()){
-        ctx.fillStyle=colors[i];ctx.fillRect(plate.x,plate.y-3,plate.w,4);
-        ctx.strokeStyle=colors[i];ctx.strokeRect(plate.x,plate.y-63,plate.w,60);
+        const relay=course.gate==='relay';
+        const done=relay && i<state.relayStep;
+        const ready=relay && i===state.relayStep && state.relayStations?.[i];
+        const color=done||ready?'#91efd1':colors[i];
+        ctx.fillStyle=color;ctx.fillRect(plate.x,plate.y-3,plate.w,4);
+        if(ready){ctx.fillStyle='#91efd133';ctx.fillRect(plate.x,plate.y-63,plate.w,60);}
+        ctx.strokeStyle=color;ctx.strokeRect(plate.x,plate.y-63,plate.w,60);
         ctx.font='700 21px system-ui';ctx.fillText(String(i+1),plate.x+10,plate.y-66);
       }
       ctx.fillStyle=state.complete?'#86e3c3':'#c7a36d';
@@ -295,7 +321,7 @@ function draw(now){
   ctx.restore();
   }
   if(state) scheduleDraw();
-  if(state?.mode==='runner' && now<nextHud && statusUpdate===players.length) return;
+  if(now<nextHud && statusUpdate===players.length) return;
   nextHud=now+180;statusUpdate=players.length;
   const type=state&&courseAt(state.checkpoint,'relay')?.gate;
   const legacy=legacyModes[lang];
@@ -305,8 +331,17 @@ function draw(now){
     ? `${players.length}/6 ${text(12)} · ${layout==='runner' ? text(17)+' '+Math.floor((me?.best||0)/10)+' m' :
       `${state.checkpoint+1}/${LENGTH}`+(type==='relay' && state.relayTime ? ' · '+Math.ceil(state.relayTime)+' s · '+(state.relayStep+1) : '')}`
     : text(status);
+  const isRelayStation=layout==='relay' && type==='relay' && !state.complete;
+  const action=$('relay-act');
+  if(action.hidden===isRelayStation) action.hidden=!isRelayStation;
+  const slot=players.findIndex(p=>p.id===id);
+  const turn=state?.relayStep;
+  const ready=isRelayStation && slot===turn && state.relayStations?.[slot];
+  action.classList.toggle('ready',Boolean(ready));
+  const relayHint=isRelayStation && slot>=0 ? relayCopy[lang][slot!==turn?1:ready?2:0]
+    .replace('{n}',String((slot!==turn?turn:slot)+1)) : '';
   const hint=layout==='jump'?legacy[2]:layout==='platform'?(state.complete?legacy[6]:legacy[3]):
-    layout==='runner'?text(15)+' '+runnerCopy[lang][1]:state?text(state.complete?16:type==='relay'?14:13):'';
+    layout==='runner'?text(15)+' '+runnerCopy[lang][1]:state?(relayHint||text(state.complete?16:type==='relay'?14:13)):'';
   if(stats!==prevStatus){$('status').textContent=stats;prevStatus=stats;}
   if(hint!==prevHint){$('hint').textContent=hint;prevHint=hint;}
 }

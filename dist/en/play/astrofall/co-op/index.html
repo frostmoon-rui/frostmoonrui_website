@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <title>Observatory Co-op</title>
-<link rel="stylesheet" href="/play/astrofall/co-op/style.css?v=60dcfed49410">
+<link rel="stylesheet" href="/play/astrofall/co-op/style.css?v=1247397b53bb">
 <main>
   <header>
     <div><a id="home" href="../">Astrofall Observatory</a><h1 id="title">Observatory Co-op</h1></div>
@@ -26,12 +26,12 @@
       <canvas id="game" width="960" height="540" aria-label="Observatory multiplayer stage"></canvas>
       <div id="respawn" role="status" hidden></div>
     </div>
-    <p id="hint"></p>
+    <div class="stage-guide"><p id="hint"></p><button id="relay-act" type="button" hidden>Act</button></div>
     <div id="controls">
       <div><button data-input="left" aria-label="Left">◀</button><button data-input="right" aria-label="Right">▶</button></div>
       <div><button data-input="link" id="touch-link">Link</button><button data-input="act" id="touch-act">Act</button><button data-input="jump" aria-label="Jump">▲</button></div>
     </div>
   </section>
 </main>
-<script type="module" src="/play/astrofall/co-op/client.mjs?v=60dcfed49410"></script>
+<script type="module" src="/play/astrofall/co-op/client.mjs?v=1247397b53bb"></script>
 </html>

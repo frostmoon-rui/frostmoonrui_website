@@ -19,13 +19,14 @@ function advance(simulation,ms,input,jump=false){
 }
 
 export function createMotion() {
-  const history=[], sent=new Map(), changes=[];
+  const history=[], sent=new Map(), changes=[], remotePositions=new Map();
   let controls={axis:0,jump:false,link:false}, queuedJump=false;
   let prediction=null, local=null, lastFrame=0, remoteAt=null;
   let offsetX=0, offsetY=0, oneWay=0, ack=0, delay=BASE_DELAY;
 
   function clearFrames() {
     history.length=0;
+    remotePositions.clear();
     prediction=null;
     local=null;
     offsetX=offsetY=lastFrame=0;
@@ -101,8 +102,8 @@ export function createMotion() {
     advance(prediction,now-cursor,replayInput,jump);
     if(!changes.length || now>cursor) queuedJump=false;
     const dx=local.x-prediction.player.x, dy=local.y-prediction.player.y;
-    offsetX=Math.abs(dx)<110 ? dx : 0;
-    offsetY=Math.abs(dy)<85 ? dy : 0;
+    offsetX=Math.abs(dx)<110 && Math.abs(dx)>.4 ? dx : 0;
+    offsetY=Math.abs(dy)<85 && Math.abs(dy)>.4 ? dy : 0;
   }
 
   function sample(now,id,legacyAxis=controls.axis) {
@@ -113,15 +114,18 @@ export function createMotion() {
     const dt=clamp(frameGap,0,42);
     lastFrame=now;
     const age=clamp(now-newest.now,0,STALE_AFTER);
-    const target=state.clock+(age-delay)/1000;
+    // Keep a small amount of forward motion if a single update arrives late.
+    const horizon=state.clock+.065;
+    const target=Math.min(horizon,state.clock+(age-delay)/1000);
     if(remoteAt===null || frameGap>90) remoteAt=target;
     else remoteAt+=dt/1000*clamp(1+(target-remoteAt-dt/1000)*3,.73,1.25);
-    remoteAt=Math.min(remoteAt,state.clock);
+    remoteAt=Math.min(remoteAt,horizon);
     const toIndex=history.findIndex(frame=>frame.state.clock>=remoteAt);
     const to=toIndex<0 ? newest : history[toIndex];
     const from=toIndex<=0 ? to : history[toIndex-1];
     const span=to.state.clock-from.state.clock;
     const progress=span>0 ? clamp((remoteAt-from.state.clock)/span,0,1) : 1;
+    for(const playerId of remotePositions.keys()) if(!newest.players.has(playerId)) remotePositions.delete(playerId);
     const players=state.players.map(player=>{
       if(player.id===id) {
         if(prediction){
@@ -144,10 +148,20 @@ export function createMotion() {
         return local;
       }
       const a=from.players.get(player.id), b=to.players.get(player.id);
-      if(!a || !b || a.spawnId!==player.spawnId || b.spawnId!==player.spawnId) return player;
+      if(!a || !b || a.spawnId!==player.spawnId || b.spawnId!==player.spawnId){
+        remotePositions.delete(player.id);
+        return player;
+      }
       const va=Number.isFinite(a.velocity)?a.velocity*60:a.vy;
       const vb=Number.isFinite(b.velocity)?b.velocity*60:b.vy;
-      return {...player,x:curve(a.x,b.x,a.vx,b.vx,span,progress),y:curve(a.y,b.y,va,vb,span,progress)};
+      const lead=player.ground && player.respawnAt==null ? Math.max(0,remoteAt-state.clock) : 0;
+      const targetX=curve(a.x,b.x,a.vx,b.vx,span,progress)+(player.vx || 0)*lead;
+      const previous=remotePositions.get(player.id);
+      const correcting=previous && previous.spawnId===player.spawnId &&
+        (previous.lead>0 && lead===0 || previous.correcting && Math.abs(previous.x-targetX)>.6);
+      const x=correcting?blend(previous.x,targetX,1-Math.exp(-dt/52)):targetX;
+      remotePositions.set(player.id,{spawnId:player.spawnId,x,lead,correcting});
+      return {...player,x,y:curve(a.y,b.y,va,vb,span,progress)};
     });
     const renderAhead=Math.min(age+oneWay,185)/1000;
     const obstacles=state.mode==='jump' && state.obstacles?.map(o=>({...o,x:o.x-282*renderAhead}));

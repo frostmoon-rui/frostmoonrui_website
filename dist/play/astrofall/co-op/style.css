@@ -35,3 +35,8 @@ main[data-mode="platform"] #controls [data-input="act"]{display:none}
 .stage{position:relative}
 #respawn:not([hidden]){position:absolute;inset:0;display:grid;place-items:center;background:#101931b3;color:#fff0d6;font-weight:700;pointer-events:none}
 #controls[inert]{opacity:.48}
+
+.stage-guide{display:flex;align-items:center;justify-content:space-between;gap:.45rem}
+#relay-act{margin:.3rem .7rem .3rem 0;white-space:nowrap}
+#relay-act.ready{background:#27605a;border-color:#91efd1}
+@media(pointer:coarse){#relay-act{display:none}}

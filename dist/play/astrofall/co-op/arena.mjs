@@ -68,7 +68,7 @@ export function createArena(mode, resume = {}) {
   function join(id) {
     if (players.size >= MAX_PLAYERS || players.has(id)) return false;
     const leader = Math.max(0, ...Array.from(players.values(), player => player.runCheckpoint));
-    const player = {id, role:serial++ % 2, input:neutral(), lastInput:clock, jumpQueued:false, actQueued:false, best:0, cooldown:0};
+    const player = {id, role:serial++ % 2, input:neutral(), lastInput:clock, jumpQueued:false, actQueued:false, actUntil:0, best:0, cooldown:0};
     spawn(player,mode === 'runner' ? leader : Math.min(checkpoint,LENGTH-1));
     players.set(id,player);
     hold=0; relayStep=0; relayTime=0;
@@ -163,8 +163,16 @@ export function createArena(mode, resume = {}) {
     const right=pads.map((plate,i) => groundedOn(party[i],plate));
     if (type === 'relay') {
       relayTime=Math.max(0,relayTime-dt);
-      if (!relayTime) relayStep=0;
-      if (right[relayStep] && party[relayStep].actQueued) {
+      if (!relayTime && relayStep) {
+        relayStep=0;
+        for(const member of party) member.actUntil=0;
+      }
+      const player=party[relayStep];
+      const plate=pads[relayStep];
+      if (player.actQueued && overlaps(player.x,WIDTH,plate.x-6,plate.x+plate.w+6) &&
+          player.y+BODY>=plate.y-36) player.actUntil=clock+.2;
+      if (right[relayStep] && player.actUntil>=clock) {
+        player.actUntil=0;
         if (!relayStep) relayTime=6;
         relayStep++;
       }
@@ -179,7 +187,7 @@ export function createArena(mode, resume = {}) {
     else {
       checkpoint++;
       // Keep the party together and place future arrivals beyond the opened doors.
-      for (const player of party) spawn(player,checkpoint);
+      for (const player of party) {player.actUntil=0;spawn(player,checkpoint);}
     }
   }
   function step(dt) {
@@ -199,8 +207,11 @@ export function createArena(mode, resume = {}) {
     for (const p of party) {p.jumpQueued=false;p.actQueued=false;}
   }
   function snapshot() {
-    return {mode,clock,checkpoint,hold,relayStep,relayTime,complete,
-      players:[...players.values()].map(({id,role,x,y,vx,vy,ground,coyote,buffer,cooldown,runCheckpoint,best,spawnId,respawnAt,input,ack,heldJump}) =>
+    const party=[...players.values()];
+    const relayStations=mode==='relay' && COURSE[checkpoint].gate==='relay' ?
+      gatePads(checkpoint,players.size).map((plate,i)=>groundedOn(party[i],plate)) : undefined;
+    return {mode,clock,checkpoint,hold,relayStep,relayTime,complete,relayStations,
+      players:party.map(({id,role,x,y,vx,vy,ground,coyote,buffer,cooldown,runCheckpoint,best,spawnId,respawnAt,input,ack,heldJump}) =>
         ({id,role,x,y,vx,vy,ground,coyote,buffer,cooldown,runCheckpoint,best,spawnId,respawnAt,link:input.link,ack,heldJump}))};
   }
   function predict(state,id) {
