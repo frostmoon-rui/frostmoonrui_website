@@ -26,10 +26,11 @@
       <canvas id="game" width="960" height="540" aria-label="Observatory multiplayer stage"></canvas>
       <div id="respawn" role="status" hidden></div>
     </div>
-    <div class="stage-guide"><p id="hint"></p><button id="relay-act" type="button" hidden>Act</button></div>
+    <div class="stage-guide"><p id="hint"></p><div><button id="link-toggle" type="button" aria-pressed="false" hidden>Link</button><button id="relay-act" type="button" hidden>Act</button></div></div>
+    <p id="ability" role="status"></p>
     <div id="controls">
       <div><button data-input="left" aria-label="Left">◀</button><button data-input="right" aria-label="Right">▶</button></div>
-      <div><button data-input="link" id="touch-link">Link</button><button data-input="act" id="touch-act">Act</button><button data-input="jump" aria-label="Jump">▲</button></div>
+      <div><button data-input="link" id="touch-link" aria-pressed="false">Link</button><button data-input="act" id="touch-act">Act</button><button data-input="jump" aria-label="Jump">▲</button></div>
     </div>
   </section>
 </main>

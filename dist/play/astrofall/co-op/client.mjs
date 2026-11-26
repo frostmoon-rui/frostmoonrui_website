@@ -8,25 +8,25 @@ const params=new URLSearchParams(location.search);
 const copy = {
   en:['Observatory Co-op','Room code','Mode','Constellation Relay','Endless Run','Join','Copy invite','Link','Act',
     'Choose a room. Anyone with its code can join.', 'Connecting…','Room unavailable. Check the connection or try a different code.',
-    'players','Hold your numbered plate. Match colors to build bridges and hold Link near a partner to boost jumps.',
+    'players','Hold your numbered plate. Use Link near a gap to build a bridge, or with a nearby partner for a jump boost.',
     'Stand on your numbered station and press Act in order. Finish before the timer expires.',
     'Run together or race ahead. A/D or arrows change speed. Space jumps; E links and F acts.',
     'The constellation is complete. Invite someone to a new room or try Endless Run.', 'Best', 'Invite copied'],
   zh:['天文台联机','房间码','玩法','星座接力','无限跑酷','加入','复制邀请','合体','互动',
     '按房间码加入，同一房间可以随时进人。','正在连接…','连接失败或房间已满。请检查网络或换一个房间码。',
-    '人在线','站上自己的编号门。不同相位的搭档按住合体可铺光桥，靠近一起合体能跳得更高。',
+    '人在线','站上自己的编号门。在缺口前开启合体可铺光桥，两人在近处同时开启合体可跳得更高。',
     '站上自己的编号门，按顺序互动。在倒计时结束前完成接力。',
     '一起跑或赛跑。方向键调速，空格跳跃，E 合体，F 互动。',
     '已点亮星座。可以邀请新伙伴或挑战无限跑酷。','最远','已复制邀请链接'],
   ru:['Совместная обсерватория','Код комнаты','Режим','Эстафета созвездий','Бесконечный забег','Войти','Копировать приглашение','Связь','Действие',
     'В комнату можно войти по её коду в любой момент.','Подключение…','Комната недоступна. Проверьте связь или выберите другой код.',
-    'в комнате','Встаньте на свою плиту. Разные фазы создают мост. Удерживайте связь рядом с партнёром для высокого прыжка.',
+    'в комнате','Встаньте на свою плиту. Включите связь у края, чтобы появился мост. Вдвоём рядом вы прыгаете выше.',
     'Встаньте на свою плиту и нажимайте «Действие» по очереди до истечения времени.',
     'Бегите вместе или наперегонки. Стрелки меняют скорость, пробел — прыжок, E — связь, F — действие.',
     'Созвездие зажглось. Попробуйте новую комнату или бесконечный забег.','Рекорд','Приглашение скопировано'],
   ja:['天文台マルチプレイ','部屋コード','モード','星座リレー','エンドレスラン','参加','招待をコピー','連携','操作',
     '部屋コードがあれば途中からでも参加できます。','接続中…','部屋に接続できません。通信状態や部屋コードを確認してください。',
-    '人参加中','自分の番号の床を踏みます。異なる位相の仲間が連携すると橋が現れ、近くで同時に連携すると高く跳べます。',
+    '人参加中','自分の番号の床を踏みます。崖の手前で連携すると橋が現れ、仲間の近くで同時に連携すると高く跳べます。',
     '自分の番号の床に立ち、時間内に順番通りに操作してください。',
     '協力や競走ができます。矢印で速度、スペースでジャンプ、E で連携、F で操作。',
     '星座が完成しました。新しい部屋やエンドレスランでも遊べます。','最長','招待をコピーしました'],
@@ -59,12 +59,18 @@ const relayCopy={
   ru:['Встаньте на площадку {n} и нажмите F или кнопку «Действие».','Ожидаем игрока {n}.','Площадка {n} готова. Нажмите F или кнопку «Действие».'],
   ja:['{n}番の台に立ち、Fキーか「操作」を押します。','{n}番の操作を待っています。','{n}番の台の準備完了。Fキーか「操作」を押します。'],
 };
+const abilityCopy={
+  en:['Link on · waiting for a nearby partner','Linked · jump for a boost','Light bridge active','Link needs another player','Hold Link on your stations together.'],
+  zh:['已开启合体，等待附近队友','已合体，现在跳跃可增高','光桥已开启','合体需要另一名玩家','各自站上编号站，再一起保持合体。'],
+  ru:['Связь включена, ожидаем партнёра рядом','Связь установлена. Прыжок усилен.','Световой мост открыт','Для связи нужен партнёр','Займите свои площадки и включите связь вместе.'],
+  ja:['連携オン。近くの仲間を待っています。','連携成立。ジャンプが高くなります。','光の橋が開きました。','連携には仲間が必要です。','番号の台に立ち、一緒に連携してください。'],
+};
 const requestedLocale=params.get('lang') || document.documentElement.dataset.locale;
 let lang=Object.hasOwn(copy,requestedLocale)?requestedLocale:'en';
 let socket,id,state,sequence=0;
 const canvas=$('game'), ctx=canvas.getContext('2d',{alpha:false});
 const motion=createMotion(), courseAt=cacheSegments();
-let runnerWaiting=false, actRelease=0;
+let runnerWaiting=false, actRelease=0, action=0, linkLatched=false;
 let camera=0, previousCameraTime=0, cameraSpawn;
 let paintFrame=0, lastPulse=-Infinity, inputActiveUntil=0, statusUpdate=0;
 const touchPointers=new Map();
@@ -87,6 +93,7 @@ function applyLanguage(){
   $('mode').options[0].textContent=text(3); $('mode').options[1].textContent=text(4);
   for(const [index,mode] of LEGACY_MODES.entries()) $('mode').querySelector('option[value="'+mode+'"]').textContent=legacyModes[lang][index];
   $('relay-act').textContent=text(8);
+  $('link-toggle').textContent=text(7);
   $('language').value=lang; document.title=text(0);
   const [label,jump,platform]=legacyLabels[lang];
   $('legacy-games').setAttribute('aria-label',label);
@@ -105,19 +112,23 @@ $('language').addEventListener('change',()=>{
   scheduleDraw();
 });
 
+const linkHeld=()=>input.link || linkLatched;
+function showLink(){
+  for(const button of [$('touch-link'),$('link-toggle')]) button.setAttribute('aria-pressed',String(linkHeld()));
+}
 function publish() {
   if(socket?.readyState!==WebSocket.OPEN || socket.bufferedAmount>2048) return;
   const seq=++sequence;
   lastPulse=performance.now();
   motion.track(seq,lastPulse);
-  socket.send(JSON.stringify({axis:axis(),jump:input.jump,link:input.link,act:input.act,seq}));
+  socket.send(JSON.stringify({axis:axis(),jump:input.jump,link:linkHeld(),act:input.act,action,seq}));
 }
 const axis=()=>Number(input.right)-Number(input.left);
 function pulse(){
   if(document.hidden || socket?.readyState!==WebSocket.OPEN) return;
   const now=performance.now();
   const driving=['runner','jump'].includes(state?.mode) || state?.players[0]?.id===id ||
-    now<inputActiveUntil || Object.values(input).some(Boolean);
+    now<inputActiveUntil || linkHeld() || Object.values(input).some(Boolean);
   if(now-lastPulse >= (driving ? 57 : 155)) publish();
 }
 // Only visible players keep the room running. Non-driving peers send fewer idle packets.
@@ -125,11 +136,13 @@ setInterval(pulse,30);
 function changedInput(){
   const now=performance.now();
   inputActiveUntil=now+750;
-  motion.control({axis:axis(),jump:input.jump,link:input.link},now);
+  motion.control({axis:axis(),jump:input.jump,link:linkHeld()},now);
+  showLink();
   publish();
 }
 function clear(){
   clearTimeout(actRelease);
+  linkLatched=false;
   Object.keys(input).forEach(name=>{input[name]=false;});
   for(const [button,pointer] of touchPointers){
     touchPointers.delete(button);
@@ -143,6 +156,7 @@ function key(event, down){
   if(name==='jump' && event.target?.closest('button') && down) return;
   if(!name || runnerWaiting || socket?.readyState!==WebSocket.OPEN) return;
   event.preventDefault();
+  if(name==='act' && down && !input.act) action++;
   if(input[name]!==down){input[name]=down;changedInput();}
 }
 window.addEventListener('keydown',event=>key(event,true));
@@ -160,14 +174,24 @@ document.addEventListener('visibilitychange',()=>{
     scheduleDraw();
   }
 });
-$('relay-act').addEventListener('click',()=>{
-  if(socket?.readyState!==WebSocket.OPEN || input.act) return;
+for(const button of [$('touch-link'),$('link-toggle')]) button.addEventListener('click',()=>{
+  if(socket?.readyState!==WebSocket.OPEN || runnerWaiting) return;
+  linkLatched=!linkLatched;
+  changedInput();
+});
+function interact(){
+  if(socket?.readyState!==WebSocket.OPEN || runnerWaiting) return;
+  clearTimeout(actRelease);
+  action++;
   input.act=true;
   changedInput();
-  actRelease=setTimeout(()=>{input.act=false;changedInput();},120);
-});
+  actRelease=setTimeout(()=>{input.act=false;changedInput();},220);
+}
+$('relay-act').addEventListener('click',interact);
+$('touch-act').addEventListener('click',interact);
 for(const button of document.querySelectorAll('[data-input]')){
   const name=button.dataset.input;
+  if(name==='link' || name==='act') continue;
   button.addEventListener('pointerdown',event=>{
     event.preventDefault();
     if(touchPointers.has(button) || runnerWaiting) return;
@@ -290,8 +314,8 @@ function draw(now){
     }
     if(layout==='relay' && n===state?.checkpoint){
       const [from,to]=course.gap;
-      if(n>0 && me && players.some(p=>p.role!==me.role && p.link && p.x>=from-130 && p.x<from+10 && p.y>440)){
-        ctx.fillStyle='#72d5d2';ctx.fillRect(from,460,to-from,6);
+      if(state.bridge){
+        ctx.fillStyle='#72d5d2';ctx.fillRect(from,475,to-from,5);
       }
       for(const [i,plate] of gatePads(n,players.length).entries()){
         const relay=course.gate==='relay';
@@ -312,7 +336,7 @@ function draw(now){
     if(layout==='runner' && p.id===id){
       ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(p.x-3,p.y-3,32,40,10);ctx.stroke();
     }
-    if(p.link){ctx.strokeStyle=p.role?'#ad9dff':'#c0eade';ctx.beginPath();ctx.arc(p.x+13,p.y+17,25,0,Math.PI*2);ctx.stroke();}
+    if(p.link){ctx.strokeStyle=p.linked?'#75f5c8':p.role?'#ad9dff':'#c0eade';ctx.beginPath();ctx.arc(p.x+13,p.y+17,25,0,Math.PI*2);ctx.stroke();}
     ctx.fillStyle=colors[index];ctx.beginPath();ctx.roundRect(p.x,p.y,26,34,8);ctx.fill();
     ctx.fillStyle='#14243b';ctx.fillRect(p.x+4,p.y+11,18,9);
     ctx.fillStyle=p.role?'#edabff':'#80f4d5';ctx.fillRect(p.x+14,p.y+13,5,5);
@@ -332,16 +356,23 @@ function draw(now){
       `${state.checkpoint+1}/${LENGTH}`+(type==='relay' && state.relayTime ? ' · '+Math.ceil(state.relayTime)+' s · '+(state.relayStep+1) : '')}`
     : text(status);
   const isRelayStation=layout==='relay' && type==='relay' && !state.complete;
-  const action=$('relay-act');
-  if(action.hidden===isRelayStation) action.hidden=!isRelayStation;
+  const actButton=$('relay-act');
+  actButton.hidden=!isRelayStation;
+  $('touch-act').hidden=!isRelayStation && layout!=='runner';
+  $('link-toggle').hidden=!me || layout==='jump' || runnerWaiting;
   const slot=players.findIndex(p=>p.id===id);
   const turn=state?.relayStep;
   const ready=isRelayStation && slot===turn && state.relayStations?.[slot];
-  action.classList.toggle('ready',Boolean(ready));
+  actButton.classList.toggle('ready',Boolean(ready));
+  $('touch-act').classList.toggle('ready',Boolean(ready));
   const relayHint=isRelayStation && slot>=0 ? relayCopy[lang][slot!==turn?1:ready?2:0]
     .replace('{n}',String((slot!==turn?turn:slot)+1)) : '';
+  const ability=abilityCopy[lang];
+  const linkText=linkHeld() && me && layout!=='jump' ?
+    ability[players.length<2?3:me.linked?1:state.bridge?2:0] : '';
+  if($('ability').textContent!==linkText) $('ability').textContent=linkText;
   const hint=layout==='jump'?legacy[2]:layout==='platform'?(state.complete?legacy[6]:legacy[3]):
-    layout==='runner'?text(15)+' '+runnerCopy[lang][1]:state?(relayHint||text(state.complete?16:type==='relay'?14:13)):'';
+    layout==='runner'?text(15)+' '+runnerCopy[lang][1]:state?(relayHint||(type==='roles' && players.length>1 && !state.complete?ability[4]:text(state.complete?16:type==='relay'?14:13))):'';
   if(stats!==prevStatus){$('status').textContent=stats;prevStatus=stats;}
   if(hint!==prevHint){$('hint').textContent=hint;prevHint=hint;}
 }

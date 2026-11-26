@@ -5,6 +5,8 @@ export const LEGACY_WIDTH = 720, LEGACY_HEIGHT = 360, LEGACY_BODY = 24;
 const GROUND = 315, JUMP_X = 100;
 const overlap = (x,w,a,b) => x+w>a && x<b;
 const clamp = (x,a,b) => Math.max(a,Math.min(b,x));
+const hasPartner=(p,party)=>party.some(other=>other.id!==p.id && other.alive && other.input.link &&
+  Math.abs(other.x-p.x)<86 && Math.abs(other.y-p.y)<60);
 const blankInput = () => ({axis:0,jump:false,link:false,act:false});
 
 function resetPlayer(player,ledge=null,index=0,now=0) {
@@ -46,8 +48,7 @@ function platformMovement(p,frames,course,previous,ledges,open,party) {
   p.vx=(p.x-oldX)*60/frames;
   if (p.jumpQueued) p.buffer=7;
   if (p.buffer>0 && p.coyote>0) {
-    const partner=p.input.link && party.some(other=>other.id!==p.id && other.input.link &&
-      Math.abs(other.x-p.x)<86 && Math.abs(other.y-p.y)<60);
+    const partner=p.input.link && hasPartner(p,party);
     p.velocity=partner ? -13.2 : -10.8;
     p.buffer=0;p.coyote=0;p.ride=-1;
   }
@@ -171,11 +172,15 @@ export function createLegacyArena(mode,resume={},capacity=6) {
     for(const p of party){p.ack=p.inputSeq;p.heldJump=p.input.jump;p.jumpQueued=false;p.actQueued=false;}
   }
   function snapshot(){
+    const party=[...players.values()];
     return {mode,clock,checkpoint:platform?level:0,complete,levelStart,spawnLedge,switchCount,collected:[...collected],
       obstacles:obstacles.map(o=>({...o})),round,countdown:nextRound===null?0:Math.max(0,nextRound-clock),
-      players:[...players.values()].map(({id,x,y,vx,ground,velocity,ride,coyote,buffer,jumps,alive,protectedUntil,
-        spawnId,score,best,reached,input,ack,heldJump})=>({id,x,y,vx,ground,velocity,ride,coyote,buffer,jumps,alive,
-        protectedUntil,spawnId,score,best,reached,link:input.link,ack,heldJump}))};
+      players:party.map(player=>{
+        const {id,x,y,vx,ground,velocity,ride,coyote,buffer,jumps,alive,protectedUntil,
+          spawnId,score,best,reached,input,ack,heldJump}=player;
+        return {id,x,y,vx,ground,velocity,ride,coyote,buffer,jumps,alive,protectedUntil,spawnId,score,best,reached,
+          link:input.link,linked:platform && input.link && hasPartner(player,party),ack,heldJump};
+      })};
   }
   function predict(state,id){
     const party=state.players.map(p=>({...p,input:{...blankInput(),link:p.link,jump:p.heldJump===true}}));

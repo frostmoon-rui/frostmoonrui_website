@@ -40,3 +40,10 @@ main[data-mode="platform"] #controls [data-input="act"]{display:none}
 #relay-act{margin:.3rem .7rem .3rem 0;white-space:nowrap}
 #relay-act.ready{background:#27605a;border-color:#91efd1}
 @media(pointer:coarse){#relay-act{display:none}}
+
+.stage-guide>div{display:flex;gap:.25rem;margin-right:.3rem}
+#link-toggle{margin:.3rem 0;white-space:nowrap}
+button[aria-pressed="true"],#touch-act.ready{background:#27605a;border-color:#91efd1}
+#ability{margin:.25rem .9rem .55rem;color:#91efd1;font-size:.85rem}
+#ability:empty{display:none}
+@media(pointer:coarse){#link-toggle{display:none}}
