@@ -22,7 +22,7 @@ export function createMotion() {
   const history=[], sent=new Map(), changes=[], remotePositions=new Map();
   let controls={axis:0,vertical:0,jump:false,link:false,act:false}, queuedJump=false;
   let prediction=null, predictedAt=0, local=null, lastFrame=0, remoteAt=null;
-  let offsetX=0, offsetY=0, oneWay=0, ack=0, delay=BASE_DELAY;
+  let offsetX=0, offsetY=0, oneWay=0, roundTrip=0, ack=0, delay=BASE_DELAY;
 
   function clearFrames() {
     history.length=0;
@@ -39,7 +39,7 @@ export function createMotion() {
     sent.clear();
     changes.length=0;
     queuedJump=false;
-    ack=oneWay=0;
+    ack=oneWay=roundTrip=0;
   }
 
   function track(sequence,now) {
@@ -74,7 +74,9 @@ export function createMotion() {
     const newAck=applied && player.ack>ack;
     if(newAck){
       ack=player.ack;
-      const measured=clamp((now-applied.now)/2-12,0,165);
+      const elapsed=now-applied.now;
+      roundTrip=roundTrip ? blend(roundTrip,elapsed,.2) : elapsed;
+      const measured=clamp(elapsed/2-12,0,165);
       oneWay=oneWay ? blend(oneWay,measured,.20) : measured;
     }
     const sameSpawn=local?.id===id && local.spawnId===player.spawnId;
@@ -179,5 +181,5 @@ export function createMotion() {
     const obstacles=state.mode==='jump' && state.obstacles?.map(o=>({...o,x:o.x-282*renderAhead}));
     return {state,players,clock:state.clock+renderAhead,obstacles};
   }
-  return {reset,push,sample,track,control};
+  return {reset,push,sample,track,control,get roundTrip(){return roundTrip;}};
 }

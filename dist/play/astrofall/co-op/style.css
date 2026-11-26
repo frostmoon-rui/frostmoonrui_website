@@ -52,3 +52,4 @@ button[aria-pressed="true"],#touch-act.ready{background:#27605a;border-color:#91
 
 main:not([data-mode="tanks"]) #controls :is([data-input="up"],[data-input="down"]),
 main:is([data-mode="tanks"],[data-mode="comets"],[data-mode="gravity"]) #controls :is([data-input="jump"],[data-input="link"]){display:none}
+#room-latency{margin:0 .9rem .45rem;font-size:.8rem;color:#abbce0;font-variant-numeric:tabular-nums}

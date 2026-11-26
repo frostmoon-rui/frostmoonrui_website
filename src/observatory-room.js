@@ -15,8 +15,13 @@ export async function handleObservatorySocket(request, env) {
  if (ip && env.OBSERVATORY_JOIN_LIMIT && !(await env.OBSERVATORY_JOIN_LIMIT.limit({key:ip})).success) {
   return new Response('Try joining again in a minute', {status:429});
  }
- const id=env.OBSERVATORY_ROOMS.idFromName(match[1]+'/'+match[2]);
- return env.OBSERVATORY_ROOMS.get(id).fetch(request);
+ const region=url.searchParams.get('region');
+ if(region!==null && region!=='apac') return new Response('Unknown room region',{status:400});
+ const room=match[1]+'/'+match[2];
+ // A separate room ID lets placement be tested without moving an active room.
+ const id=env.OBSERVATORY_ROOMS.idFromName(region==='apac'?'apac-ne/'+room:room);
+ const stub=region==='apac' ? env.OBSERVATORY_ROOMS.get(id,{locationHint:'apac-ne'}) : env.OBSERVATORY_ROOMS.get(id);
+ return stub.fetch(request);
 }
 
 export class ObservatoryRoom {

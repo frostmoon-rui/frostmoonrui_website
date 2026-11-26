@@ -6,10 +6,10 @@ const origin='https://frostmoonrui.com';
 const path='/play/astrofall/co-op/socket/relay/crew-01';
 
 test('Observatory WebSocket requests stay on the site and are isolated by mode and room',async ()=>{
- const keys=[];
+ const keys=[], placements=[];
  const env={OBSERVATORY_ROOMS:{
   idFromName(name){keys.push(name);return name;},
-  get(){return {fetch:()=>new Response('connected')};},
+  get(id,options){placements.push([id,options?.locationHint]);return {fetch:()=>new Response('connected')};},
  }};
  const upgrade={Upgrade:'websocket',Origin:origin};
  assert.equal((await handle(new Request(origin+path),env)).status,426);
@@ -21,7 +21,10 @@ test('Observatory WebSocket requests stay on the site and are isolated by mode a
   const result=await handle(new Request(origin+path.replace('/relay/','/'+mode+'/'),{headers:upgrade}),env);
   assert.equal(result.status,200);
  }
- assert.deepEqual(keys,['relay/crew-01','runner/crew-01','jump/crew-01','platform/crew-01','gravity/crew-01','tanks/crew-01','brawl/crew-01','comets/crew-01']);
+ assert.equal((await handle(new Request(origin+path+'?region=shanghai',{headers:upgrade}),env)).status,400);
+ assert.equal((await handle(new Request(origin+path+'?region=apac',{headers:upgrade}),env)).status,200);
+ assert.deepEqual(placements.at(-1),['apac-ne/relay/crew-01','apac-ne']);
+ assert.deepEqual(keys,['relay/crew-01','runner/crew-01','jump/crew-01','platform/crew-01','gravity/crew-01','tanks/crew-01','brawl/crew-01','comets/crew-01','apac-ne/relay/crew-01']);
 });
 
 test('a visible driver advances the room with one snapshot per pulse and ignores backed-up recipients',async context=>{

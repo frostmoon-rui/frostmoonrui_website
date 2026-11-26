@@ -7,6 +7,8 @@ import {drawLegacy,LEGACY_LEVELS} from './legacy-render.mjs';
 
 const $ = id => document.getElementById(id);
 const params=new URLSearchParams(location.search);
+const apacRoom=params.get('region')==='apac';
+const networkLabels={zh:'亚太测试 · 输入确认',en:'Asia-Pacific trial · Input confirmation',ru:'Тест АТР · Подтверждение ввода',ja:'アジア太平洋テスト · 入力の確認'};
 const copy = {
   en:['Observatory Co-op','Room code','Mode','Constellation Relay','Endless Run','Join','Copy invite','Link','Act',
     'Choose a room. Anyone with its code can join.', 'Connecting…','Room unavailable. Check the connection or try a different code.',
@@ -228,6 +230,7 @@ $('lobby').addEventListener('submit',event=>{
   $('invite').hidden=true;
   const target=new URL(relativePath+'socket/'+mode+'/'+room,location.origin);
   target.protocol=location.protocol==='https:'?'wss:':'ws:';
+  if(apacRoom) target.searchParams.set('region','apac');
   const connection=new WebSocket(target);
   socket=connection;
   connection.addEventListener('open',()=>{
@@ -360,6 +363,13 @@ function draw(now){
   if(state) scheduleDraw();
   if(now<nextHud && statusUpdate===players.length) return;
   nextHud=now+180;statusUpdate=players.length;
+  if(apacRoom){
+    const network=$('room-latency');
+    network.hidden=!state;
+    const latency=motion.roundTrip;
+    const value=networkLabels[lang]+(latency ? ' · '+Math.round(latency)+' ms' : '');
+    if(network.textContent!==value) network.textContent=value;
+  }
   const type=state&&courseAt(state.checkpoint,'relay')?.gate;
   const legacy=legacyModes[lang];
   const extra=EXPANSION_MODES.includes(layout);
