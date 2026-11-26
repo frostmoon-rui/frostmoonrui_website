@@ -1,5 +1,7 @@
 import {cacheSegments, gatePads, SPAN, LENGTH} from './arena.mjs';
 import {createMotion} from './motion.mjs';
+import {LEGACY_MODES} from './legacy-arena.mjs';
+import {drawLegacy,LEGACY_LEVELS} from './legacy-render.mjs';
 
 const $ = id => document.getElementById(id);
 const params=new URLSearchParams(location.search);
@@ -35,6 +37,16 @@ const legacyLabels={
   ru:['Классические одиночные игры','Игра с прыжками','Платформер'],
   ja:['クラシックな一人用ゲーム','ジャンプゲーム','アクションゲーム'],
 };
+const legacyModes={
+  en:['Jump Race','Platform Co-op','Double-jump to dodge the shared obstacles. A new round starts after everyone falls.',
+    'Help each other jump, share switches and checkpoints, and reach the flag together.','Score','At flag','All eight courses cleared'],
+  zh:['跳跃竞速','平台合作','二段跳躲开同一组障碍。所有玩家出局后会开启下一轮。',
+    '一起踩开关、共享存档点。靠近队友按住合体可跳得更高，全员到旗帜后进入下一关。','得分','到旗帜','八关全部通关'],
+  ru:['Гонка прыжков','Совместный платформер','Двойной прыжок помогает уклоняться от общих препятствий. После выбывания всех начинается новый раунд.',
+    'Помогайте друг другу прыгать, вместе включайте плиты и доберитесь до флага.','Очки','У флага','Все восемь уровней пройдены'],
+  ja:['ジャンプレース','協力アクション','二段ジャンプで共通の障害を避けます。全員が脱落すると次のラウンドが始まります。',
+    '連携ジャンプや共有スイッチ、チェックポイントを使い、全員で旗にたどり着こう。','スコア','旗に到達','全8ステージクリア'],
+};
 const requestedLocale=params.get('lang') || document.documentElement.dataset.locale;
 let lang=Object.hasOwn(copy,requestedLocale)?requestedLocale:'en';
 let socket,id,state,sequence=0;
@@ -49,7 +61,7 @@ const controls={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',Spa
 const relativePath = /^\/(zh|en|ru|ja)\/play\/astrofall\/co-op\/$/.test(location.pathname)
   ? '/play/astrofall/co-op/' : new URL('./',location.href).pathname;
 if (/^[a-z0-9-]{3,24}$/.test(params.get('room')||'')) $('room').value=params.get('room');
-if (params.get('mode')==='runner') $('mode').value='runner';
+if (['runner',...LEGACY_MODES].includes(params.get('mode'))) $('mode').value=params.get('mode');
 if (params.get('home')?.match(/^\/(?:zh|en|ru|ja)\/play\/astrofall\/$/)) $('home').href=params.get('home');
 
 function applyLanguage(){
@@ -58,6 +70,7 @@ function applyLanguage(){
     if(id) $(id).textContent=text(index);
   }
   $('mode').options[0].textContent=text(3); $('mode').options[1].textContent=text(4);
+  for(const [index,mode] of LEGACY_MODES.entries()) $('mode').querySelector('option[value="'+mode+'"]').textContent=legacyModes[lang][index];
   $('language').value=lang; document.title=text(0);
   const [label,jump,platform]=legacyLabels[lang];
   $('legacy-games').setAttribute('aria-label',label);
@@ -87,7 +100,7 @@ const axis=()=>Number(input.right)-Number(input.left);
 function pulse(){
   if(document.hidden || socket?.readyState!==WebSocket.OPEN) return;
   const now=performance.now();
-  const driving=state?.mode==='runner' || state?.players[0]?.id===id ||
+  const driving=['runner','jump'].includes(state?.mode) || state?.players[0]?.id===id ||
     now<inputActiveUntil || Object.values(input).some(Boolean);
   if(now-lastPulse >= (driving ? 57 : 155)) publish();
 }
@@ -145,6 +158,7 @@ for(const button of document.querySelectorAll('[data-input]')){
 $('lobby').addEventListener('submit',event=>{
   event.preventDefault(); clear(); socket?.close();
   const mode=$('mode').value, room=$('room').value.trim().toLowerCase();
+  document.querySelector('main').dataset.mode=mode;
   if(!/^[a-z0-9-]{3,24}$/.test(room)) return;
   status=10;state=null;id=null;lastPulse=-Infinity;
   motion.reset();
@@ -216,6 +230,8 @@ function draw(now){
   const parallax=Math.floor(camera*.13)%960;
   ctx.drawImage(sky,-parallax,0);
   if(parallax) ctx.drawImage(sky,960-parallax,0);
+  if(view && LEGACY_MODES.includes(layout)) drawLegacy(ctx,view,me,colors);
+  else {
   ctx.save();ctx.translate(-camera,0);
   const first=Math.floor(camera/SPAN);
   const last=Math.floor((camera+960)/SPAN);
@@ -254,15 +270,20 @@ function draw(now){
     ctx.fillStyle='#f1f5fb';ctx.font='700 14px system-ui';ctx.fillText(String(index+1),p.x+9,p.y-12);
   }
   ctx.restore();
+  }
   if(state) scheduleDraw();
   if(state?.mode==='runner' && now<nextHud && statusUpdate===players.length) return;
   nextHud=now+180;statusUpdate=players.length;
   const type=state&&courseAt(state.checkpoint,'relay')?.gate;
-  const stats=state
+  const legacy=legacyModes[lang];
+  const stats=layout==='jump' ? `${players.length}/6 ${text(12)} · ${legacy[4]} ${me?.score || 0} · ${text(17)} ${me?.best || 0}` :
+    layout==='platform' ? `${players.length}/6 ${text(12)} · ${state.checkpoint+1}/${LEGACY_LEVELS} · ${legacy[5]} ${players.filter(p=>p.reached).length}/${players.length}` :
+    state
     ? `${players.length}/6 ${text(12)} · ${layout==='runner' ? text(17)+' '+Math.floor((me?.best||0)/10)+' m' :
       `${state.checkpoint+1}/${LENGTH}`+(type==='relay' && state.relayTime ? ' · '+Math.ceil(state.relayTime)+' s · '+(state.relayStep+1) : '')}`
     : text(status);
-  const hint=state?text(state.complete?16:layout==='runner'?15:type==='relay'?14:13):'';
+  const hint=layout==='jump'?legacy[2]:layout==='platform'?(state.complete?legacy[6]:legacy[3]):
+    state?text(state.complete?16:layout==='runner'?15:type==='relay'?14:13):'';
   if(stats!==prevStatus){$('status').textContent=stats;prevStatus=stats;}
   if(hint!==prevHint){$('hint').textContent=hint;prevHint=hint;}
 }

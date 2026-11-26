@@ -1,6 +1,6 @@
 import {createArena, MAX_PLAYERS, TICK} from '../dist/play/astrofall/co-op/arena.mjs';
 
-const socketPath = /^\/play\/astrofall\/co-op\/socket\/(relay|runner)\/([a-z0-9-]{3,24})$/;
+const socketPath = /^\/play\/astrofall\/co-op\/socket\/(relay|runner|jump|platform)\/([a-z0-9-]{3,24})$/;
 
 export async function handleObservatorySocket(request, env) {
  const url = new URL(request.url);

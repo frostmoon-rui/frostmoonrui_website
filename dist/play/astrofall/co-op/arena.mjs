@@ -1,3 +1,5 @@
+import {createLegacyArena,LEGACY_MODES} from './legacy-arena.mjs';
+
 export const MAX_PLAYERS = 6;
 export const HEIGHT = 540;
 export const SPAN = 840;
@@ -53,6 +55,7 @@ export function gatePads(index, count) {
 }
 
 export function createArena(mode, resume = {}) {
+  if(LEGACY_MODES.includes(mode)) return createLegacyArena(mode,resume,MAX_PLAYERS);
   const players = new Map();
   const courseAt = cacheSegments();
   let clock = 0, checkpoint = clamp(Number.isInteger(resume.checkpoint) ? resume.checkpoint : 0,0,LENGTH-1);

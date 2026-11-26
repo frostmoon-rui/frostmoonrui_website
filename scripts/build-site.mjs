@@ -27,8 +27,10 @@ for(const locale of locales.filter(code=>code!=='en')){
 }
 const gameShell=read('templates/night-observatory.html');
 const coOpShell=read('dist/play/astrofall/co-op/index.html');
+const legacyCourse=read('dist/assets/legacy-platform-levels.js').split('const storageKey=')[0];
+write('play/astrofall/co-op/legacy-platform-levels.mjs',legacyCourse.trimEnd()+'\n');
 const coOpHash=createHash('sha256');
-for(const file of ['client.mjs','motion.mjs','arena.mjs','style.css']){
+for(const file of ['client.mjs','motion.mjs','arena.mjs','style.css','legacy-arena.mjs','legacy-render.mjs','legacy-platform-levels.mjs']){
  coOpHash.update(read('dist/play/astrofall/co-op/'+file).replace(/\r\n/g,'\n'));
 }
 const coOpRevision=coOpHash.digest('hex').slice(0,12);

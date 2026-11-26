@@ -22,6 +22,8 @@ canvas{width:100%;height:auto;display:block;background:#101931;touch-action:none
 #controls{display:flex;justify-content:space-between;padding:.55rem;gap:.5rem}
 #controls div{display:flex;gap:.45rem}#controls button{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;min-height:3rem;min-width:2.8rem}
 #controls button:active{background:#356264}
+main[data-mode="jump"] #controls [data-input]:not([data-input="jump"]),
+main[data-mode="platform"] #controls [data-input="act"]{display:none}
 @media(pointer:fine){#controls{display:none}}
 @media(orientation:landscape) and (max-height:560px) and (pointer:coarse){
  main{width:min(100% - 1rem,calc((100svh - 6rem)*1.77));padding:.35rem 0}
