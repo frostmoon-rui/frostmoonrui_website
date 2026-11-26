@@ -12,6 +12,10 @@ input{width:9rem}
 button{cursor:pointer}
 button[type=submit],#join{background:#27605a;border-color:#76ceb9}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #f4c17c;outline-offset:2px}
+#legacy-games:not([hidden]){display:flex;align-items:center;flex-wrap:wrap;gap:.4rem .6rem;margin-bottom:.8rem}
+#legacy-games span{font-size:.78rem;color:#c1cde2}
+#legacy-games a{border:1px solid #53617d;border-radius:1rem;padding:.36rem .75rem;text-decoration:none;font-size:.85rem}
+#legacy-games a:hover,#legacy-games a:focus-visible{background:#243554;color:#e6faf5}
 section{border:1px solid #39496b;border-radius:1.6rem;overflow:hidden;background:#101832}
 #status,#hint{padding:.55rem .9rem;margin:0;color:#d5def1}
 canvas{width:100%;height:auto;display:block;background:#101931;touch-action:none}

@@ -8,6 +8,8 @@ const copy={
  ja:['アーカイブに戻る','旧サイトのツール、授業前の発表、プロジェクト記録、ミニゲーム。','授業前の発表','旧ツール集','FG2002 の録画','ジャンプゲーム','アクションゲーム','旧サイトからのお知らせ','Bilibili で見る','開始','スコア','画面をタップするかスペースキーを押します。二段ジャンプができます。','プロフィールに戻る','ゲーム終了']
 };
 
+export const legacyGameTitles=locale=>copy[locale].slice(5,7);
+
 const statusCopy={
  zh:{video:'哔哩哔哩未找到原视频',summary:'{count} 条视频流可读取 · 核验于 {date}'},
  en:{video:'Original video unavailable on Bilibili',summary:'{count} video streams reachable · Checked {date}'},

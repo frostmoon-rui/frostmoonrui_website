@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <title>Observatory Co-op</title>
-<link rel="stylesheet" href="/play/astrofall/co-op/style.css?v=8167b293875b">
+<link rel="stylesheet" href="/play/astrofall/co-op/style.css?v=4f7f18734243">
 <main>
   <header>
     <div><a id="home" href="../">Astrofall Observatory</a><h1 id="title">Observatory Co-op</h1></div>
@@ -15,6 +15,11 @@
     <label><span id="mode-label">Mode</span><select id="mode"><option value="relay">Constellation Relay</option><option value="runner">Endless Run</option></select></label>
     <button id="join">Join</button><button id="invite" type="button" hidden>Copy invite</button>
   </form>
+  <nav id="legacy-games" aria-label="Классические одиночные игры">
+    <span id="legacy-label">Классические одиночные игры</span>
+    <a id="legacy-jump" href="/ru/legacy/jump/">Игра с прыжками</a>
+    <a id="legacy-platform" href="/ru/legacy/platform/">Платформер</a>
+  </nav>
   <section aria-label="Game">
     <div id="status" role="status"></div>
     <canvas id="game" width="960" height="540" aria-label="Observatory multiplayer stage"></canvas>
@@ -25,5 +30,5 @@
     </div>
   </section>
 </main>
-<script type="module" src="/play/astrofall/co-op/client.mjs?v=8167b293875b"></script>
+<script type="module" src="/play/astrofall/co-op/client.mjs?v=4f7f18734243"></script>
 </html>

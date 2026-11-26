@@ -9,7 +9,7 @@ import {documents,validateSite,validateDocument,surfaceCornerRadius,articleDate,
 import {resourcesBody,applicationBody,deskBody} from './community-pages.mjs';
 import {secretPage} from './secret-page.mjs';
 import {buildNotebook,topicPaths} from './notebook.mjs';
-import {archivePages,archiveTitle} from './legacy-archive.mjs';
+import {archivePages,archiveTitle,legacyGameTitles} from './legacy-archive.mjs';
 import {applyChrome,aboutBody,friendsBody} from './site-chrome.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
@@ -32,6 +32,10 @@ for(const file of ['client.mjs','motion.mjs','arena.mjs','style.css']){
  coOpHash.update(read('dist/play/astrofall/co-op/'+file).replace(/\r\n/g,'\n'));
 }
 const coOpRevision=coOpHash.digest('hex').slice(0,12);
+const coOpLegacyHeading={
+ zh:'经典单人游戏',en:'Classic single-player games',
+ ru:'Классические одиночные игры',ja:'クラシックな一人用ゲーム',
+};
 const gameWorker=read('templates/night-observatory-sw.js');
 const gameManifest=JSON.parse(read('templates/night-observatory.webmanifest'));
 const gameAssetPattern=/(href|src)="assets\/((?:exploration|icons)\/[^"]+)"/g;
@@ -113,8 +117,12 @@ for(const prefix of ['',...locales.map(locale=>`${locale}/`)]){
 }
 for(const locale of locales){
  writeNightGame(locale+'/',locale);
+ const [legacyJump,legacyPlatform]=legacyGameTitles(locale);
  write(locale+'/play/astrofall/co-op/index.html',coOpShell
   .replace('<html lang="en">','<html lang="'+htmlLanguages[locale]+'" data-locale="'+locale+'">')
+  .replaceAll('Classic single-player games',escape(coOpLegacyHeading[locale]))
+  .replace(/https:\/\/frostmoonrui\.com\/en\/legacy\/jump\/">Jump game/,languagePath(locale,'legacy/jump/')+'">'+escape(legacyJump))
+  .replace(/https:\/\/frostmoonrui\.com\/en\/legacy\/platform\/">Platform game/,languagePath(locale,'legacy/platform/')+'">'+escape(legacyPlatform))
   .replace('href="./style.css"','href="/play/astrofall/co-op/style.css?v='+coOpRevision+'"')
   .replace('src="./client.mjs"','src="/play/astrofall/co-op/client.mjs?v='+coOpRevision+'"'));
  if(locale==='en')writeNightGame('',locale);

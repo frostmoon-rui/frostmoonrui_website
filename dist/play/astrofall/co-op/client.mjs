@@ -29,6 +29,12 @@ const copy = {
     '協力や競走ができます。矢印で速度、スペースでジャンプ、E で連携、F で操作。',
     '星座が完成しました。新しい部屋やエンドレスランでも遊べます。','最長','招待をコピーしました'],
 };
+const legacyLabels={
+  en:['Classic single-player games','Jump game','Platform game'],
+  zh:['经典单人游戏','跳跃游戏','平台游戏'],
+  ru:['Классические одиночные игры','Игра с прыжками','Платформер'],
+  ja:['クラシックな一人用ゲーム','ジャンプゲーム','アクションゲーム'],
+};
 const requestedLocale=params.get('lang') || document.documentElement.dataset.locale;
 let lang=Object.hasOwn(copy,requestedLocale)?requestedLocale:'en';
 let socket,id,state,sequence=0;
@@ -53,6 +59,14 @@ function applyLanguage(){
   }
   $('mode').options[0].textContent=text(3); $('mode').options[1].textContent=text(4);
   $('language').value=lang; document.title=text(0);
+  const [label,jump,platform]=legacyLabels[lang];
+  $('legacy-games').setAttribute('aria-label',label);
+  $('legacy-label').textContent=label;
+  for(const [game,title] of [['jump',jump],['platform',platform]]){
+    const link=$('legacy-'+game);
+    link.textContent=title;
+    link.href='https://frostmoonrui.com/'+lang+'/legacy/'+game+'/';
+  }
 }
 applyLanguage();
 $('language').addEventListener('change',()=>{
@@ -144,7 +158,9 @@ $('lobby').addEventListener('submit',event=>{
     if(socket!==connection) return;
     params.set('room',room);params.set('mode',mode);params.set('lang',lang);
     history.replaceState(null,'','?'+params);
-    $('invite').hidden=false;document.activeElement?.blur();
+    $('invite').hidden=false;
+    $('legacy-games').hidden=true;
+    document.activeElement?.blur();
     publish();
   });
   connection.addEventListener('message',event=>{
@@ -160,6 +176,7 @@ $('lobby').addEventListener('submit',event=>{
   connection.addEventListener('close',()=>{
     if(socket!==connection) return;
     status=11;state=null;id=null;$('invite').hidden=true;
+    $('legacy-games').hidden=false;
     motion.reset();
     scheduleDraw();
   });
