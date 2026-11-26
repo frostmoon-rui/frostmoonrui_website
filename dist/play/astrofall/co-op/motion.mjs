@@ -21,7 +21,7 @@ function advance(simulation,ms,input,jump=false){
 export function createMotion() {
   const history=[], sent=new Map(), changes=[], remotePositions=new Map();
   let controls={axis:0,jump:false,link:false}, queuedJump=false;
-  let prediction=null, local=null, lastFrame=0, remoteAt=null;
+  let prediction=null, predictedAt=0, local=null, lastFrame=0, remoteAt=null;
   let offsetX=0, offsetY=0, oneWay=0, ack=0, delay=BASE_DELAY;
 
   function clearFrames() {
@@ -29,7 +29,7 @@ export function createMotion() {
     remotePositions.clear();
     prediction=null;
     local=null;
-    offsetX=offsetY=lastFrame=0;
+    offsetX=offsetY=lastFrame=predictedAt=0;
     remoteAt=null;
     delay=BASE_DELAY;
   }
@@ -80,7 +80,17 @@ export function createMotion() {
     const sameSpawn=local?.id===id && local.spawnId===player.spawnId;
     const confirmedFall=player.respawnAt!=null && local?.respawnAt==null;
     if(prediction && sameSpawn && !newAck && !confirmedFall) return;
+    const elapsed=clamp(now-predictedAt,0,42);
+    // Reconcile both simulations at packet time. The last drawn position is one frame behind.
+    let expectedX=local?.x, expectedY=local?.y;
+    if(prediction && sameSpawn && !confirmedFall && newAck){
+      advance(prediction,elapsed,controls,queuedJump);
+      const decay=Math.exp(-elapsed/85);
+      expectedX=prediction.player.x+offsetX*decay;
+      expectedY=prediction.player.y+offsetY*decay;
+    }
     prediction=createArena(state.mode,state).predict(state,id);
+    predictedAt=now;
     // A confirmed respawn or room transition always wins over local prediction.
     if(!sameSpawn || confirmedFall || !newAck){
       offsetX=offsetY=0;
@@ -101,9 +111,9 @@ export function createMotion() {
     }
     advance(prediction,now-cursor,replayInput,jump);
     if(!changes.length || now>cursor) queuedJump=false;
-    const dx=local.x-prediction.player.x, dy=local.y-prediction.player.y;
-    offsetX=Math.abs(dx)<110 && Math.abs(dx)>.4 ? dx : 0;
-    offsetY=Math.abs(dy)<85 && Math.abs(dy)>.4 ? dy : 0;
+    const dx=expectedX-prediction.player.x, dy=expectedY-prediction.player.y;
+    offsetX=Math.abs(dx)<110 && Math.abs(dx)>.04 ? dx : 0;
+    offsetY=Math.abs(dy)<85 && Math.abs(dy)>.04 ? dy : 0;
   }
 
   function sample(now,id,legacyAxis=controls.axis) {
@@ -129,11 +139,13 @@ export function createMotion() {
     const players=state.players.map(player=>{
       if(player.id===id) {
         if(prediction){
-          if(now-newest.now<STALE_AFTER){
-            advance(prediction,dt,controls,queuedJump);
+          const elapsed=clamp(now-predictedAt,0,42);
+          if(elapsed && now-newest.now<STALE_AFTER){
+            advance(prediction,elapsed,controls,queuedJump);
             queuedJump=false;
           }
-          const decay=Math.exp(-dt/85);
+          predictedAt=Math.max(predictedAt,now);
+          const decay=Math.exp(-elapsed/85);
           offsetX*=decay;offsetY*=decay;
           local={...player,x:prediction.player.x+offsetX,y:prediction.player.y+offsetY,link:controls.link,
             respawnAt:player.respawnAt ?? prediction.player.respawnAt};
