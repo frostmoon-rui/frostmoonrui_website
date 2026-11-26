@@ -1,3 +1,5 @@
+import {createExpansionArena,EXPANSION_MODES} from './expansion-arena.mjs';
+export {getRoomCapacity} from './expansion-arena.mjs';
 import {createLegacyArena,LEGACY_MODES} from './legacy-arena.mjs';
 
 export const MAX_PLAYERS = 6;
@@ -59,6 +61,7 @@ export function gatePads(index, count) {
 }
 
 export function createArena(mode, resume = {}) {
+  if(EXPANSION_MODES.includes(mode)) return createExpansionArena(mode,resume);
   if(LEGACY_MODES.includes(mode)) return createLegacyArena(mode,resume,MAX_PLAYERS);
   const players = new Map();
   const courseAt = cacheSegments();

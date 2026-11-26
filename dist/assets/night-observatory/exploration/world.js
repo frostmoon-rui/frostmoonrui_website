@@ -257,7 +257,10 @@ window.ObservatoryWorld = (() => {
     ascent(dome, 252);
     plate(dome, 593, null, 'finale');
 
-    if (expanded) extendCampaign({rooms, room, names, rect, prism, plate});
+    if (expanded) {
+      extendCampaign({rooms, room, names, rect, prism, plate});
+      extendExpeditions({rooms, room, prism, plate});
+    }
 
     for (const r of Object.values(rooms)) {
       const cut = (span, limit, makeRect) => {
@@ -397,6 +400,68 @@ window.ObservatoryWorld = (() => {
       add(159,480); add(b + 142,352); add(802,480);
       puzzle.sequence = sector % 2 ? [1,2,3] : [3,2,1];
       puzzle.seconds = Math.max(8, 14 - sector * .4);
+    }
+  }
+
+  // Each row is an authored room: title, platforms, circuit points, beams and timer.
+  function extendExpeditions({rooms, room, prism, plate}) {
+    const expeditions = [
+      {theme:'aurora', title:names('极光温室','Aurora Conservatory','Сад сияний','極光温室'), entrance:536, courses:[
+        [names('夜露','Night Dew','Ночная роса','夜露'), [[216,437,105],[435,424,116],[628,435,122]], [[267,410],[694,408],[490,397]], [], 9],
+        [names('逆光叶脉','Backlit Veins','Листья против света','逆光の葉脈'), [[178,433,114],[371,375,150],[655,434,120]], [[231,405,1],[719,405,0],[429,348]], [], 12],
+        [names('花影','Canopy Shadow','Тень кроны','花影'), [[285,426,108],[543,414,124],[695,357,95]], [[321,399],[742,330],[602,387]], [[474,260,232,2.7,.3]], 11],
+        [names('子夜结露','Midnight Bloom','Полуночное цветение','真夜中の結露'), [[270,433,104],[467,386,108],[651,429,106]], [[706,401,1],[523,358,0],[321,405]], [[587,310,180,3.4,1.2]], 12],
+      ]},
+      {theme:'cinder', title:names('余烬铸场','Cinder Works','Цех углей','残火工房'), entrance:617, courses:[
+        [names('炉压','Furnace Pressure','Давление печи','炉圧'), [[207,432,100],[392,423,126],[649,428,96]], [[774,478,'impact'],[435,396],[258,405]], [], 10],
+        [names('熔流闸','Slag Sluice','Шлюз шлака','溶滓の水門'), [[204,431,98],[478,422,100],[712,432,105]], [[248,404],[755,405],[521,395]], [[367,330,180,2.8,0],[629,345,165,3.2,1]], 12],
+        [names('煤砂天梯','Ash Stair','Лестница из золы','灰の階段'), [[239,433,91],[329,366,93],[431,298,108],[635,424,99]], [[485,270],[684,396],[279,405]], [], 10],
+        [names('双炉共鸣','Twin Resonance','Два резонанса','双炉の共鳴'), [[213,434,116],[653,433,112],[426,428,109]], [[794,478,'impact'],[360,478,'impact'],[482,400]], [[558,325,185,3.1,.4]], 13],
+      ]},
+      {theme:'tide', title:names('潮汐水库','Tidal Reservoir','Приливное водохранилище','潮汐貯水池'), entrance:774, courses:[
+        [names('偏航水门','Crosscurrent Lock','Шлюз течений','横流れの水門'), [[186,431,120],[326,371,105],[641,435,130]], [[372,343],[695,408],[241,404]], [[539,335,174,3.3,1.4]], 11],
+        [names('冷潮','Cold Surge','Холодный прилив','冷たい潮'), [[221,431,111],[488,429,118],[705,414,119]], [[765,387],[267,403],[541,402]], [[416,332,177,2.6,0],[663,345,164,3.5,1.2]], 12],
+        [names('暗流星仪','Undertow Dial','Прибор подводного течения','暗流の星儀'), [[167,431,114],[367,426,103],[554,373,123],[724,432,103]], [[618,345,1],[214,402,0],[779,405]], [], 13],
+        [names('回潮钟','Return-Tide Bell','Колокол отлива','返し潮の鐘'), [[200,435,123],[401,432,104],[501,365,105],[712,420,114]], [[779,392],[552,337],[350,478,'impact'],[455,404]], [[642,334,176,3.4,.5]], 15],
+      ]},
+    ];
+    function portal(source,x,target,needs=[]){
+      (source.portals ??= []).push({x,y:480,to:target.id,tx:58,needs});
+    }
+    for (const [sector, expedition] of expeditions.entries()) {
+      const hubReturn=sector===1?617:expedition.entrance-39;
+      const wing = expedition.courses.map(([name, ledges, points, beams, seconds], index) => {
+        const chamber=room('B'+(sector+1)+'-'+(index+1),3+index,16+sector,'hub',
+          Object.fromEntries(Object.entries(name).map(([lang,title])=>[lang,expedition.title[lang]+' · '+title])),
+          expedition.theme==='cinder'?'impact':expedition.theme==='aurora'?'phase':'mover');
+        chamber.theme=expedition.theme;
+        chamber.spawn.x=58;
+        for(const ledge of ledges) chamber.solids.push(rect(...ledge));
+        chamber.puzzle={kind:'expedition',seconds,switches:[],sequence:[],beams:[]};
+        for(const [i,[x,y,rule]] of points.entries()){
+          const id=i+1;
+          const part={id,x,y,mark:id};
+          if(rule==='impact'){
+            part.impact=true;
+            plate(chamber,x-44,id,'campaign');
+          } else if(Number.isInteger(rule)) part.phase=rule;
+          chamber.puzzle.switches.push(part);
+          chamber.puzzle.sequence.push(id);
+        }
+        if(points.some(part=>Number.isInteger(part[2]))) {
+          prism(chamber,114,484);
+          prism(chamber,804,484);
+        }
+        chamber.puzzle.beams=beams.map(([x,y,h,period,offset])=>({x,y,h,w:14,period,offset}));
+        return chamber;
+      });
+      portal(rooms.H1,expedition.entrance,wing[0]);
+      for(const [index,chamber] of wing.entries()){
+        portal(chamber,65,wing[index-1] || rooms.H1);
+        portal(chamber,877,wing[index+1] || rooms.H1,[chamber.id]);
+        if(index===0) chamber.portals[0].tx=hubReturn;
+        if(index===wing.length-1) chamber.portals[1].tx=hubReturn;
+      }
     }
   }
 

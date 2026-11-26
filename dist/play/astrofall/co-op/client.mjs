@@ -1,3 +1,5 @@
+import {EXPANSION_MODES} from './expansion-arena.mjs';
+import {expansionStatus,expansionText,drawExpansion} from './expansion-render.mjs';
 import {cacheSegments, gatePads, SPAN, LENGTH, GATE_HOLD} from './arena.mjs';
 import {createMotion} from './motion.mjs';
 import {LEGACY_MODES} from './legacy-arena.mjs';
@@ -80,15 +82,15 @@ let runnerWaiting=false, actRelease=0, action=0, linkLatched=false;
 let camera=0, previousCameraTime=0, cameraSpawn;
 let paintFrame=0, lastPulse=-Infinity, inputActiveUntil=0, statusUpdate=0;
 const touchPointers=new Map();
-const input={left:false,right:false,jump:false,link:false,act:false};
+const input={left:false,right:false,up:false,down:false,jump:false,link:false,act:false};
 const colors=['#ffe4a9','#96eadc','#f3a6c3','#9abdf4','#c4a5ec','#ebad84'];
 const text=index=>copy[lang][index];
 let status=9;
-const controls={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',Space:'jump',KeyE:'link',KeyF:'act'};
+const controls={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'up',KeyW:'up',ArrowDown:'down',KeyS:'down',Space:'jump',KeyE:'link',KeyF:'act'};
 const relativePath = /^\/(zh|en|ru|ja)\/play\/astrofall\/co-op\/$/.test(location.pathname)
   ? '/play/astrofall/co-op/' : new URL('./',location.href).pathname;
 if (/^[a-z0-9-]{3,24}$/.test(params.get('room')||'')) $('room').value=params.get('room');
-if (['runner',...LEGACY_MODES].includes(params.get('mode'))) $('mode').value=params.get('mode');
+if (['runner',...LEGACY_MODES,...EXPANSION_MODES].includes(params.get('mode'))) $('mode').value=params.get('mode');
 if (params.get('home')?.match(/^\/(?:zh|en|ru|ja)\/play\/astrofall\/$/)) $('home').href=params.get('home');
 
 function applyLanguage(){
@@ -100,6 +102,7 @@ function applyLanguage(){
   for(const [index,mode] of LEGACY_MODES.entries()) $('mode').querySelector('option[value="'+mode+'"]').textContent=legacyModes[lang][index];
   $('relay-act').textContent=text(8);
   $('link-toggle').textContent=text(7);
+  for(const mode of EXPANSION_MODES) $('mode').querySelector('option[value="'+mode+'"]').textContent=expansionText[lang][mode][0];
   $('language').value=lang; document.title=text(0);
   const [label,jump,platform]=legacyLabels[lang];
   $('legacy-games').setAttribute('aria-label',label);
@@ -127,9 +130,10 @@ function publish() {
   const seq=++sequence;
   lastPulse=performance.now();
   motion.track(seq,lastPulse);
-  socket.send(JSON.stringify({axis:axis(),jump:input.jump,link:linkHeld(),act:input.act,action,seq}));
+  socket.send(JSON.stringify({axis:axis(),jump:input.jump,link:linkHeld(),act:input.act,vertical:vertical(),action,seq}));
 }
 const axis=()=>Number(input.right)-Number(input.left);
+const vertical=()=>Number(input.down)-Number(input.up);
 function pulse(){
   if(document.hidden || socket?.readyState!==WebSocket.OPEN) return;
   const now=performance.now();
@@ -142,7 +146,7 @@ setInterval(pulse,30);
 function changedInput(){
   const now=performance.now();
   inputActiveUntil=now+750;
-  motion.control({axis:axis(),jump:input.jump,link:linkHeld()},now);
+  motion.control({axis:axis(),vertical:vertical(),jump:input.jump,link:linkHeld(),act:input.act},now);
   showLink();
   publish();
 }
@@ -159,6 +163,7 @@ function clear(){
 function key(event, down){
   if(['INPUT','SELECT'].includes(event.target?.tagName) && down) return;
   const name=controls[event.code];
+  if((name==='up'||name==='down') && state?.mode!=='tanks') return;
   if(name==='jump' && event.target?.closest('button') && down) return;
   if(!name || runnerWaiting || socket?.readyState!==WebSocket.OPEN) return;
   event.preventDefault();
@@ -301,7 +306,8 @@ function draw(now){
   const parallax=camera*.13%960;
   ctx.drawImage(sky,-parallax,0);
   if(parallax) ctx.drawImage(sky,960-parallax,0);
-  if(view && LEGACY_MODES.includes(layout)) drawLegacy(ctx,view,me,colors);
+  if(view && EXPANSION_MODES.includes(layout)) drawExpansion(ctx,view,me);
+  else if(view && LEGACY_MODES.includes(layout)) drawLegacy(ctx,view,me,colors);
   else {
   ctx.save();ctx.translate(-camera,0);
   const first=Math.floor(camera/SPAN);
@@ -356,7 +362,8 @@ function draw(now){
   nextHud=now+180;statusUpdate=players.length;
   const type=state&&courseAt(state.checkpoint,'relay')?.gate;
   const legacy=legacyModes[lang];
-  const stats=layout==='jump' ? `${players.length}/6 ${text(12)} · ${legacy[4]} ${me?.score || 0} · ${text(17)} ${me?.best || 0}` :
+  const extra=EXPANSION_MODES.includes(layout);
+  const stats=extra?expansionStatus(lang,state):layout==='jump' ? `${players.length}/6 ${text(12)} · ${legacy[4]} ${me?.score || 0} · ${text(17)} ${me?.best || 0}` :
     layout==='platform' ? `${players.length}/6 ${text(12)} · ${state.checkpoint+1}/${LEGACY_LEVELS} · ${legacy[5]} ${players.filter(p=>p.reached).length}/${players.length}` :
     state
     ? `${players.length}/6 ${text(12)} · ${layout==='runner' ? text(17)+' '+Math.floor((me?.best||0)/10)+' m' :
@@ -364,9 +371,15 @@ function draw(now){
     : text(status);
   const isRelayStation=layout==='relay' && type==='relay' && !state.complete;
   const actButton=$('relay-act');
-  actButton.hidden=!isRelayStation;
-  $('touch-act').hidden=!isRelayStation && layout!=='runner';
-  $('link-toggle').hidden=!me || layout==='jump' || runnerWaiting;
+  const extraWords=expansionText[lang];
+  const actionText=extra?extraWords[layout==='tanks'?'fire':layout==='brawl'?'strike':'flip']:text(8);
+  const linkTextLabel=layout==='brawl'?extraWords.guard:text(7);
+  actButton.textContent=actionText;
+  $('touch-act').textContent=actionText;
+  $('touch-link').textContent=$('link-toggle').textContent=linkTextLabel;
+  actButton.hidden=!isRelayStation && !extra;
+  $('touch-act').hidden=!isRelayStation && layout!=='runner' && !extra;
+  $('link-toggle').hidden=!me || layout==='jump' || (extra && layout!=='brawl') || runnerWaiting;
   const slot=players.findIndex(p=>p.id===id);
   const turn=state?.relayStep;
   const ready=isRelayStation && slot===turn && state.relayStations?.[slot];
@@ -375,7 +388,7 @@ function draw(now){
   const relayHint=isRelayStation && slot>=0 ? relayCopy[lang][slot!==turn?1:ready?2:0]
     .replace('{n}',String((slot!==turn?turn:slot)+1)) : '';
   const ability=abilityCopy[lang];
-  const linkText=linkHeld() && me && layout!=='jump' ?
+  const linkText=linkHeld() && me && !extra && layout!=='jump' ?
     ability[players.length<2?3:me.linked?1:state.bridge?2:0] : '';
   if($('ability').textContent!==linkText) $('ability').textContent=linkText;
   const isHoldGate=layout==='relay' && state && !state.complete && type!=='relay' && slot>=0;
@@ -394,7 +407,7 @@ function draw(now){
     progress.setAttribute('aria-label',gate[4]);
     progress.value=Math.min(1,state.hold/GATE_HOLD);
   }
-  const hint=layout==='jump'?legacy[2]:layout==='platform'?(state.complete?legacy[6]:legacy[3]):
+  const hint=extra?extraWords[layout][1]:layout==='jump'?legacy[2]:layout==='platform'?(state.complete?legacy[6]:legacy[3]):
     layout==='runner'?text(15)+' '+runnerCopy[lang][1]:state?(relayHint||gateHint||(type==='roles' && players.length>1 && !state.complete?ability[4]:text(state.complete?16:type==='relay'?14:13))):'';
   if(stats!==prevStatus){$('status').textContent=stats;prevStatus=stats;}
   if(hint!==prevHint){$('hint').textContent=hint;prevHint=hint;}

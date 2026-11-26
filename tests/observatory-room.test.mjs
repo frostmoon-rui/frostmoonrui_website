@@ -17,11 +17,11 @@ test('Observatory WebSocket requests stay on the site and are isolated by mode a
  assert.equal((await handle(new Request(origin+path.replace('crew-01','a'),{headers:upgrade}),env)).status,404);
  assert.equal((await handle(new Request(origin+path,{headers:upgrade}),env)).status,200);
  assert.equal((await handle(new Request(origin+path.replace('/relay/','/runner/'),{headers:upgrade}),env)).status,200);
- for(const mode of ['jump','platform']){
+ for(const mode of ['jump','platform','gravity','tanks','brawl','comets']){
   const result=await handle(new Request(origin+path.replace('/relay/','/'+mode+'/'),{headers:upgrade}),env);
   assert.equal(result.status,200);
  }
- assert.deepEqual(keys,['relay/crew-01','runner/crew-01','jump/crew-01','platform/crew-01']);
+ assert.deepEqual(keys,['relay/crew-01','runner/crew-01','jump/crew-01','platform/crew-01','gravity/crew-01','tanks/crew-01','brawl/crew-01','comets/crew-01']);
 });
 
 test('a visible driver advances the room with one snapshot per pulse and ignores backed-up recipients',async context=>{

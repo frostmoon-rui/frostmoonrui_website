@@ -139,10 +139,10 @@
   const languages = ['zh','en','ru','ja'];
   const routeLocale = document.documentElement.dataset.locale;
   const previewText = {
-    zh: {impact:'落地', grades:['轻落','中落','重落'], fullscreen:'横屏全屏', exitFullscreen:'退出全屏', rotate:'横过手机可获得更大的操作空间', glassLocked:'玻璃的铜扣连着工坊悬锤。', copied:'已复制存档码', copyManual:'存档码已生成，可从输入框复制。', confirm:'开始新探索会清空当前进度。确定继续？', saveCode:'存档码', preview:'80 间互通星室', reset:'返回本房间入口', audio:'切换机关音效', left:'向左', right:'向右', jump:'跳跃', act:'互动'},
-    en: {impact:'Landing', grades:['Light','Medium','Heavy'], fullscreen:'Enter fullscreen', exitFullscreen:'Exit fullscreen', rotate:'Rotate your phone for more room to play', glassLocked:'The glass latch is wired to the Workshop counterweight.', copied:'Save code copied', copyManual:'Save code generated. Copy it from the field.', confirm:'Start over and clear your current exploration?', saveCode:'Save code', preview:'80 connected rooms', reset:'Return to room entrance', audio:'Toggle sound effects', left:'Left', right:'Right', jump:'Jump', act:'Interact'},
-    ru: {impact:'Удар', grades:['Лёгкий','Средний','Тяжёлый'], fullscreen:'Во весь экран', exitFullscreen:'Выйти из полноэкранного режима', rotate:'Поверните телефон для удобной игры', glassLocked:'Защёлка стекла соединена с противовесом мастерской.', copied:'Код сохранения скопирован', copyManual:'Код создан. Скопируйте его из поля.', confirm:'Начать заново и стереть текущий прогресс?', saveCode:'Код сохранения', preview:'80 связанных комнат', reset:'Вернуться ко входу в комнату', audio:'Переключить звуковые эффекты', left:'Влево', right:'Вправо', jump:'Прыжок', act:'Действие'},
-    ja: {impact:'着地', grades:['軽','中','重'], fullscreen:'全画面', exitFullscreen:'全画面を終了', rotate:'端末を横向きにすると操作しやすくなります', glassLocked:'ガラスの留め具は工房の重りにつながっています。', copied:'セーブコードをコピーしました', copyManual:'セーブコードを生成しました。入力欄からコピーできます。', confirm:'現在の進行状況を消して最初から遊びますか？', saveCode:'セーブコード', preview:'全80室', reset:'部屋の入口に戻る', audio:'効果音の切り替え', left:'左', right:'右', jump:'ジャンプ', act:'調べる'}
+    zh: {impact:'落地', grades:['轻落','中落','重落'], fullscreen:'横屏全屏', exitFullscreen:'退出全屏', rotate:'横过手机可获得更大的操作空间', glassLocked:'玻璃的铜扣连着工坊悬锤。', copied:'已复制存档码', copyManual:'存档码已生成，可从输入框复制。', confirm:'开始新探索会清空当前进度。确定继续？', saveCode:'存档码', preview:'92 间互通星室', reset:'返回本房间入口', audio:'切换机关音效', left:'向左', right:'向右', jump:'跳跃', act:'互动'},
+    en: {impact:'Landing', grades:['Light','Medium','Heavy'], fullscreen:'Enter fullscreen', exitFullscreen:'Exit fullscreen', rotate:'Rotate your phone for more room to play', glassLocked:'The glass latch is wired to the Workshop counterweight.', copied:'Save code copied', copyManual:'Save code generated. Copy it from the field.', confirm:'Start over and clear your current exploration?', saveCode:'Save code', preview:'92 connected rooms', reset:'Return to room entrance', audio:'Toggle sound effects', left:'Left', right:'Right', jump:'Jump', act:'Interact'},
+    ru: {impact:'Удар', grades:['Лёгкий','Средний','Тяжёлый'], fullscreen:'Во весь экран', exitFullscreen:'Выйти из полноэкранного режима', rotate:'Поверните телефон для удобной игры', glassLocked:'Защёлка стекла соединена с противовесом мастерской.', copied:'Код сохранения скопирован', copyManual:'Код создан. Скопируйте его из поля.', confirm:'Начать заново и стереть текущий прогресс?', saveCode:'Код сохранения', preview:'92 связанные комнаты', reset:'Вернуться ко входу в комнату', audio:'Переключить звуковые эффекты', left:'Влево', right:'Вправо', jump:'Прыжок', act:'Действие'},
+    ja: {impact:'着地', grades:['軽','中','重'], fullscreen:'全画面', exitFullscreen:'全画面を終了', rotate:'端末を横向きにすると操作しやすくなります', glassLocked:'ガラスの留め具は工房の重りにつながっています。', copied:'セーブコードをコピーしました', copyManual:'セーブコードを生成しました。入力欄からコピーできます。', confirm:'現在の進行状況を消して最初から遊びますか？', saveCode:'セーブコード', preview:'全92室', reset:'部屋の入口に戻る', audio:'効果音の切り替え', left:'左', right:'右', jump:'ジャンプ', act:'調べる'}
   };
 
   /* =========================================================
@@ -864,7 +864,8 @@
 
   const nearPoint = (x, y, dx, dy) =>
     Math.abs(P.x + P.w / 2 - x) <= dx && Math.abs(P.y + P.h / 2 - y) <= dy;
-  const beamLive = beam => roomClock % beam.period >= beam.period * .58;
+  const roomBeams = () => currentRoom.puzzle?.beams || (currentRoom.puzzle?.beam ? [currentRoom.puzzle.beam] : []);
+  const beamLive = beam => (roomClock+(beam.offset || 0)) % beam.period >= beam.period * .58;
 
   function updatePhysics(dt) {
     if (!currentRoom) return;
@@ -1004,8 +1005,7 @@
       }
     });
 
-    const beam = currentRoom.puzzle?.beam;
-    if (beam && beamLive(beam) && aabb(P, beam)) {
+    if (roomBeams().some(beam=>beamLive(beam) && aabb(P,beam))) {
       enterRoom(currentRoom.id);
       return;
     }
@@ -1124,6 +1124,51 @@
   /* =========================================================
      9. RENDERER (Celestial Observatory Glass Aesthetic)
      ========================================================= */
+  const backdrops = new Map();
+  function backdrop(theme) {
+    if(backdrops.has(theme)) return backdrops.get(theme);
+    const palettes={
+      hub:['#070c1a','#111d3a','#94b8ff'],east:['#160d19','#3a2229','#d69679'],
+      west:['#0d1227','#282249','#b59fea'],north:['#081724','#153646','#89c7e4'],
+      south:['#101824','#202b38','#94b9a7'],secret:['#160f25','#2c2041','#c6a0e9'],
+      aurora:['#071b23','#123c33','#78f2b3'],cinder:['#170c15','#42231f','#f0a26e'],
+      tide:['#071628','#153b52','#83d2ee'],
+    };
+    const [top,bottom,accent]=palettes[theme] || palettes.hub;
+    const layer=document.createElement('canvas');
+    layer.width=W;layer.height=H;
+    const paint=layer.getContext('2d');
+    const gradient=paint.createLinearGradient(0,0,0,H);
+    gradient.addColorStop(0,top);gradient.addColorStop(1,bottom);
+    paint.fillStyle=gradient;paint.fillRect(0,0,W,H);
+    paint.strokeStyle=accent;paint.fillStyle=accent;
+    paint.globalAlpha=.13;paint.lineWidth=2;
+    for(let i=0;i<7;i++){
+      paint.beginPath();
+      if(theme==='aurora'){
+        paint.moveTo(-30,154+i*24);paint.bezierCurveTo(240,-60+i*26,450,350-i*12,1010,70+i*29);
+      }else if(theme==='cinder'){
+        const x=53+i*151;
+        paint.moveTo(x,490);paint.lineTo(x,175+(i%3)*44);
+        paint.arcTo(x,146+(i%3)*44,x+30,146+(i%3)*44,24);
+        paint.lineTo(x+85,146+(i%3)*44);paint.lineTo(x+85,490);
+      }else if(theme==='tide'){
+        paint.moveTo(-30,180+i*39);
+        for(let x=0;x<=W;x+=12) paint.lineTo(x,180+i*39+22*Math.sin(x/95+i*.75));
+      }else paint.arc(W/2,H+60,140+i*48,Math.PI*1.05,Math.PI*1.95);
+      paint.stroke();
+    }
+    if(theme==='aurora' || theme==='tide'){
+      paint.globalAlpha=.055;
+      for(let i=0;i<11;i++){
+        paint.beginPath();
+        paint.ellipse((i*179)%W,89+(i*73)%390,17+(i%3)*20,31+(i%4)*11,.45,0,Math.PI*2);
+        paint.fill();
+      }
+    }
+    backdrops.set(theme,layer);
+    return layer;
+  }
   function render(now) {
     const tSec = now * 0.001;
     ctx.save();
@@ -1131,22 +1176,7 @@
       ctx.translate((Math.random() - 0.5) * shakeMag, (Math.random() - 0.5) * shakeMag);
     }
 
-    // Deep night sky gradient
-    const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#070c1a');
-    bg.addColorStop(0.55, '#0d1730');
-    bg.addColorStop(1, '#111d3a');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
-
-    // Subtle Observatory Dome Arcs in background
-    ctx.strokeStyle = 'rgba(148, 184, 255, 0.06)';
-    ctx.lineWidth = 1.5;
-    for (let r = 140; r <= 420; r += 90) {
-      ctx.beginPath();
-      ctx.arc(W / 2, H + 60, r, Math.PI * 1.05, Math.PI * 1.95);
-      ctx.stroke();
-    }
+    ctx.drawImage(backdrop(currentRoom?.theme || currentRoom?.zone || 'hub'),0,0);
 
     // Twinkling Stars
     stars.forEach(st => {
@@ -1311,8 +1341,7 @@
         ctx.textAlign = 'center';
         ctx.fillText(String(part.mark),part.x,part.y+6);
       }
-      if (puzzle.beam) {
-        const beam = puzzle.beam;
+      for (const beam of roomBeams()) {
         ctx.fillStyle = beamLive(beam) ? '#ff759c' : '#632853';
         ctx.fillRect(beam.x,beam.y,beam.w,beam.h);
       }

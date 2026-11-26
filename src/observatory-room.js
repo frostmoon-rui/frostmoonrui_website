@@ -1,6 +1,6 @@
-import {createArena, MAX_PLAYERS, TICK} from '../dist/play/astrofall/co-op/arena.mjs';
+import {createArena, getRoomCapacity, TICK} from '../dist/play/astrofall/co-op/arena.mjs';
 
-const socketPath = /^\/play\/astrofall\/co-op\/socket\/(relay|runner|jump|platform)\/([a-z0-9-]{3,24})$/;
+const socketPath = /^\/play\/astrofall\/co-op\/socket\/(relay|runner|jump|platform|gravity|tanks|brawl|comets)\/([a-z0-9-]{3,24})$/;
 
 export async function handleObservatorySocket(request, env) {
  const url = new URL(request.url);
@@ -49,7 +49,7 @@ export class ObservatoryRoom {
    this.lastTick=Date.now();
    this.remainder=0;
   }
-  if (this.arena.size>=MAX_PLAYERS) return new Response('Room full',{status:503});
+  if (this.arena.size>=getRoomCapacity(mode)) return new Response('Room full',{status:503});
   const pair=new WebSocketPair();
   const id=crypto.randomUUID();
   this.arena.join(id);

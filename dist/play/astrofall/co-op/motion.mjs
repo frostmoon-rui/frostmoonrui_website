@@ -20,7 +20,7 @@ function advance(simulation,ms,input,jump=false){
 
 export function createMotion() {
   const history=[], sent=new Map(), changes=[], remotePositions=new Map();
-  let controls={axis:0,jump:false,link:false}, queuedJump=false;
+  let controls={axis:0,vertical:0,jump:false,link:false,act:false}, queuedJump=false;
   let prediction=null, predictedAt=0, local=null, lastFrame=0, remoteAt=null;
   let offsetX=0, offsetY=0, oneWay=0, ack=0, delay=BASE_DELAY;
 
@@ -48,7 +48,7 @@ export function createMotion() {
   }
 
   function control(next,now) {
-    if (next.axis===controls.axis && next.jump===controls.jump && next.link===controls.link) return;
+    if (next.axis===controls.axis && next.jump===controls.jump && next.link===controls.link && next.vertical===controls.vertical && next.act===controls.act) return;
     const jump=next.jump && !controls.jump;
     queuedJump ||= jump;
     controls=next;

@@ -27,11 +27,11 @@ function walkThrough(game,to) {
   assert.equal(game.state.roomId,to,from+' → '+to);
 }
 
-test('the 80-room map has 11 forked sectors and no orphaned or duplicated rooms',()=>{
+test('the 92-room map includes the 11 forked sectors and 12 expedition rooms and no orphaned or duplicated rooms',()=>{
   const {rooms}=loadGame();
   const roomsList=Object.values(rooms);
-  assert.equal(roomsList.length,80);
-  assert.equal(new Set(roomsList.map(room=>room.gx+':'+room.gy)).size,80);
+  assert.equal(roomsList.length,92);
+  assert.equal(new Set(roomsList.map(room=>room.gx+':'+room.gy)).size,92);
   const explored=new Set(), pending=['H0'];
   while(pending.length){
     const id=pending.pop();
@@ -45,9 +45,9 @@ test('the 80-room map has 11 forked sectors and no orphaned or duplicated rooms'
     }
     if(id==='H1') pending.push('H2');
   }
-  assert.equal(explored.size,80);
+  assert.equal(explored.size,92);
   assert.equal(roomsList.filter(room=>room.seal).length,11);
-  assert.equal(new Set(roomsList.filter(room=>room.puzzle).map(room=>room.puzzle.kind)).size,8);
+  assert.equal(new Set(roomsList.filter(room=>room.puzzle).map(room=>room.puzzle.kind)).size,9);
   for(const room of roomsList) for(const locale of ['zh','en','ru','ja']) assert.ok(room.name[locale],room.id);
 });
 
@@ -61,7 +61,7 @@ test('every new circuit can be solved from its room entrance using movement and 
   }
 });
 
-test('both branches replay in all eleven sectors and all 80 rooms contribute to the hidden ending',()=>{
+test('the original eleven sectors and ending are still solvable',()=>{
   const game=loadGame();
   game.start();
   for(let sector=1;sector<=11;sector++){
@@ -126,4 +126,27 @@ test('the Mirror gate names unfinished branches and opens after both are solved'
   solve(game,'A4-2');
   walkThrough(game,'A4-4');
   walkThrough(game,'A4-5');
+});
+
+test('the conservatory circuit is reachable with ordinary jumps and the exit advances the expedition',()=>{
+  const game=loadGame();
+  game.start();
+  game.enter('B1-1');
+  const center=()=>game.player.x+game.player.w/2;
+  function walk(x){
+    for(let i=0;i<600&&Math.abs(center()-x)>3;i++) game.step(Math.sign(x-center()));
+  }
+  for(const [target,top,start] of [[267,437,199],[694,435,612],[490,424,567]]){
+    walk(start);
+    game.step(0,true);
+    for(let tick=0;tick<100;tick++){
+      const direction=game.player.y+game.player.h<top+2 && Math.abs(center()-target)>3?
+        Math.sign(target-center()):0;
+      game.step(direction);
+      if(Math.abs(center()-target)<8 && game.player.onGround) break;
+    }
+    game.step(0,false,true);
+  }
+  assert.ok(game.state.puzzles.includes('B1-1'));
+  walkThrough(game,'B1-2');
 });

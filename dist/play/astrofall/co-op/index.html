@@ -12,7 +12,7 @@
   </header>
   <form id="lobby">
     <label><span id="room-label">Room code</span><input id="room" pattern="[a-z0-9\-]{3,24}" maxlength="24" value="starlight" required autocomplete="off"></label>
-    <label><span id="mode-label">Mode</span><select id="mode"><option value="relay">Constellation Relay</option><option value="runner">Endless Run</option><option value="jump">Jump Race</option><option value="platform">Platform Co-op</option></select></label>
+    <label><span id="mode-label">Mode</span><select id="mode"><option value="relay">Constellation Relay</option><option value="runner">Endless Run</option><option value="jump">Jump Race</option><option value="platform">Platform Co-op</option><option value="gravity">Opposite Orbits</option><option value="tanks">Ricochet Garage</option><option value="brawl">Bell Tower Brawl</option><option value="comets">Comet Circuit</option></select></label>
     <button id="join">Join</button><button id="invite" type="button" hidden>Copy invite</button>
   </form>
   <nav id="legacy-games" aria-label="Classic single-player games">
@@ -30,7 +30,7 @@
     <progress id="gate-progress" max="1" hidden></progress>
     <p id="ability" role="status"></p>
     <div id="controls">
-      <div><button data-input="left" aria-label="Left">◀</button><button data-input="right" aria-label="Right">▶</button></div>
+      <div><button data-input="left" aria-label="Left">◀</button><button data-input="right" aria-label="Right">▶</button><button data-input="up" aria-label="Up">▲</button><button data-input="down" aria-label="Down">▼</button></div>
       <div><button data-input="link" id="touch-link" aria-pressed="false">Link</button><button data-input="act" id="touch-act">Act</button><button data-input="jump" aria-label="Jump">▲</button></div>
     </div>
   </section>

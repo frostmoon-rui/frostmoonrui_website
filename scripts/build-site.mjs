@@ -30,7 +30,7 @@ const coOpShell=read('dist/play/astrofall/co-op/index.html');
 const legacyCourse=read('dist/assets/legacy-platform-levels.js').split('const storageKey=')[0];
 write('play/astrofall/co-op/legacy-platform-levels.mjs',legacyCourse.trimEnd()+'\n');
 const coOpHash=createHash('sha256');
-for(const file of ['client.mjs','motion.mjs','arena.mjs','style.css','legacy-arena.mjs','legacy-render.mjs','legacy-platform-levels.mjs']){
+for(const file of ['client.mjs','motion.mjs','arena.mjs','style.css','legacy-arena.mjs','legacy-render.mjs','legacy-platform-levels.mjs','expansion-arena.mjs','expansion-maps.mjs','expansion-render.mjs']){
  coOpHash.update(read('dist/play/astrofall/co-op/'+file).replace(/\r\n/g,'\n'));
 }
 const coOpRevision=coOpHash.digest('hex').slice(0,12);
@@ -47,10 +47,10 @@ const localeRuntime={window:{}};
 runInNewContext(read(gameAssetRoot+'exploration/labels.js'),localeRuntime);
 const gameLabels=localeRuntime.window.ObservatoryLabels;
 const gameDescriptions={
- zh:'探索 80 间互通星室，也可以与伙伴体验星座接力和无限跑酷。',
- en:'Explore 80 connected rooms or play Constellation Relay and Endless Run with friends.',
- ru:'Исследуйте 80 связанных комнат или сыграйте с друзьями в эстафету и бесконечный забег.',
- ja:'80室を探索し、仲間と星座リレーやエンドレスランに挑もう。',
+ zh:'探索 92 间互通星室，也可以体验重力合作、坦克和多人竞速。',
+ en:'Explore 92 connected rooms or play gravity co-op, tanks, and races with friends.',
+ ru:'Исследуйте 92 комнаты или сыграйте с друзьями в гонки, танки и задачи с гравитацией.',
+ ja:'92室を探索し、仲間と重力パズルや戦車対戦、レースで遊ぼう。',
 };
 const revisionHash=createHash('sha256');
 for(const text of [gameShell,gameWorker,JSON.stringify(gameManifest),JSON.stringify(gameDescriptions)]){

@@ -1,7 +1,7 @@
 {
   "name": "Astrofall Observatory",
   "short_name": "Astrofall Observatory",
-  "description": "Explore 80 connected rooms or play Constellation Relay and Endless Run with friends.",
+  "description": "Explore 92 connected rooms or play gravity co-op, tanks, and races with friends.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",
@@ -15,19 +15,19 @@
   ],
   "icons": [
     {
-      "src": "/assets/night-observatory/icons/icon-192.png?v=430220fed96c",
+      "src": "/assets/night-observatory/icons/icon-192.png?v=b33095d012ce",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/night-observatory/icons/icon-512.png?v=430220fed96c",
+      "src": "/assets/night-observatory/icons/icon-512.png?v=b33095d012ce",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/night-observatory/icons/icon-512.png?v=430220fed96c",
+      "src": "/assets/night-observatory/icons/icon-512.png?v=b33095d012ce",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
