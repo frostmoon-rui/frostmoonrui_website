@@ -48,3 +48,16 @@ test('a visible driver advances the room with one snapshot per pulse and ignores
  assert.ok(snapshots[11].players[0].x>170);
  assert.equal(blocked.length,0);
 });
+
+test('co-op pages and module requests bypass stale validators',async ()=>{
+ for(const route of ['/zh/play/astrofall/co-op/','/play/astrofall/co-op/arena.mjs']){
+  const req=new Request(origin+route,{headers:{'If-None-Match':'"old"','If-Modified-Since':'Wed, 25 Nov 2026 00:00:00 GMT'}});
+  const response=await handle(req,{ASSETS:{fetch(asset){
+   assert.equal(asset.headers.get('If-None-Match'),null);
+   assert.equal(asset.headers.get('If-Modified-Since'),null);
+   return new Response('current',{headers:{'Cache-Control':'public, max-age=3600'}});
+  }}});
+  assert.equal(response.headers.get('Cache-Control'),'no-store');
+  assert.equal(response.headers.get('Cloudflare-CDN-Cache-Control'),'no-store');
+ }
+});

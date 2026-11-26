@@ -47,3 +47,5 @@ button[aria-pressed="true"],#touch-act.ready{background:#27605a;border-color:#91
 #ability{margin:.25rem .9rem .55rem;color:#91efd1;font-size:.85rem}
 #ability:empty{display:none}
 @media(pointer:coarse){#link-toggle{display:none}}
+
+#gate-progress:not([hidden]){display:block;width:calc(100% - 1.8rem);height:.5rem;margin:0 .9rem .5rem;accent-color:#91efd1}

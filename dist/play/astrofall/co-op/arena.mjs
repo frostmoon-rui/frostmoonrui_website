@@ -4,6 +4,7 @@ export const MAX_PLAYERS = 6;
 export const HEIGHT = 540;
 export const SPAN = 840;
 export const TICK = 1 / 30;
+export const GATE_HOLD = .65;
 const GROUND = 476;
 const WIDTH = 26;
 const BODY = 34;
@@ -162,6 +163,9 @@ export function createArena(mode, resume = {}) {
     }
     p.best=Math.max(p.best,Math.round(p.x));
   }
+  function needsLink(party){
+    return COURSE[checkpoint].gate==='roles' && new Set(party.map(p=>p.role)).size>1;
+  }
   function advanceGate(party,dt) {
     if (complete || !party.length) return;
     const type=COURSE[checkpoint].gate;
@@ -185,9 +189,8 @@ export function createArena(mode, resume = {}) {
       }
       if (relayStep < party.length) return;
     } else {
-      const requiresLink=type==='roles' && new Set(party.map(p=>p.role)).size>1;
-      hold=right.every(Boolean) && (!requiresLink || party.every(p=>p.input.link)) ? hold+dt : 0;
-      if (hold < .65) return;
+      hold=right.every(Boolean) && (!needsLink(party) || party.every(p=>p.input.link)) ? hold+dt : 0;
+      if (hold < GATE_HOLD) return;
     }
     hold=0; relayStep=0; relayTime=0;
     if (checkpoint===LENGTH-1) complete=true;
@@ -217,7 +220,7 @@ export function createArena(mode, resume = {}) {
     const party=[...players.values()];
     const relayStations=mode==='relay' ?
       gatePads(checkpoint,players.size).map((plate,i)=>groundedOn(party[i],plate)) : undefined;
-    return {mode,clock,checkpoint,hold,relayStep,relayTime,complete,relayStations,bridge:bridgeActive(checkpoint,party),
+    return {mode,clock,checkpoint,hold,relayStep,relayTime,complete,relayStations,linkGate:mode==='relay' && needsLink(party),bridge:bridgeActive(checkpoint,party),
       players:party.map(player=>{
         const {id,role,x,y,vx,vy,ground,coyote,buffer,cooldown,runCheckpoint,best,spawnId,respawnAt,input,ack,heldJump}=player;
         return {id,role,x,y,vx,vy,ground,coyote,buffer,cooldown,runCheckpoint,best,spawnId,respawnAt,

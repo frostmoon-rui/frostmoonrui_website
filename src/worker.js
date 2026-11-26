@@ -57,7 +57,8 @@ export async function handle(request,env,fetcher=fetch){
   return Response.redirect(url,308);
  }
  const localized=localizedAsset(request);
- const fresh=publishedData.has(url.pathname)||resourcesPage.test(url.pathname);
+ const coOpAsset=/^\/(?:zh\/|en\/|ru\/|ja\/)?play\/astrofall\/co-op(?:\/|$)/.test(url.pathname);
+ const fresh=coOpAsset||publishedData.has(url.pathname)||resourcesPage.test(url.pathname);
  let assetRequest=localized?new Request(localized,request):request;
  if(fresh){
   const headers=new Headers(assetRequest.headers);

@@ -1,4 +1,4 @@
-import {cacheSegments, gatePads, SPAN, LENGTH} from './arena.mjs';
+import {cacheSegments, gatePads, SPAN, LENGTH, GATE_HOLD} from './arena.mjs';
 import {createMotion} from './motion.mjs';
 import {LEGACY_MODES} from './legacy-arena.mjs';
 import {drawLegacy,LEGACY_LEVELS} from './legacy-render.mjs';
@@ -64,6 +64,12 @@ const abilityCopy={
   zh:['已开启合体，等待附近队友','已合体，现在跳跃可增高','光桥已开启','合体需要另一名玩家','各自站上编号站，再一起保持合体。'],
   ru:['Связь включена, ожидаем партнёра рядом','Связь установлена. Прыжок усилен.','Световой мост открыт','Для связи нужен партнёр','Займите свои площадки и включите связь вместе.'],
   ja:['連携オン。近くの仲間を待っています。','連携成立。ジャンプが高くなります。','光の橋が開きました。','連携には仲間が必要です。','番号の台に立ち、一緒に連携してください。'],
+};
+const gateCopy={
+  en:['Go to station {n}.','Waiting for stations {n}.','Enable Link here with E or the Link button.','Waiting for Link from player {n}.','Opening gate'],
+  zh:['请站上自己的 {n} 号站。','等 {n} 号站就位。','你已就位，按住 E 或点「合体」。','等 {n} 号开启合体。','正在开门'],
+  ru:['Встаньте на площадку {n}.','Ожидаем площадки {n}.','Удерживайте E или нажмите «Связь».','Ожидаем связь от игроков {n}.','Ворота открываются'],
+  ja:['自分の {n} 番の台に立ちます。','{n} 番の台を待っています。','Eを押し続けるか「連携」を押します。','{n} 番の連携を待っています。','ゲートを開いています'],
 };
 const requestedLocale=params.get('lang') || document.documentElement.dataset.locale;
 let lang=Object.hasOwn(copy,requestedLocale)?requestedLocale:'en';
@@ -320,8 +326,9 @@ function draw(now){
       for(const [i,plate] of gatePads(n,players.length).entries()){
         const relay=course.gate==='relay';
         const done=relay && i<state.relayStep;
-        const ready=relay && i===state.relayStep && state.relayStations?.[i];
-        const color=done||ready?'#91efd1':colors[i];
+        const occupied=state.relayStations?.[i];
+        const ready=occupied && (relay ? i===state.relayStep : !state.linkGate || players[i]?.link);
+        const color=done||ready?'#91efd1':occupied && !relay?'#f1c67e':colors[i];
         ctx.fillStyle=color;ctx.fillRect(plate.x,plate.y-3,plate.w,4);
         if(ready){ctx.fillStyle='#91efd133';ctx.fillRect(plate.x,plate.y-63,plate.w,60);}
         ctx.strokeStyle=color;ctx.strokeRect(plate.x,plate.y-63,plate.w,60);
@@ -333,7 +340,7 @@ function draw(now){
   }
   for(const [index,p] of players.entries()){
     if(p.respawnAt!=null || p.x < camera-60 || p.x > camera+1020) continue;
-    if(layout==='runner' && p.id===id){
+    if(p.id===id){
       ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(p.x-3,p.y-3,32,40,10);ctx.stroke();
     }
     if(p.link){ctx.strokeStyle=p.linked?'#75f5c8':p.role?'#ad9dff':'#c0eade';ctx.beginPath();ctx.arc(p.x+13,p.y+17,25,0,Math.PI*2);ctx.stroke();}
@@ -371,8 +378,24 @@ function draw(now){
   const linkText=linkHeld() && me && layout!=='jump' ?
     ability[players.length<2?3:me.linked?1:state.bridge?2:0] : '';
   if($('ability').textContent!==linkText) $('ability').textContent=linkText;
+  const isHoldGate=layout==='relay' && state && !state.complete && type!=='relay' && slot>=0;
+  const gate=gateCopy[lang];
+  let gateHint='';
+  if(isHoldGate && state.relayStations){
+    const missing=players.flatMap((p,i)=>state.relayStations[i]?[]:[i+1]);
+    const noLink=state.linkGate ? players.flatMap((p,i)=>p.link?[]:[i+1]) : [];
+    const [label,number]=missing.includes(slot+1)?[0,slot+1]:missing.length?[1,missing.join(', ')]:
+      noLink.includes(slot+1)?[2,'']:noLink.length?[3,noLink.join(', ')]:[4,''];
+    gateHint=gate[label].replace('{n}',String(number));
+  }
+  const progress=$('gate-progress');
+  progress.hidden=!isHoldGate || !state.hold;
+  if(!progress.hidden){
+    progress.setAttribute('aria-label',gate[4]);
+    progress.value=Math.min(1,state.hold/GATE_HOLD);
+  }
   const hint=layout==='jump'?legacy[2]:layout==='platform'?(state.complete?legacy[6]:legacy[3]):
-    layout==='runner'?text(15)+' '+runnerCopy[lang][1]:state?(relayHint||(type==='roles' && players.length>1 && !state.complete?ability[4]:text(state.complete?16:type==='relay'?14:13))):'';
+    layout==='runner'?text(15)+' '+runnerCopy[lang][1]:state?(relayHint||gateHint||(type==='roles' && players.length>1 && !state.complete?ability[4]:text(state.complete?16:type==='relay'?14:13))):'';
   if(stats!==prevStatus){$('status').textContent=stats;prevStatus=stats;}
   if(hint!==prevHint){$('hint').textContent=hint;prevHint=hint;}
 }
